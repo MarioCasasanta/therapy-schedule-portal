@@ -26,6 +26,11 @@ const DomainInfo = () => {
                 </li>
                 <li>
                   <code className="block bg-white p-3 rounded border border-gray-200 text-lg select-all">
+                    https://www.alemdoapego.com.br/terms-of-service
+                  </code>
+                </li>
+                <li>
+                  <code className="block bg-white p-3 rounded border border-gray-200 text-lg select-all">
                     https://www.alemdoapego.com.br/auth
                   </code>
                 </li>
