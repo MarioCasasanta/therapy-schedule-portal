@@ -1,21 +1,31 @@
 
-import { BadgeCheck } from "lucide-react";
+import { Brain, Heart, Clock, Battery, Users } from "lucide-react";
 
 const services = [
   {
-    title: "Psicoterapia Individual",
-    description: "Sessões personalizadas para auxiliar no seu desenvolvimento pessoal e bem-estar emocional.",
-    features: ["Ambiente acolhedor", "Abordagem personalizada", "Horários flexíveis"]
+    title: "Depressão",
+    description: "Tristeza profunda, falta de interesse e sensação de vazio? Vamos ressignificar essas emoções e te devolver o bem-estar.",
+    icon: Brain
   },
   {
-    title: "Terapia de Casal",
-    description: "Fortalecendo relacionamentos através do diálogo e compreensão mútua.",
-    features: ["Mediação especializada", "Exercícios práticos", "Desenvolvimento conjunto"]
+    title: "Ansiedade",
+    description: "Medos e preocupações constantes? Juntos, vamos quebrar os ciclos negativos e te ensinar a lidar com esses sentimentos.",
+    icon: Heart
   },
   {
-    title: "Constelação Familiar",
-    description: "Compreenda e transforme padrões familiares através desta abordagem sistêmica.",
-    features: ["Abordagem sistêmica", "Resolução de conflitos", "Cura transgeracional"]
+    title: "Procrastinação",
+    description: "Cansado de não conseguir agir? Vamos identificar os bloqueios e te dar ferramentas para voltar ao controle da sua vida.",
+    icon: Clock
+  },
+  {
+    title: "Burnout",
+    description: "Exaustão e sobrecarga? Chegou a hora de equilibrar sua vida e lidar com o estresse de forma eficaz.",
+    icon: Battery
+  },
+  {
+    title: "Conflitos familiares",
+    description: "Mágoas e desconexão? Vamos restaurar o diálogo e fortalecer os laços familiares com respeito.",
+    icon: Users
   }
 ];
 
@@ -25,27 +35,25 @@ const ServicesSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-playfair font-semibold text-accent mb-4">
-            Nossos Serviços
+            Está passando por algum desses desafios?
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Oferecemos uma variedade de serviços terapêuticos para atender suas necessidades específicas
+            Eu posso te ajudar, independentemente do seu desafio
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
             <div key={index} className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <service.icon className="w-10 h-10 text-sage-500 mb-4" />
               <h3 className="text-xl font-semibold mb-4 text-sage-700">{service.title}</h3>
-              <p className="text-gray-600 mb-6">{service.description}</p>
-              <ul className="space-y-3">
-                {service.features.map((feature, fIndex) => (
-                  <li key={fIndex} className="flex items-center text-gray-600">
-                    <BadgeCheck className="w-5 h-5 text-sage-500 mr-2" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-gray-600">{service.description}</p>
             </div>
           ))}
+        </div>
+        <div className="text-center mt-12">
+          <button className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1">
+            Quero superar meus desafios
+          </button>
         </div>
       </div>
     </section>

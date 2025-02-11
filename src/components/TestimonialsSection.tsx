@@ -4,20 +4,20 @@ import { Star } from "lucide-react";
 const testimonials = [
   {
     name: "Maria Silva",
-    text: "A terapia mudou completamente minha perspectiva sobre a vida. Me sinto mais forte e preparada para enfrentar desafios.",
-    role: "Cliente há 1 ano",
+    text: "O método do Mario me ajudou a superar a ansiedade que me paralisava. Logo na primeira sessão já senti a diferença!",
+    role: "Cliente há 2 meses",
     rating: 5
   },
   {
     name: "João Santos",
-    text: "O ambiente acolhedor e a abordagem profissional me ajudaram a superar um momento muito difícil da minha vida.",
-    role: "Cliente há 6 meses",
+    text: "Finalmente consegui entender os padrões que me impediam de progredir. A abordagem é única e os resultados são reais.",
+    role: "Cliente há 3 meses",
     rating: 5
   },
   {
     name: "Ana Costa",
-    text: "As sessões de terapia têm sido fundamentais para meu desenvolvimento pessoal e profissional.",
-    role: "Cliente há 2 anos",
+    text: "As sessões mudaram minha vida. O Mario tem um dom especial para nos ajudar a ver as coisas de uma nova perspectiva.",
+    role: "Cliente há 1 mês",
     rating: 5
   }
 ];
