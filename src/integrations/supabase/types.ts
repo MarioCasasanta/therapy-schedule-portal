@@ -342,8 +342,10 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          name: string | null
           phone: string | null
           preferences: Json | null
+          role: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -351,8 +353,10 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          name?: string | null
           phone?: string | null
           preferences?: Json | null
+          role?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -360,8 +364,10 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          name?: string | null
           phone?: string | null
           preferences?: Json | null
+          role?: string | null
         }
         Relationships: []
       }
