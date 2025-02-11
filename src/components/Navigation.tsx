@@ -18,16 +18,28 @@ const Navigation = () => {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#services" className="text-sage-600 hover:text-sage-800 transition-colors">
+            <a href="#" className="text-sage-600 hover:text-sage-800 transition-colors" onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#services')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               Serviços
             </a>
-            <a href="#about" className="text-sage-600 hover:text-sage-800 transition-colors">
+            <a href="#" className="text-sage-600 hover:text-sage-800 transition-colors" onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               Sobre
             </a>
-            <a href="#testimonials" className="text-sage-600 hover:text-sage-800 transition-colors">
+            <a href="#" className="text-sage-600 hover:text-sage-800 transition-colors" onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#testimonials')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               Depoimentos
             </a>
-            <a href="#contact" className="text-sage-600 hover:text-sage-800 transition-colors">
+            <a href="#" className="text-sage-600 hover:text-sage-800 transition-colors" onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               Contato
             </a>
             <Link 
@@ -55,30 +67,46 @@ const Navigation = () => {
         <div className="md:hidden bg-white border-b border-gray-100">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <a
-              href="#services"
+              href="#"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#services')?.scrollIntoView({ behavior: 'smooth' });
+                setIsOpen(false);
+              }}
             >
               Serviços
             </a>
             <a
-              href="#about"
+              href="#"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
+                setIsOpen(false);
+              }}
             >
               Sobre
             </a>
             <a
-              href="#testimonials"
+              href="#"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#testimonials')?.scrollIntoView({ behavior: 'smooth' });
+                setIsOpen(false);
+              }}
             >
               Depoimentos
             </a>
             <a
-              href="#contact"
+              href="#"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+                setIsOpen(false);
+              }}
             >
               Contato
             </a>
