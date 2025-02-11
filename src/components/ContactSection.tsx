@@ -33,8 +33,8 @@ const ContactSection = () => {
             Agende sua sessão agora mesmo!
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Transformação começa aqui! Não adie mais a sua felicidade.
-            Clique abaixo e agende sua sessão. Estamos juntos nessa jornada.
+            A transformação começa aqui! Não adie mais a sua felicidade.
+            Entre em contato e vamos começar sua jornada de mudança.
           </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -49,7 +49,7 @@ const ContactSection = () => {
             <div className="flex items-start space-x-4">
               <Mail className="w-6 h-6 text-sage-500 mt-1" />
               <div>
-                <h3 className="font-semibold text-lg mb-1">Email</h3>
+                <h3 className="font-semibold text-lg mb-1">E-mail</h3>
                 <p className="text-gray-600">mario@psicanalise.com</p>
               </div>
             </div>
@@ -75,21 +75,23 @@ const ContactSection = () => {
           <form className="space-y-6 bg-white p-8 rounded-lg shadow-md">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Nome
+                Nome completo
               </label>
               <input
                 type="text"
                 id="name"
+                placeholder="Digite seu nome completo"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
               />
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                E-mail
               </label>
               <input
                 type="email"
                 id="email"
+                placeholder="Digite seu melhor e-mail"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
               />
             </div>
@@ -100,6 +102,7 @@ const ContactSection = () => {
               <input
                 type="tel"
                 id="phone"
+                placeholder="(00) 00000-0000"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
               />
             </div>
@@ -110,6 +113,7 @@ const ContactSection = () => {
               <textarea
                 id="message"
                 rows={4}
+                placeholder="Conte um pouco sobre o que está te trazendo aqui..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
               ></textarea>
             </div>
@@ -117,7 +121,7 @@ const ContactSection = () => {
               type="submit"
               className="w-full bg-sage-500 text-white px-6 py-3 rounded-md hover:bg-sage-600 transition-colors"
             >
-              Agendar Sessão
+              Agendar Minha Sessão
             </button>
           </form>
         </div>
