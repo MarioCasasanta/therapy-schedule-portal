@@ -19,7 +19,7 @@ const Documentation = () => {
     {
       title: "Fase 2 - Landing Page e Agendamentos",
       tasks: [
-        { task: "Criar layout responsivo para Landing Page", completed: false },
+        { task: "Criar layout responsivo para Landing Page", completed: true },
         { task: "Implementar CTA com agendamento", completed: false },
         { task: "Integração com Google Agenda", completed: false },
       ]
@@ -51,7 +51,7 @@ const Documentation = () => {
     {
       title: "Fase 6 - Deploy e Manutenção",
       tasks: [
-        { task: "Configurar deploy", completed: false },
+        { task: "Configurar deploy", completed: true },
         { task: "Monitoramento e otimização", completed: false },
         { task: "Melhorias baseadas no feedback inicial", completed: false },
       ]
