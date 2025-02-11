@@ -311,6 +311,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pagamentos: {
+        Row: {
+          cliente_id: string | null
+          created_at: string
+          data_pagamento: string | null
+          id: string
+          metodo_pagamento: string | null
+          sessao_id: string | null
+          status: string | null
+          valor: number
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          id?: string
+          metodo_pagamento?: string | null
+          sessao_id?: string | null
+          status?: string | null
+          valor: number
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string
+          data_pagamento?: string | null
+          id?: string
+          metodo_pagamento?: string | null
+          sessao_id?: string | null
+          status?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagamentos_sessao_id_fkey"
+            columns: ["sessao_id"]
+            isOneToOne: false
+            referencedRelation: "sessoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page_content: {
         Row: {
           content: Json
@@ -339,6 +387,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          data_nascimento: string | null
           email: string | null
           full_name: string | null
           id: string
@@ -346,10 +395,13 @@ export type Database = {
           phone: string | null
           preferences: Json | null
           role: string | null
+          telefone: string | null
+          tipo_usuario: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          data_nascimento?: string | null
           email?: string | null
           full_name?: string | null
           id: string
@@ -357,10 +409,13 @@ export type Database = {
           phone?: string | null
           preferences?: Json | null
           role?: string | null
+          telefone?: string | null
+          tipo_usuario?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          data_nascimento?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -368,6 +423,8 @@ export type Database = {
           phone?: string | null
           preferences?: Json | null
           role?: string | null
+          telefone?: string | null
+          tipo_usuario?: string | null
         }
         Relationships: []
       }
@@ -427,6 +484,50 @@ export type Database = {
           {
             foreignKeyName: "questionnaire_responses_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessoes: {
+        Row: {
+          cliente_id: string | null
+          created_at: string
+          data_hora: string
+          google_event_id: string | null
+          id: string
+          notas: string | null
+          status: string | null
+          tipo_sessao: string
+          updated_at: string
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string
+          data_hora: string
+          google_event_id?: string | null
+          id?: string
+          notas?: string | null
+          status?: string | null
+          tipo_sessao: string
+          updated_at?: string
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string
+          data_hora?: string
+          google_event_id?: string | null
+          id?: string
+          notas?: string | null
+          status?: string | null
+          tipo_sessao?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessoes_cliente_id_fkey"
+            columns: ["cliente_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

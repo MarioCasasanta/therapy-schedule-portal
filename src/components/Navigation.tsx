@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,26 +11,31 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex-shrink-0 flex items-center">
-            <h1 className="text-xl font-playfair font-semibold text-sage-600">Tranquil Mind</h1>
+            <Link to="/" className="text-xl font-playfair font-semibold text-sage-600">
+              Tranquil Mind
+            </Link>
           </div>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <a href="#services" className="text-sage-600 hover:text-sage-800 transition-colors">
-              Services
+              Serviços
             </a>
             <a href="#about" className="text-sage-600 hover:text-sage-800 transition-colors">
-              About
+              Sobre
             </a>
             <a href="#testimonials" className="text-sage-600 hover:text-sage-800 transition-colors">
-              Testimonials
+              Depoimentos
             </a>
             <a href="#contact" className="text-sage-600 hover:text-sage-800 transition-colors">
-              Contact
+              Contato
             </a>
-            <button className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors">
-              Schedule Now
-            </button>
+            <Link 
+              to="/auth" 
+              className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+            >
+              Agendar Agora
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -53,32 +59,36 @@ const Navigation = () => {
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Services
+              Serviços
             </a>
             <a
               href="#about"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              About
+              Sobre
             </a>
             <a
               href="#testimonials"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Testimonials
+              Depoimentos
             </a>
             <a
               href="#contact"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Contact
+              Contato
             </a>
-            <button className="w-full text-center bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors">
-              Schedule Now
-            </button>
+            <Link
+              to="/auth"
+              className="block text-center bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              Agendar Agora
+            </Link>
           </div>
         </div>
       )}
