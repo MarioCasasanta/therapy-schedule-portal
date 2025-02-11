@@ -168,6 +168,30 @@ export type Database = {
         }
         Relationships: []
       }
+      configuracoes_site: {
+        Row: {
+          conteudo: string
+          created_at: string
+          id: string
+          secao: string
+          updated_at: string
+        }
+        Insert: {
+          conteudo: string
+          created_at?: string
+          id?: string
+          secao: string
+          updated_at?: string
+        }
+        Update: {
+          conteudo?: string
+          created_at?: string
+          id?: string
+          secao?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       daily_audios: {
         Row: {
           audio_url: string
