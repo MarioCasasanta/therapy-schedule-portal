@@ -26,7 +26,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#7C9082",
+          DEFAULT: "#8257E5",
           foreground: "#ffffff",
         },
         secondary: {
@@ -34,16 +34,16 @@ export default {
           foreground: "#2C3639",
         },
         sage: {
-          50: "#f2f5f3",
-          100: "#e6ebe7",
-          200: "#ccd7cf",
-          300: "#b3c3b7",
-          400: "#99af9f",
-          500: "#7C9082",
-          600: "#647368",
-          700: "#4b564e",
-          800: "#323a34",
-          900: "#191d1a",
+          50: "#f6f4ff",
+          100: "#ede9ff",
+          200: "#dbd2ff",
+          300: "#c1b0ff",
+          400: "#a584ff",
+          500: "#8257E5",
+          600: "#7645d9",
+          700: "#6235bd",
+          800: "#512b96",
+          900: "#432679",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -54,7 +54,7 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#2C3639",
+          DEFAULT: "#8257E5",
           foreground: "#ffffff",
         },
         popover: {

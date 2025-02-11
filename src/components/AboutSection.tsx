@@ -38,8 +38,8 @@ const AboutSection = () => {
           <div className="relative h-[400px] rounded-lg overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-sage-500/20 to-sage-500/10" />
             <img
-              src="/placeholder.svg"
-              alt="Mario Casasanta Neto"
+              src="/photo-1721322800607-8c38375eef04"
+              alt="Ambiente acolhedor para terapia"
               className="w-full h-full object-cover"
             />
           </div>

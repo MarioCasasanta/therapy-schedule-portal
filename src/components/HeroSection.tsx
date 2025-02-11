@@ -13,7 +13,7 @@ const HeroSection = () => {
             </span>
           </div>
           <h1 className="animate-fadeIn [animation-delay:400ms] text-4xl md:text-6xl font-playfair font-semibold text-accent mb-6">
-            Transforme sua VIDA em terapia rápida e eficaz!
+            Além do Apego: Transforme sua vida através da terapia!
           </h1>
           <p className="animate-fadeIn [animation-delay:600ms] text-lg md:text-xl text-gray-600 mb-4">
             Sofrendo com traumas, ansiedade, depressão ou conflitos pessoais?

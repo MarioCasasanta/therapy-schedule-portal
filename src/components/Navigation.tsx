@@ -12,7 +12,7 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="text-xl font-playfair font-semibold text-sage-600">
-              Tranquil Mind
+              Além do Apego
             </Link>
           </div>
           
