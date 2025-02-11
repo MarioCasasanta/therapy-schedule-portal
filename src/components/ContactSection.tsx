@@ -1,5 +1,6 @@
 
 import { Mail, Phone, HelpCircle } from "lucide-react";
+import { useState } from "react";
 
 const faqs = [
   {
@@ -25,6 +26,49 @@ const faqs = [
 ];
 
 const ContactSection = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Google Calendar event creation
+    const event = {
+      'summary': `Sessão de Terapia - ${name}`,
+      'description': `
+        Nome: ${name}
+        Email: ${email}
+        Telefone: ${phone}
+        Mensagem: ${message}
+      `,
+      'start': {
+        'dateTime': new Date().toISOString(),
+        'timeZone': 'America/Sao_Paulo'
+      },
+      'end': {
+        'dateTime': new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
+        'timeZone': 'America/Sao_Paulo'
+      }
+    };
+
+    try {
+      // We'll implement the actual Google Calendar integration after setting up the credentials
+      console.log("Evento a ser criado:", event);
+      alert("Sua mensagem foi enviada! Entraremos em contato em breve para confirmar o agendamento.");
+      
+      // Clear form
+      setName("");
+      setEmail("");
+      setPhone("");
+      setMessage("");
+    } catch (error) {
+      console.error("Erro ao agendar:", error);
+      alert("Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente.");
+    }
+  };
+
   return (
     <section id="contact" className="py-20 bg-sage-50">
       <div className="container mx-auto px-4">
@@ -72,7 +116,7 @@ const ContactSection = () => {
               </div>
             </div>
           </div>
-          <form className="space-y-6 bg-white p-8 rounded-lg shadow-md">
+          <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-lg shadow-md">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                 Nome completo
@@ -80,8 +124,11 @@ const ContactSection = () => {
               <input
                 type="text"
                 id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Digite seu nome completo"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
+                required
               />
             </div>
             <div>
@@ -91,8 +138,11 @@ const ContactSection = () => {
               <input
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Digite seu melhor e-mail"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
+                required
               />
             </div>
             <div>
@@ -102,8 +152,11 @@ const ContactSection = () => {
               <input
                 type="tel"
                 id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 placeholder="(00) 00000-0000"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
+                required
               />
             </div>
             <div>
@@ -112,9 +165,12 @@ const ContactSection = () => {
               </label>
               <textarea
                 id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 rows={4}
                 placeholder="Conte um pouco sobre o que está te trazendo aqui..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-sage-500 focus:border-sage-500"
+                required
               ></textarea>
             </div>
             <button

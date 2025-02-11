@@ -1,11 +1,16 @@
-
 import { Brain, Heart, Target } from "lucide-react";
 
 const HeroSection = () => {
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
-      <div className="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-5" />
-      <div className="container mx-auto px-4 pt-20">
+      <div className="absolute inset-0">
+        <img
+          src="/photo-1501854140801-50d01698950b"
+          alt="Background"
+          className="w-full h-full object-cover opacity-10"
+        />
+      </div>
+      <div className="container mx-auto px-4 pt-20 relative z-10">
         <div className="text-center max-w-4xl mx-auto">
           <div className="animate-fadeIn [animation-delay:200ms]">
             <span className="inline-block px-4 py-1 mb-6 text-sm font-medium text-sage-600 bg-sage-100 rounded-full">

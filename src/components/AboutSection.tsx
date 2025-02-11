@@ -1,4 +1,3 @@
-
 const AboutSection = () => {
   return (
     <section id="about" className="py-20 bg-sage-50">
@@ -35,13 +34,13 @@ const AboutSection = () => {
               Vamos juntos dar o próximo passo?
             </button>
           </div>
-          <div className="relative h-[400px] rounded-lg overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-sage-500/20 to-sage-500/10" />
+          <div className="relative h-[500px] rounded-lg overflow-hidden shadow-xl">
             <img
-              src="/photo-1721322800607-8c38375eef04"
-              alt="Ambiente acolhedor para terapia"
+              src="/photo-1581091226825-a6a2a5aee158"
+              alt="Mario Casasanta em seu ambiente de trabalho"
               className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
           </div>
         </div>
       </div>
