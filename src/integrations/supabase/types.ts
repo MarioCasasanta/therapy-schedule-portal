@@ -335,6 +335,50 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          related_session_id: string | null
+          scheduled_for: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          related_session_id?: string | null
+          scheduled_for?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          related_session_id?: string | null
+          scheduled_for?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_related_session_id_fkey"
+            columns: ["related_session_id"]
+            isOneToOne: false
+            referencedRelation: "sessoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagamentos: {
         Row: {
           cliente_id: string | null
@@ -730,7 +774,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      session_statistics: {
+        Row: {
+          cliente_id: string | null
+          paid_sessions: number | null
+          past_sessions: number | null
+          pending_sessions: number | null
+          total_paid: number | null
+          total_pending: number | null
+          total_sessions: number | null
+          upcoming_sessions: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessoes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       is_admin: {
