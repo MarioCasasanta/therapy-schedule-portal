@@ -520,7 +520,10 @@ export type Database = {
           created_at: string
           data_hora: string
           google_event_id: string | null
+          guest_email: string | null
           id: string
+          invitation_sent_at: string | null
+          invitation_status: string | null
           notas: string | null
           status: string | null
           tipo_sessao: string
@@ -531,7 +534,10 @@ export type Database = {
           created_at?: string
           data_hora: string
           google_event_id?: string | null
+          guest_email?: string | null
           id?: string
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
           notas?: string | null
           status?: string | null
           tipo_sessao: string
@@ -542,7 +548,10 @@ export type Database = {
           created_at?: string
           data_hora?: string
           google_event_id?: string | null
+          guest_email?: string | null
           id?: string
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
           notas?: string | null
           status?: string | null
           tipo_sessao?: string
