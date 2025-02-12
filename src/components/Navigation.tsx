@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Menu, X, User, Settings, LogOut } from "lucide-react";
+import { Menu, X, User, Settings, LogOut, Calendar } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -127,6 +127,12 @@ const Navigation = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
+                    <Link to="/minhas-sessoes" className="flex items-center w-full">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      <span>Minhas Sessões</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
                     <Link to="/configuracoes" className="flex items-center w-full">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Configurações</span>
@@ -217,6 +223,13 @@ const Navigation = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   Perfil
+                </Link>
+                <Link
+                  to="/minhas-sessoes"
+                  className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Minhas Sessões
                 </Link>
                 <Link
                   to="/configuracoes"
