@@ -519,6 +519,7 @@ export type Database = {
           cliente_id: string | null
           created_at: string
           data_hora: string
+          data_pagamento: string | null
           google_event_id: string | null
           guest_email: string | null
           id: string
@@ -526,13 +527,16 @@ export type Database = {
           invitation_status: string | null
           notas: string | null
           status: string | null
+          status_pagamento: string | null
           tipo_sessao: string
           updated_at: string
+          valor: number | null
         }
         Insert: {
           cliente_id?: string | null
           created_at?: string
           data_hora: string
+          data_pagamento?: string | null
           google_event_id?: string | null
           guest_email?: string | null
           id?: string
@@ -540,13 +544,16 @@ export type Database = {
           invitation_status?: string | null
           notas?: string | null
           status?: string | null
+          status_pagamento?: string | null
           tipo_sessao: string
           updated_at?: string
+          valor?: number | null
         }
         Update: {
           cliente_id?: string | null
           created_at?: string
           data_hora?: string
+          data_pagamento?: string | null
           google_event_id?: string | null
           guest_email?: string | null
           id?: string
@@ -554,8 +561,10 @@ export type Database = {
           invitation_status?: string | null
           notas?: string | null
           status?: string | null
+          status_pagamento?: string | null
           tipo_sessao?: string
           updated_at?: string
+          valor?: number | null
         }
         Relationships: [
           {

@@ -12,6 +12,9 @@ interface Session {
   guest_email?: string;
   invitation_status?: string;
   notas?: string;
+  valor?: number;
+  status_pagamento?: string;
+  data_pagamento?: string;
 }
 
 interface SessionListProps {
@@ -22,6 +25,17 @@ interface SessionListProps {
 }
 
 export const SessionList = ({ sessions, onEdit, onDelete, onSendInvite }: SessionListProps) => {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pago":
+        return "bg-green-500 hover:bg-green-600";
+      case "cancelado":
+        return "bg-red-500 hover:bg-red-600";
+      default:
+        return "bg-yellow-500 hover:bg-yellow-600";
+    }
+  };
+
   return (
     <div className="space-y-4">
       {sessions.map((session) => (
@@ -34,9 +48,16 @@ export const SessionList = ({ sessions, onEdit, onDelete, onSendInvite }: Sessio
               <h3 className="font-semibold">
                 {format(new Date(session.data_hora), "PPp", { locale: ptBR })}
               </h3>
-              <Badge variant={session.tipo_sessao === "individual" ? "default" : "secondary"}>
-                {session.tipo_sessao}
-              </Badge>
+              <div className="flex gap-2 mt-1">
+                <Badge variant={session.tipo_sessao === "individual" ? "default" : "secondary"}>
+                  {session.tipo_sessao}
+                </Badge>
+                {session.status_pagamento && (
+                  <Badge className={getStatusColor(session.status_pagamento)}>
+                    {session.status_pagamento}
+                  </Badge>
+                )}
+              </div>
               {session.guest_email && (
                 <p className="text-sm text-gray-600 mt-1">
                   Convidado: {session.guest_email}
@@ -51,6 +72,16 @@ export const SessionList = ({ sessions, onEdit, onDelete, onSendInvite }: Sessio
                     >
                       {session.invitation_status}
                     </Badge>
+                  )}
+                </p>
+              )}
+              {session.valor !== undefined && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Valor: R$ {session.valor.toFixed(2)}
+                  {session.data_pagamento && (
+                    <span className="ml-2">
+                      (Pago em: {format(new Date(session.data_pagamento), "PP", { locale: ptBR })})
+                    </span>
                   )}
                 </p>
               )}

@@ -13,6 +13,9 @@ interface SessionFormProps {
     tipo_sessao?: string;
     guest_email?: string;
     notas?: string;
+    valor?: number;
+    status_pagamento?: string;
+    data_pagamento?: string;
   };
   onSubmit: (data: any) => void;
   onCancel: () => void;
@@ -24,11 +27,17 @@ export const SessionForm = ({ initialData, onSubmit, onCancel }: SessionFormProp
     tipo_sessao: initialData?.tipo_sessao || "",
     guest_email: initialData?.guest_email || "",
     notas: initialData?.notas || "",
+    valor: initialData?.valor?.toString() || "0",
+    status_pagamento: initialData?.status_pagamento || "pendente",
+    data_pagamento: initialData?.data_pagamento || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({
+      ...formData,
+      valor: parseFloat(formData.valor),
+    });
   };
 
   return (
@@ -70,6 +79,48 @@ export const SessionForm = ({ initialData, onSubmit, onCancel }: SessionFormProp
           onChange={(e) => setFormData({ ...formData, guest_email: e.target.value })}
         />
       </div>
+
+      <div>
+        <Label htmlFor="valor">Valor</Label>
+        <Input
+          id="valor"
+          type="number"
+          min="0"
+          step="0.01"
+          value={formData.valor}
+          onChange={(e) => setFormData({ ...formData, valor: e.target.value })}
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="status_pagamento">Status do Pagamento</Label>
+        <Select 
+          value={formData.status_pagamento}
+          onValueChange={(value) => setFormData({ ...formData, status_pagamento: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione o status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pendente">Pendente</SelectItem>
+            <SelectItem value="pago">Pago</SelectItem>
+            <SelectItem value="cancelado">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {formData.status_pagamento === "pago" && (
+        <div>
+          <Label htmlFor="data_pagamento">Data do Pagamento</Label>
+          <Input
+            id="data_pagamento"
+            type="datetime-local"
+            value={formData.data_pagamento}
+            onChange={(e) => setFormData({ ...formData, data_pagamento: e.target.value })}
+          />
+        </div>
+      )}
 
       <div>
         <Label htmlFor="notas">Notas</Label>
