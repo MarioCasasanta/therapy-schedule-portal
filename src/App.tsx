@@ -11,6 +11,7 @@ import Documentation from "./pages/Documentation";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DomainInfo from "./pages/DomainInfo";
 import TermsOfService from "./pages/TermsOfService";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/domain-info" element={<DomainInfo />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
