@@ -65,10 +65,11 @@ export const SessionManager = ({ selectedDate, sessions, setSessions }: SessionM
 
     setIsFormOpen(false);
     setEditingSession(null);
-    setSessions((prev) => [
-      ...prev.filter((s) => s.id !== session.data?.id),
+    const updatedSessions = [
+      ...sessions.filter((s) => s.id !== session.data?.id),
       session.data,
-    ].sort((a, b) => new Date(a.data_hora).getTime() - new Date(b.data_hora).getTime()));
+    ].sort((a, b) => new Date(a.data_hora).getTime() - new Date(b.data_hora).getTime());
+    setSessions(updatedSessions);
   };
 
   const handleDelete = async () => {
@@ -93,7 +94,8 @@ export const SessionManager = ({ selectedDate, sessions, setSessions }: SessionM
       description: "Sessão excluída com sucesso!",
     });
 
-    setSessions((prev) => prev.filter((s) => s.id !== sessionToDelete));
+    const updatedSessions = sessions.filter((s) => s.id !== sessionToDelete);
+    setSessions(updatedSessions);
     setIsDeleteDialogOpen(false);
     setSessionToDelete(null);
   };

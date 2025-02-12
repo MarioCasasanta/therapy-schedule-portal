@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Mail, Edit, Trash2 } from "lucide-react";
+import { Mail, Edit, Trash2, CreditCard } from "lucide-react";
 
 interface Session {
   id: string;
@@ -22,9 +22,18 @@ interface SessionListProps {
   onEdit: (session: Session) => void;
   onDelete: (id: string) => void;
   onSendInvite: (session: Session) => void;
+  isClientView?: boolean;
+  onPayment?: (session: Session) => void;
 }
 
-export const SessionList = ({ sessions, onEdit, onDelete, onSendInvite }: SessionListProps) => {
+export const SessionList = ({ 
+  sessions, 
+  onEdit, 
+  onDelete, 
+  onSendInvite,
+  isClientView,
+  onPayment 
+}: SessionListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pago":
@@ -90,29 +99,44 @@ export const SessionList = ({ sessions, onEdit, onDelete, onSendInvite }: Sessio
               )}
             </div>
             <div className="flex space-x-2">
-              {session.guest_email && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onSendInvite(session)}
-                >
-                  <Mail className="h-4 w-4" />
-                </Button>
+              {isClientView ? (
+                session.status_pagamento === "pendente" && onPayment && (
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => onPayment(session)}
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pagar
+                  </Button>
+                )
+              ) : (
+                <>
+                  {session.guest_email && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onSendInvite(session)}
+                    >
+                      <Mail className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onEdit(session)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => onDelete(session.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
               )}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onEdit(session)}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onDelete(session.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </div>
