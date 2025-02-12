@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { SessionManager } from "@/components/dashboard/SessionManager";
 import { CalendarManager } from "@/components/dashboard/CalendarManager";
+import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { startOfDay, endOfDay } from "date-fns";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -85,18 +87,31 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CalendarManager
-              selectedDate={selectedDate}
-              onSelectDate={(date) => date && setSelectedDate(date)}
-            />
-            <SessionManager
-              selectedDate={selectedDate}
-              sessions={sessions}
-              setSessions={setSessions}
-            />
-          </div>
+
+          <Tabs defaultValue="calendar" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="calendar">Agenda</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="calendar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CalendarManager
+                  selectedDate={selectedDate}
+                  onSelectDate={(date) => date && setSelectedDate(date)}
+                />
+                <SessionManager
+                  selectedDate={selectedDate}
+                  sessions={sessions}
+                  setSessions={setSessions}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="analytics">
+              <AnalyticsDashboard />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
