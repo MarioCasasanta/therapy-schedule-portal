@@ -335,6 +335,39 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_reports: {
+        Row: {
+          cancellations_count: number
+          created_at: string
+          id: string
+          paid_sessions_count: number
+          pending_sessions_count: number
+          report_date: string
+          sessions_count: number
+          total_revenue: number
+        }
+        Insert: {
+          cancellations_count?: number
+          created_at?: string
+          id?: string
+          paid_sessions_count?: number
+          pending_sessions_count?: number
+          report_date: string
+          sessions_count?: number
+          total_revenue?: number
+        }
+        Update: {
+          cancellations_count?: number
+          created_at?: string
+          id?: string
+          paid_sessions_count?: number
+          pending_sessions_count?: number
+          report_date?: string
+          sessions_count?: number
+          total_revenue?: number
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
