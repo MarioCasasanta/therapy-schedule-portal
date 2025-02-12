@@ -13,14 +13,14 @@ const Documentation = () => {
         { task: "Criar repositório no GitHub", completed: true },
         { task: "Configurar Frontend com React + Vite", completed: true },
         { task: "Criar banco de dados no Supabase", completed: true },
-        { task: "Implementar autenticação com Supabase", completed: false },
+        { task: "Implementar autenticação com Supabase", completed: true },
       ]
     },
     {
       title: "Fase 2 - Landing Page e Agendamentos",
       tasks: [
         { task: "Criar layout responsivo para Landing Page", completed: true },
-        { task: "Implementar CTA com agendamento", completed: false },
+        { task: "Implementar CTA com agendamento", completed: true },
         { task: "Integração com Google Agenda", completed: false },
       ]
     },
@@ -28,16 +28,17 @@ const Documentation = () => {
       title: "Fase 3 - Área do Cliente",
       tasks: [
         { task: "Criar dashboard do cliente", completed: false },
-        { task: "Listagem de sessões", completed: false },
+        { task: "Listagem de sessões", completed: true },
         { task: "Controle de pagamentos", completed: false },
       ]
     },
     {
       title: "Fase 4 - Dashboard Administrativo",
       tasks: [
-        { task: "Criar painel de controle de sessões", completed: false },
-        { task: "Implementar gestão de clientes", completed: false },
-        { task: "Criar sistema de edição da landing page", completed: false },
+        { task: "Criar painel de controle de sessões", completed: true },
+        { task: "Implementar gestão de clientes", completed: true },
+        { task: "Implementar sistema de convites por email", completed: true },
+        { task: "Configurar permissões de admin", completed: true },
       ]
     },
     {
@@ -52,6 +53,7 @@ const Documentation = () => {
       title: "Fase 6 - Deploy e Manutenção",
       tasks: [
         { task: "Configurar deploy", completed: true },
+        { task: "Configurar sistema de convites", completed: true },
         { task: "Monitoramento e otimização", completed: false },
         { task: "Melhorias baseadas no feedback inicial", completed: false },
       ]
@@ -73,7 +75,8 @@ const Documentation = () => {
         { path: "POST /rest/v1/sessoes", description: "Criar sessão" },
         { path: "GET /rest/v1/sessoes", description: "Listar sessões" },
         { path: "PATCH /rest/v1/sessoes", description: "Atualizar sessão" },
-        { path: "DELETE /rest/v1/sessoes", description: "Cancelar sessão" }
+        { path: "DELETE /rest/v1/sessoes", description: "Cancelar sessão" },
+        { path: "POST /functions/v1/send-invite", description: "Enviar convite por email" }
       ]
     },
     {
@@ -87,8 +90,8 @@ const Documentation = () => {
 
   const techStack = [
     { name: "Frontend", items: ["React", "Vite", "TailwindCSS", "Shadcn/UI"] },
-    { name: "Backend", items: ["Supabase (PostgreSQL + Auth)", "Edge Functions"] },
-    { name: "Integrações", items: ["Google Calendar API", "Sistema de Pagamentos"] },
+    { name: "Backend", items: ["Supabase (PostgreSQL + Auth)", "Edge Functions", "Resend (Email)"] },
+    { name: "Integrações", items: ["Resend API", "Sistema de Pagamentos (em breve)"] },
     { name: "Deploy", items: ["Supabase (Backend)", "Vercel/Netlify (Frontend)"] }
   ];
 
@@ -102,7 +105,7 @@ const Documentation = () => {
         "full_name: text",
         "avatar_url: text",
         "phone: text",
-        "role: text"
+        "role: text (admin/cliente)"
       ]
     },
     {
@@ -114,7 +117,10 @@ const Documentation = () => {
         "data_hora: timestamp",
         "tipo_sessao: text",
         "status: text",
-        "notas: text"
+        "notas: text",
+        "guest_email: text",
+        "invitation_status: text",
+        "invitation_sent_at: timestamp"
       ]
     },
     {
@@ -127,15 +133,6 @@ const Documentation = () => {
         "valor: numeric",
         "status: text",
         "data_pagamento: timestamp"
-      ]
-    },
-    {
-      name: "configuracoes_site",
-      description: "Configurações editáveis do site",
-      fields: [
-        "id: uuid (PK)",
-        "secao: text",
-        "conteudo: text"
       ]
     }
   ];
@@ -154,17 +151,17 @@ const Documentation = () => {
             <p className="text-muted-foreground mb-4">
               Plataforma para oferta de serviços terapêuticos incluindo Psicanálise, 
               Constelação Familiar e PNL. O sistema oferece agendamento integrado,
-              área do cliente e dashboard administrativo.
+              área do cliente e dashboard administrativo com sistema de convites por email.
             </p>
             <div className="mt-4">
               <h3 className="font-semibold mb-2">Principais Funcionalidades:</h3>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                 <li>Landing Page responsiva com CTA para agendamento</li>
                 <li>Autenticação e gerenciamento de usuários</li>
-                <li>Integração com Google Calendar</li>
+                <li>Sistema de convites por email</li>
                 <li>Área do cliente com histórico de sessões</li>
                 <li>Dashboard administrativo completo</li>
-                <li>Sistema de pagamentos integrado</li>
+                <li>Sistema de pagamentos integrado (em breve)</li>
               </ul>
             </div>
           </CardContent>
