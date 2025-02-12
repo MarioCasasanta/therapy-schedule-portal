@@ -42,8 +42,12 @@ export const SessionList = ({ sessions, onEdit, onDelete, onSendInvite }: Sessio
                   Convidado: {session.guest_email}
                   {session.invitation_status && (
                     <Badge 
-                      variant={session.invitation_status === "accepted" ? "success" : "warning"}
-                      className="ml-2"
+                      variant={session.invitation_status === "accepted" ? "default" : "secondary"}
+                      className={`ml-2 ${
+                        session.invitation_status === "accepted" 
+                          ? "bg-green-500 hover:bg-green-600" 
+                          : "bg-yellow-500 hover:bg-yellow-600"
+                      }`}
                     >
                       {session.invitation_status}
                     </Badge>
