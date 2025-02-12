@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/stripe-js/pure";
 
 const stripePromise = loadStripe("pk_test_your_publishable_key");
 
@@ -39,46 +40,26 @@ interface SessionListProps {
   onPayment?: (session: Session) => void;
 }
 
-export const SessionList = ({ 
-  sessions, 
-  onEdit, 
-  onDelete, 
-  onSendInvite,
-  isClientView,
-  onPayment 
-}: SessionListProps) => {
-  const { toast } = useToast();
-  const [paymentSession, setPaymentSession] = useState<Session | null>(null);
+const PaymentForm = ({ session, onSuccess, onCancel }: { 
+  session: Session; 
+  onSuccess: () => void;
+  onCancel: () => void;
+}) => {
+  const stripe = useStripe();
+  const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pago":
-        return "bg-green-500 hover:bg-green-600";
-      case "cancelado":
-        return "bg-red-500 hover:bg-red-600";
-      default:
-        return "bg-yellow-500 hover:bg-yellow-600";
-    }
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
 
-  const handlePayment = async (session: Session) => {
+    setIsProcessing(true);
     try {
-      setIsProcessing(true);
-      const stripe = await stripePromise;
-      
-      if (!stripe) {
-        throw new Error('Stripe não foi inicializado corretamente');
-      }
-
-      // Criar um PaymentMethod
       const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: {
-          number: '4242424242424242', // Para teste
-          exp_month: 12,
-          exp_year: 2024,
-          cvc: '123',
+        elements,
+        params: {
+          type: 'card',
         },
       });
 
@@ -86,11 +67,10 @@ export const SessionList = ({
         throw stripeError;
       }
 
-      // Processar o pagamento através da Edge Function
       const { data, error } = await supabase.functions.invoke('process-payment', {
         body: { 
           session_id: session.id,
-          payment_method: paymentMethod?.id,
+          payment_method: paymentMethod.id,
         },
       });
 
@@ -101,11 +81,8 @@ export const SessionList = ({
         description: "Pagamento processado com sucesso.",
       });
 
-      setPaymentSession(null);
-      if (onPayment) {
-        onPayment(session);
-      }
-    } catch (error) {
+      onSuccess();
+    } catch (error: any) {
       console.error('Erro no pagamento:', error);
       toast({
         variant: "destructive",
@@ -114,6 +91,43 @@ export const SessionList = ({
       });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <PaymentElement />
+      <div className="mt-4 space-x-2">
+        <Button type="submit" disabled={isProcessing}>
+          {isProcessing ? "Processando..." : "Pagar"}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+export const SessionList = ({ 
+  sessions, 
+  onEdit, 
+  onDelete, 
+  onSendInvite,
+  isClientView,
+  onPayment 
+}: SessionListProps) => {
+  const { toast } = useToast();
+  const [paymentSession, setPaymentSession] = useState<Session | null>(null);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pago":
+        return "bg-green-500 hover:bg-green-600";
+      case "cancelado":
+        return "bg-red-500 hover:bg-red-600";
+      default:
+        return "bg-yellow-500 hover:bg-yellow-600";
     }
   };
 
@@ -224,20 +238,20 @@ export const SessionList = ({
               Você está prestes a pagar a sessão no valor de R$ {paymentSession?.valor?.toFixed(2)}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              Para fins de demonstração, usando cartão de teste:
-              <br />
-              4242 4242 4242 4242 - 12/24 - 123
-            </p>
-            <Button 
-              onClick={() => paymentSession && handlePayment(paymentSession)}
-              disabled={isProcessing}
-              className="w-full"
-            >
-              {isProcessing ? "Processando..." : "Confirmar Pagamento"}
-            </Button>
-          </div>
+          {paymentSession && (
+            <Elements stripe={stripePromise}>
+              <PaymentForm 
+                session={paymentSession}
+                onSuccess={() => {
+                  setPaymentSession(null);
+                  if (onPayment) {
+                    onPayment(paymentSession);
+                  }
+                }}
+                onCancel={() => setPaymentSession(null)}
+              />
+            </Elements>
+          )}
         </DialogContent>
       </Dialog>
     </>
