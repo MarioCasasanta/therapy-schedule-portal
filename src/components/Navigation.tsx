@@ -1,10 +1,42 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: error.message,
+      });
+    } else {
+      navigate("/");
+    }
+  };
 
   return (
     <nav className="fixed w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-100">
@@ -42,12 +74,21 @@ const Navigation = () => {
             }}>
               Contato
             </a>
-            <Link 
-              to="/auth" 
-              className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
-            >
-              Agendar Agora
-            </Link>
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="text-sage-600 hover:text-sage-800 transition-colors"
+              >
+                Sair
+              </button>
+            ) : (
+              <Link 
+                to="/auth" 
+                className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+              >
+                Entrar
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -110,13 +151,25 @@ const Navigation = () => {
             >
               Contato
             </a>
-            <Link
-              to="/auth"
-              className="block text-center bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              Agendar Agora
-            </Link>
+            {user ? (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}
+                className="block w-full text-left px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+              >
+                Sair
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="block text-center bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                Entrar
+              </Link>
+            )}
           </div>
         </div>
       )}
