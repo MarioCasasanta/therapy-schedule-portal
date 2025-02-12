@@ -1,29 +1,62 @@
 
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, Settings, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProfile = async (userId) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return;
+    }
+    
+    setProfile(data);
+  };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -75,12 +108,37 @@ const Navigation = () => {
               Contato
             </a>
             {user ? (
-              <button
-                onClick={handleLogout}
-                className="text-sage-600 hover:text-sage-800 transition-colors"
-              >
-                Sair
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="focus:outline-none">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile?.avatar_url} />
+                    <AvatarFallback className="bg-sage-100 text-sage-600">
+                      {profile?.full_name?.charAt(0) || user.email?.charAt(0)?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Link to="/perfil" className="flex items-center w-full">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Perfil</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/configuracoes" className="flex items-center w-full">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Configurações</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link 
                 to="/auth" 
@@ -152,15 +210,31 @@ const Navigation = () => {
               Contato
             </a>
             {user ? (
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setIsOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              >
-                Sair
-              </button>
+              <>
+                <Link
+                  to="/perfil"
+                  className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Perfil
+                </Link>
+                <Link
+                  to="/configuracoes"
+                  className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Configurações
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+                >
+                  Sair
+                </button>
+              </>
             ) : (
               <Link
                 to="/auth"
