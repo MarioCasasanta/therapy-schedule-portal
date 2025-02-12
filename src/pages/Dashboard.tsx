@@ -43,19 +43,37 @@ const Dashboard = () => {
         return;
       }
 
-      const { data: profile } = await supabase
+      // Debug logs
+      console.log("User ID:", session.user.id);
+
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("role")
+        .select("*")
         .eq("id", session.user.id)
         .single();
 
-      if (profile?.role !== "admin") {
+      // Debug logs
+      console.log("Profile:", profile);
+      console.log("Profile Error:", profileError);
+
+      if (profileError || !profile) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar perfil",
+          description: "Não foi possível verificar suas permissões.",
+        });
+        navigate("/");
+        return;
+      }
+
+      if (profile.role !== "admin") {
         toast({
           variant: "destructive",
           title: "Acesso negado",
           description: "Você não tem permissão para acessar esta página.",
         });
         navigate("/");
+        return;
       }
     };
 
