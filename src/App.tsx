@@ -25,7 +25,8 @@ import ClientSessionDetail from "./pages/client/SessionDetail";
 import ClientPayments from "./pages/client/ClientPayments";
 import ClientInvoices from "./pages/client/ClientInvoices";
 import ClientNotifications from "./pages/client/ClientNotifications";
-import Profile from "./pages/Profile";
+import ClientProfile from "./pages/client/Profile";
+import AdminProfile from "./pages/admin/Profile";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/dashboard/payments" element={<Payments />} />
           <Route path="/dashboard/reports" element={<Reports />} />
           <Route path="/dashboard/availability" element={<Availability />} />
+          <Route path="/dashboard/profile" element={<AdminProfile />} />
           
           {/* Client Dashboard Routes */}
           <Route path="/client-dashboard" element={<ClientDashboard />} />
@@ -60,8 +62,8 @@ const App = () => (
           <Route path="/client-dashboard/payments" element={<ClientPayments />} />
           <Route path="/client-dashboard/invoices" element={<ClientInvoices />} />
           <Route path="/client-dashboard/notifications" element={<ClientNotifications />} />
+          <Route path="/client-dashboard/profile/edit" element={<ClientProfile />} />
           
-          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
