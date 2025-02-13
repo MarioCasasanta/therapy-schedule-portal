@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -8,52 +7,40 @@ import { SessionList } from "@/components/SessionList";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { SessionController } from "@/controllers/SessionController";
+import { Session } from "@/types/session";
 
 const Sessions = () => {
   const [date, setDate] = useState<Date>(new Date());
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSessions = async () => {
-      const { data, error } = await supabase
-        .from("sessoes")
-        .select(`
-          *,
-          profiles:cliente_id (*)
-        `)
-        .order("data_hora", { ascending: true });
-
-      if (error) {
+      try {
+        const data = await SessionController.list();
+        setSessions(data);
+      } catch (error: any) {
         toast({
           variant: "destructive",
           title: "Erro ao carregar sessões",
           description: error.message,
         });
-        return;
       }
-
-      setSessions(data || []);
     };
 
     fetchSessions();
   }, [toast]);
 
-  const handleEdit = (id: string) => {
-    navigate(`/dashboard/sessions/${id}`);
+  const handleEdit = (session: Session) => {
+    navigate(`/dashboard/sessions/${session.id}`);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (session: Session) => {
     try {
-      const { error } = await supabase
-        .from("sessoes")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-
-      setSessions(sessions.filter(session => session.id !== id));
+      await SessionController.delete(session.id);
+      setSessions(sessions.filter(s => s.id !== session.id));
       toast({
         title: "Sucesso",
         description: "Sessão excluída com sucesso.",
@@ -67,14 +54,9 @@ const Sessions = () => {
     }
   };
 
-  const handleSendInvite = async (id: string) => {
+  const handleSendInvite = async (session: Session) => {
     try {
-      const { error } = await supabase.functions.invoke('send-invite', {
-        body: { session_id: id }
-      });
-
-      if (error) throw error;
-
+      await SessionController.sendInvite(session.id);
       toast({
         title: "Sucesso",
         description: "Convite enviado com sucesso.",
