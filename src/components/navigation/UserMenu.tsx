@@ -18,6 +18,10 @@ interface UserMenuProps {
 }
 
 export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
+  const isAdmin = profile?.role === 'admin';
+  const profilePath = isAdmin ? "/dashboard/profile" : "/client-dashboard/profile/edit";
+  const dashboardPath = isAdmin ? "/dashboard" : "/client-dashboard";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="focus:outline-none">
@@ -32,25 +36,17 @@ export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
         <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link to="/profile" className="flex items-center w-full">
+          <Link to={profilePath} className="flex items-center w-full">
             <User className="mr-2 h-4 w-4" />
             <span>Perfil</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link to="/client-dashboard" className="flex items-center w-full">
+          <Link to={dashboardPath} className="flex items-center w-full">
             <Calendar className="mr-2 h-4 w-4" />
-            <span>Minhas Sessões</span>
+            <span>{isAdmin ? "Dashboard" : "Minhas Sessões"}</span>
           </Link>
         </DropdownMenuItem>
-        {profile?.role === 'admin' && (
-          <DropdownMenuItem>
-            <Link to="/dashboard" className="flex items-center w-full">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Dashboard Admin</span>
-            </Link>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />

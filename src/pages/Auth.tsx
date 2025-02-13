@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +16,18 @@ const Auth = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/client-dashboard");
+        // Verificar o role do usuário
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profile?.role === "admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/client-dashboard");
+        }
       }
     };
 
@@ -35,7 +46,18 @@ const Auth = () => {
         });
         if (error) throw error;
         if (session) {
-          navigate("/client-dashboard");
+          // Verificar o role do usuário após login
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single();
+
+          if (profile?.role === "admin") {
+            navigate("/dashboard");
+          } else {
+            navigate("/client-dashboard");
+          }
         }
       } else {
         const { error } = await supabase.auth.signUp({

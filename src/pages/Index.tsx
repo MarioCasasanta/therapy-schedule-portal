@@ -16,7 +16,18 @@ const Index = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/client-dashboard");
+        // Buscar o perfil do usuário para verificar o role
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profile?.role === "admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/client-dashboard");
+        }
       }
     };
 
