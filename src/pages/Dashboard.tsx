@@ -1,30 +1,24 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { SessionManager } from "@/components/dashboard/SessionManager";
 import { CalendarManager } from "@/components/dashboard/CalendarManager";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
-import { startOfDay, endOfDay, format } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Users, FileText, Settings, ArrowLeft } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { Session } from "@/types/session";
 
-const Dashboard = () => {
+export default function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [clients, setClients] = useState<any[]>([]);
 
   useEffect(() => {
@@ -118,38 +112,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <div className="w-64 bg-white border-r border-gray-200 p-4">
-          <div className="space-y-4">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => navigate("/")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar ao Site
-            </Button>
-            
-            <div className="space-y-1">
-              <Button variant="ghost" className="w-full justify-start">
-                <Calendar className="mr-2 h-4 w-4" />
-                Agenda
-              </Button>
-              <Button variant="ghost" className="w-full justify-start">
-                <Users className="mr-2 h-4 w-4" />
-                Clientes
-              </Button>
-              <Button variant="ghost" className="w-full justify-start">
-                <FileText className="mr-2 h-4 w-4" />
-                Relatórios
-              </Button>
-              <Button variant="ghost" className="w-full justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                Configurações
-              </Button>
-            </div>
-          </div>
-        </div>
+        <AdminSidebar currentPath={location.pathname} />
 
         {/* Main Content */}
         <div className="flex-1 p-8">
@@ -158,70 +121,43 @@ const Dashboard = () => {
               <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
             </div>
 
-            <Tabs defaultValue="calendar" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="calendar">Agenda</TabsTrigger>
-                <TabsTrigger value="clients">Clientes</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              </TabsList>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-semibold">{sessions.length}</div>
+                  <div className="text-sm text-gray-500">Sessões Hoje</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-semibold">{clients.length}</div>
+                  <div className="text-sm text-gray-500">Total de Clientes</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-semibold">
+                    {sessions.filter(s => s.status === "concluido").length}
+                  </div>
+                  <div className="text-sm text-gray-500">Sessões Concluídas</div>
+                </CardContent>
+              </Card>
+            </div>
 
-              <TabsContent value="calendar">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <CalendarManager
-                    selectedDate={selectedDate}
-                    onSelectDate={(date) => date && setSelectedDate(date)}
-                  />
-                  <SessionManager
-                    selectedDate={selectedDate}
-                    sessions={sessions}
-                    setSessions={setSessions}
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="clients">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Lista de Clientes</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Nome</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Telefone</TableHead>
-                          <TableHead>Data de Nascimento</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {clients.map((client) => (
-                          <TableRow key={client.id}>
-                            <TableCell>{client.full_name || "Não informado"}</TableCell>
-                            <TableCell>{client.email}</TableCell>
-                            <TableCell>{client.telefone || "Não informado"}</TableCell>
-                            <TableCell>
-                              {client.data_nascimento 
-                                ? format(new Date(client.data_nascimento), 'dd/MM/yyyy')
-                                : "Não informado"}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="analytics">
-                <AnalyticsDashboard />
-              </TabsContent>
-            </Tabs>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CalendarManager
+                selectedDate={selectedDate}
+                onSelectDate={(date) => date && setSelectedDate(date)}
+              />
+              <SessionManager
+                selectedDate={selectedDate}
+                sessions={sessions}
+                setSessions={setSessions}
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Dashboard;
+}
