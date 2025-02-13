@@ -23,7 +23,7 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        navigate("/");
+        navigate("/client-dashboard"); // Modificado para redirecionar para o client-dashboard
       } else {
         const { error } = await supabase.auth.signUp({
           email,
