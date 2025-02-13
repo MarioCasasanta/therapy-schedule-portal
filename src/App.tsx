@@ -13,6 +13,7 @@ import DomainInfo from "./pages/DomainInfo";
 import TermsOfService from "./pages/TermsOfService";
 import Dashboard from "./pages/Dashboard";
 import ClientDashboard from "./pages/ClientDashboard";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/client-dashboard" element={<ClientDashboard />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
