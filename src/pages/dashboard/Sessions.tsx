@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,11 +36,10 @@ const Sessions = () => {
     navigate(`/dashboard/sessions/${session.id}`);
   };
 
-  const handleDelete = (session: Session) => {
-    const id = session.id;
+  const handleDelete = async (session: Session) => {
     try {
-      SessionController.delete(id);
-      setSessions(sessions.filter(s => s.id !== id));
+      await SessionController.delete(session.id);
+      setSessions(sessions.filter(s => s.id !== session.id));
       toast({
         title: "Sucesso",
         description: "Sessão excluída com sucesso.",
@@ -55,10 +53,9 @@ const Sessions = () => {
     }
   };
 
-  const handleSendInvite = (session: Session) => {
-    const id = session.id;
+  const handleSendInvite = async (session: Session) => {
     try {
-      SessionController.sendInvite(id);
+      await SessionController.sendInvite(session.id);
       toast({
         title: "Sucesso",
         description: "Convite enviado com sucesso.",
