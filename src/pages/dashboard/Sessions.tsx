@@ -37,37 +37,39 @@ const Sessions = () => {
     navigate(`/dashboard/sessions/${session.id}`);
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await SessionController.delete(id);
-      setSessions(sessions.filter(s => s.id !== id));
-      toast({
-        title: "Sucesso",
-        description: "Sessão excluída com sucesso.",
+  const handleDelete = (session: Session) => {
+    SessionController.delete(session.id)
+      .then(() => {
+        setSessions(sessions.filter(s => s.id !== session.id));
+        toast({
+          title: "Sucesso",
+          description: "Sessão excluída com sucesso.",
+        });
+      })
+      .catch((error: any) => {
+        toast({
+          variant: "destructive",
+          title: "Erro ao excluir sessão",
+          description: error.message,
+        });
       });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao excluir sessão",
-        description: error.message,
-      });
-    }
   };
 
-  const handleSendInvite = async (id: string) => {
-    try {
-      await SessionController.sendInvite(id);
-      toast({
-        title: "Sucesso",
-        description: "Convite enviado com sucesso.",
+  const handleSendInvite = (session: Session) => {
+    SessionController.sendInvite(session.id)
+      .then(() => {
+        toast({
+          title: "Sucesso",
+          description: "Convite enviado com sucesso.",
+        });
+      })
+      .catch((error: any) => {
+        toast({
+          variant: "destructive",
+          title: "Erro ao enviar convite",
+          description: error.message,
+        });
       });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao enviar convite",
-        description: error.message,
-      });
-    }
   };
 
   return (
