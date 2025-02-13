@@ -4,10 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DocumentUpload } from "@/components/documents/DocumentUpload";
 import { SessionHistory } from "@/components/sessions/SessionHistory";
 import { InvoiceViewer } from "@/components/invoices/InvoiceViewer";
-import { FileText, Calendar, Receipt } from "lucide-react";
+import { Calendar, Receipt } from "lucide-react";
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -58,10 +57,6 @@ const ClientDashboard = () => {
                 <Calendar className="h-4 w-4 mr-2" />
                 Sessões
               </TabsTrigger>
-              <TabsTrigger value="documents" className="flex items-center">
-                <FileText className="h-4 w-4 mr-2" />
-                Documentos
-              </TabsTrigger>
               <TabsTrigger value="invoices" className="flex items-center">
                 <Receipt className="h-4 w-4 mr-2" />
                 Faturas
@@ -70,10 +65,6 @@ const ClientDashboard = () => {
 
             <TabsContent value="sessions">
               <SessionHistory />
-            </TabsContent>
-
-            <TabsContent value="documents">
-              <DocumentUpload />
             </TabsContent>
 
             <TabsContent value="invoices">
