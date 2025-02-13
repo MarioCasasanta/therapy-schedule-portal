@@ -11,6 +11,8 @@ export interface Session {
   data_pagamento?: string;
   cliente_id?: string;
   status?: string;
+  feedback?: string;
+  post_session_notes?: string;
 }
 
 export interface SessionFormData {
@@ -26,6 +28,6 @@ export interface SessionFormData {
 export interface SessionListProps {
   sessions: Session[];
   onEdit: (session: Session) => void;
-  onDelete: (id: string) => void;
-  onSendInvite: (id: string) => void;
+  onDelete: (session: Session) => void;
+  onSendInvite: (session: Session) => void;
 }

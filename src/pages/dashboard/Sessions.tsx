@@ -37,10 +37,10 @@ const Sessions = () => {
     navigate(`/dashboard/sessions/${session.id}`);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (session: Session) => {
     try {
-      await SessionController.delete(id);
-      setSessions(sessions.filter(s => s.id !== id));
+      SessionController.delete(session.id);
+      setSessions(sessions.filter(s => s.id !== session.id));
       toast({
         title: "Sucesso",
         description: "Sessão excluída com sucesso.",
@@ -54,9 +54,9 @@ const Sessions = () => {
     }
   };
 
-  const handleSendInvite = async (id: string) => {
+  const handleSendInvite = (session: Session) => {
     try {
-      await SessionController.sendInvite(id);
+      SessionController.sendInvite(session.id);
       toast({
         title: "Sucesso",
         description: "Convite enviado com sucesso.",

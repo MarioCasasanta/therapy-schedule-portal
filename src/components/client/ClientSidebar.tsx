@@ -4,15 +4,20 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   LayoutDashboard, 
-  Calendar, 
-  ClipboardList, 
-  Receipt, 
+  User,
+  Settings,
+  Calendar,
+  Receipt,
   Bell,
-  CreditCard,
+  FileText,
+  Lock,
+  Mail,
   MessageSquare,
   CalendarPlus,
   History,
-  FileText
+  Edit,
+  HelpCircle,
+  LogOut
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -36,8 +41,20 @@ export function ClientSidebar({ className }: SidebarProps) {
                 </Button>
               )}
             </NavLink>
+            <NavLink to="/client-dashboard/profile/edit">
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Editar Perfil
+                </Button>
+              )}
+            </NavLink>
           </div>
         </div>
+
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold">Sessões</h2>
           <div className="space-y-1">
@@ -65,47 +82,80 @@ export function ClientSidebar({ className }: SidebarProps) {
             </NavLink>
           </div>
         </div>
+
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold">Financeiro</h2>
+          <h2 className="mb-2 px-4 text-lg font-semibold">Configurações</h2>
           <div className="space-y-1">
-            <NavLink to="/client-dashboard/payments">
+            <NavLink to="/client-dashboard/settings/profile">
               {({ isActive }) => (
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
-                  className="w-full justify-start"
+                  className="w-full justify-start pl-8"
                 >
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Pagamentos
+                  <User className="mr-2 h-4 w-4" />
+                  Meu Perfil
                 </Button>
               )}
             </NavLink>
-            <NavLink to="/client-dashboard/invoices">
+            <NavLink to="/client-dashboard/settings/security">
               {({ isActive }) => (
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
-                  className="w-full justify-start"
+                  className="w-full justify-start pl-8"
                 >
-                  <FileText className="mr-2 h-4 w-4" />
-                  Faturas e Recibos
+                  <Lock className="mr-2 h-4 w-4" />
+                  Segurança
+                </Button>
+              )}
+            </NavLink>
+            <NavLink to="/client-dashboard/settings/calendar">
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? "secondary" : "ghost"}
+                  className="w-full justify-start pl-8"
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Google Calendar
+                </Button>
+              )}
+            </NavLink>
+            <NavLink to="/client-dashboard/settings/notifications">
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? "secondary" : "ghost"}
+                  className="w-full justify-start pl-8"
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  Notificações
                 </Button>
               )}
             </NavLink>
           </div>
         </div>
+
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold">Comunicação</h2>
           <div className="space-y-1">
-            <NavLink to="/client-dashboard/notifications">
+            <NavLink to="/client-dashboard/help">
               {({ isActive }) => (
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
                   className="w-full justify-start"
                 >
-                  <Bell className="mr-2 h-4 w-4" />
-                  Notificações
+                  <HelpCircle className="mr-2 h-4 w-4" />
+                  Ajuda
                 </Button>
               )}
             </NavLink>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+              onClick={() => {
+                // Implementar lógica de logout
+              }}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sair
+            </Button>
           </div>
         </div>
       </div>
