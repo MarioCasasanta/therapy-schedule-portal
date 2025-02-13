@@ -76,7 +76,6 @@ const Navigation = () => {
           
           <DesktopNav user={user} profile={profile} handleLogout={handleLogout} />
 
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -92,6 +91,7 @@ const Navigation = () => {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         user={user}
+        profile={profile}
         handleLogout={handleLogout}
       />
     </nav>

@@ -32,23 +32,25 @@ export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
         <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link to="/perfil" className="flex items-center w-full">
+          <Link to="/profile" className="flex items-center w-full">
             <User className="mr-2 h-4 w-4" />
             <span>Perfil</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link to="/minhas-sessoes" className="flex items-center w-full">
+          <Link to="/client-dashboard" className="flex items-center w-full">
             <Calendar className="mr-2 h-4 w-4" />
             <span>Minhas Sessões</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Link to="/configuracoes" className="flex items-center w-full">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Configurações</span>
-          </Link>
-        </DropdownMenuItem>
+        {profile?.role === 'admin' && (
+          <DropdownMenuItem>
+            <Link to="/dashboard" className="flex items-center w-full">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Dashboard Admin</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
