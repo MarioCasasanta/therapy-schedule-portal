@@ -17,3 +17,13 @@ export interface Session {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface SessionFormData {
+  cliente_id?: string;
+  data_hora: string;
+  tipo_sessao: string;
+  status?: string;
+  notas?: string;
+  valor?: number;
+  guest_email?: string;
+}

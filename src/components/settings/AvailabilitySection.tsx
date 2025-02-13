@@ -14,7 +14,7 @@ export function AvailabilitySection() {
       <CardContent>
         <div className="space-y-4">
           <Button onClick={() => navigate('/dashboard/availability')}>
-            Gerenciar Horários
+            Gerenciar Disponibilidade
           </Button>
         </div>
       </CardContent>

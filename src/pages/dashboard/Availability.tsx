@@ -34,8 +34,11 @@ const AvailabilityPage = () => {
             day_of_week: index,
             start_time: "09:00",
             end_time: "17:00",
-            is_available: false
-          };
+            is_available: false,
+            interval_minutes: 60,
+            max_concurrent_sessions: 1,
+            exceptions: []
+          } as Availability;
         });
         setAvailabilities(availability);
       } catch (error: any) {

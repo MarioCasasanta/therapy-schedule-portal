@@ -1,10 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { SessionList } from "@/components/SessionList";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SessionController } from "@/controllers/SessionController";
 import { Session } from "@/types/session";
@@ -73,10 +74,16 @@ const Sessions = () => {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Sessões</h1>
-        <Button onClick={() => navigate("/dashboard/sessions/new")}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nova Sessão
-        </Button>
+        <div className="space-x-2">
+          <Button onClick={() => navigate("/dashboard/availability")}>
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            Gerenciar Disponibilidade
+          </Button>
+          <Button onClick={() => navigate("/dashboard/sessions/new")}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Sessão
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

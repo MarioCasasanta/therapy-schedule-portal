@@ -26,7 +26,7 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
     { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
     { icon: Users, label: "Clientes", path: "/dashboard/clients" },
     { icon: Calendar, label: "Sessões", path: "/dashboard/sessions" },
-    { icon: CreditCard, label: "Pagamentos", path: "/dashboard/payments" },
+    { icon: CreditCard, label: "Financeiro", path: "/dashboard/payments" },
     { icon: BarChart, label: "Relatórios", path: "/dashboard/reports" },
     { icon: Bell, label: "Notificações", path: "/dashboard/notifications" },
     { icon: Settings, label: "Configurações", path: "/dashboard/settings" },
