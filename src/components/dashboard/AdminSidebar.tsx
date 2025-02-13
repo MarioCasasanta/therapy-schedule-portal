@@ -10,8 +10,7 @@ import {
   Bell,
   Settings,
   UserCircle,
-  ArrowLeft,
-  FileText
+  ArrowLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,13 +32,17 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
     { icon: UserCircle, label: "Meu Perfil", path: "/dashboard/profile" },
   ];
 
+  const handleGoToHome = () => {
+    window.location.href = "/";
+  };
+
   return (
     <div className="w-64 bg-white border-r border-gray-200 p-4">
       <div className="space-y-4">
         <Button
           variant="ghost"
           className="w-full justify-start"
-          onClick={() => navigate("/")}
+          onClick={handleGoToHome}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar ao Site
