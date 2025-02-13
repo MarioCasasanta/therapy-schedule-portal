@@ -9,7 +9,6 @@ import { InvoiceViewer } from "@/components/invoices/InvoiceViewer";
 import { Calendar, Receipt } from "lucide-react";
 import { ClientSidebar } from "@/components/client/ClientSidebar";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
-import Navigation from "@/components/Navigation";
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -48,8 +47,7 @@ const ClientDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      <div className="flex h-screen pt-16"> {/* Ajustado para incluir o menu lateral */}
+      <div className="flex h-screen">
         <ClientSidebar className="w-64 hidden md:block" />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
