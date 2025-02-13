@@ -15,19 +15,24 @@ const Navigation = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Verificar sessão atual ao montar o componente
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);
       }
-    });
+    };
 
+    checkSession();
+
+    // Configurar listener para mudanças de autenticação
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        await fetchProfile(session.user.id);
       } else {
         setProfile(null);
       }
@@ -52,15 +57,29 @@ const Navigation = () => {
   };
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      // Primeiro limpar os estados locais
+      setUser(null);
+      setProfile(null);
+      
+      // Então fazer o signOut
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Após o signOut bem sucedido, redirecionar
+      navigate("/");
+      
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro no logout:', error);
       toast({
         variant: "destructive",
         title: "Erro ao sair",
         description: error.message,
       });
-    } else {
-      navigate("/");
     }
   };
 
