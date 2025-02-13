@@ -21,7 +21,10 @@ const Index = () => {
           .from("profiles")
           .select("role")
           .eq("id", session.user.id)
-          .single();
+          .maybeSingle();
+
+        console.log("Session:", session); // Para ajudar no debug
+        console.log("Profile:", profile); // Para ajudar no debug
 
         if (profile?.role === "admin") {
           navigate("/dashboard");

@@ -21,7 +21,7 @@ const Auth = () => {
           .from("profiles")
           .select("role")
           .eq("id", session.user.id)
-          .single();
+          .maybeSingle();
 
         if (profile?.role === "admin") {
           navigate("/dashboard");
@@ -44,14 +44,20 @@ const Auth = () => {
           email,
           password,
         });
+
         if (error) throw error;
+
         if (session) {
           // Verificar o role do usuário após login
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("role")
             .eq("id", session.user.id)
-            .single();
+            .maybeSingle();
+
+          if (profileError) throw profileError;
+
+          console.log("Profile data:", profile); // Para ajudar no debug
 
           if (profile?.role === "admin") {
             navigate("/dashboard");
@@ -71,6 +77,7 @@ const Auth = () => {
         });
       }
     } catch (error: any) {
+      console.error("Auth error:", error); // Para ajudar no debug
       toast({
         variant: "destructive",
         title: "Erro",
