@@ -1,12 +1,9 @@
 
 import { useEffect, useState } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Download, Receipt, Calendar, AlertCircle } from 'lucide-react';
+import { InvoiceCard } from './InvoiceCard';
 
 interface Invoice {
   id: string;
@@ -38,7 +35,7 @@ export const InvoiceViewer = () => {
 
       if (error) throw error;
 
-      setInvoices(data || []);
+      setInvoices(data as Invoice[]);
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -92,40 +89,14 @@ export const InvoiceViewer = () => {
         <CardContent>
           <div className="space-y-4">
             {invoices.map((invoice) => (
-              <Card key={invoice.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Receipt className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">
-                          Fatura #{invoice.invoice_number}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <span>
-                          Vencimento: {format(new Date(invoice.due_date), "dd/MM/yyyy", { locale: ptBR })}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <AlertCircle className="h-4 w-4 text-gray-500" />
-                        <span className={invoice.status === 'paid' ? 'text-green-600' : 'text-yellow-600'}>
-                          R$ {invoice.amount.toFixed(2)} - {invoice.status === 'paid' ? 'Pago' : 'Pendente'}
-                        </span>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownloadInvoice(invoice)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <InvoiceCard
+                key={invoice.id}
+                invoice_number={invoice.invoice_number}
+                amount={invoice.amount}
+                status={invoice.status}
+                due_date={invoice.due_date}
+                onDownload={() => handleDownloadInvoice(invoice)}
+              />
             ))}
           </div>
         </CardContent>

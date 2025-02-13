@@ -1,12 +1,13 @@
 
-import { useState } from 'react';
-import { Upload, File, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DocumentCard } from './DocumentCard';
 
 interface Document {
   id: string;
@@ -22,6 +23,10 @@ export const DocumentUpload = () => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    loadDocuments();
+  }, []);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
@@ -32,15 +37,13 @@ export const DocumentUpload = () => {
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      // Upload do arquivo
       const { error: uploadError } = await supabase.storage
         .from('documents')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      // Salvar metadados no banco
-      const { error: dbError } = await supabase
+      const { data, error: dbError } = await supabase
         .from('documents')
         .insert({
           title: file.name,
@@ -48,7 +51,9 @@ export const DocumentUpload = () => {
           file_path: filePath,
           file_type: file.type,
           file_size: file.size,
-        });
+        })
+        .select()
+        .single();
 
       if (dbError) throw dbError;
 
@@ -57,8 +62,10 @@ export const DocumentUpload = () => {
         description: "Documento enviado com sucesso.",
       });
 
-      // Recarregar lista de documentos
-      loadDocuments();
+      // Adiciona o novo documento à lista
+      if (data) {
+        setDocuments(prev => [...prev, data as Document]);
+      }
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -85,19 +92,17 @@ export const DocumentUpload = () => {
       return;
     }
 
-    setDocuments(data || []);
+    setDocuments(data as Document[]);
   };
 
   const handleDelete = async (id: string, filePath: string) => {
     try {
-      // Deletar arquivo do storage
       const { error: storageError } = await supabase.storage
         .from('documents')
         .remove([filePath]);
 
       if (storageError) throw storageError;
 
-      // Deletar registro do banco
       const { error: dbError } = await supabase
         .from('documents')
         .delete()
@@ -110,8 +115,7 @@ export const DocumentUpload = () => {
         description: "Documento excluído com sucesso.",
       });
 
-      // Atualizar lista
-      loadDocuments();
+      setDocuments(prev => prev.filter(doc => doc.id !== id));
     } catch (error) {
       toast({
         title: "Erro",
@@ -144,37 +148,13 @@ export const DocumentUpload = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {documents.map((doc) => (
-          <Card key={doc.id}>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">{doc.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <File className="h-8 w-8 text-gray-400" />
-                <div className="space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const { data } = supabase.storage
-                        .from('documents')
-                        .getPublicUrl(doc.file_path);
-                      window.open(data.publicUrl, '_blank');
-                    }}
-                  >
-                    Download
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(doc.id, doc.file_path)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <DocumentCard
+            key={doc.id}
+            id={doc.id}
+            title={doc.title}
+            file_path={doc.file_path}
+            onDelete={handleDelete}
+          />
         ))}
       </div>
     </div>
