@@ -13,7 +13,9 @@ import DomainInfo from "./pages/DomainInfo";
 import TermsOfService from "./pages/TermsOfService";
 import Dashboard from "./pages/Dashboard";
 import ClientDetail from "./pages/dashboard/ClientDetail";
+import Sessions from "./pages/dashboard/Sessions";
 import SessionDetail from "./pages/dashboard/SessionDetail";
+import Payments from "./pages/dashboard/Payments";
 import Reports from "./pages/dashboard/Reports";
 import Availability from "./pages/dashboard/Availability";
 import ClientDashboard from "./pages/client/ClientDashboard";
@@ -44,7 +46,9 @@ const App = () => (
           {/* Dashboard Routes */}
           <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="/dashboard/clients/:id" element={<ClientDetail />} />
+          <Route path="/dashboard/sessions" element={<Sessions />} />
           <Route path="/dashboard/sessions/:id" element={<SessionDetail />} />
+          <Route path="/dashboard/payments" element={<Payments />} />
           <Route path="/dashboard/reports" element={<Reports />} />
           <Route path="/dashboard/availability" element={<Availability />} />
           
