@@ -12,7 +12,12 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DomainInfo from "./pages/DomainInfo";
 import TermsOfService from "./pages/TermsOfService";
 import Dashboard from "./pages/Dashboard";
-import ClientDashboard from "./pages/ClientDashboard";
+import ClientDashboard from "./pages/client/ClientDashboard";
+import ClientSchedule from "./pages/client/ClientSchedule";
+import ClientSessions from "./pages/client/ClientSessions";
+import ClientPayments from "./pages/client/ClientPayments";
+import ClientInvoices from "./pages/client/ClientInvoices";
+import ClientNotifications from "./pages/client/ClientNotifications";
 import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
@@ -30,8 +35,13 @@ const App = () => (
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/domain-info" element={<DomainInfo />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="/client-dashboard" element={<ClientDashboard />} />
+          <Route path="/client-dashboard/schedule" element={<ClientSchedule />} />
+          <Route path="/client-dashboard/sessions" element={<ClientSessions />} />
+          <Route path="/client-dashboard/payments" element={<ClientPayments />} />
+          <Route path="/client-dashboard/invoices" element={<ClientInvoices />} />
+          <Route path="/client-dashboard/notifications" element={<ClientNotifications />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -41,6 +41,39 @@ export type Database = {
           },
         ]
       }
+      availability: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          is_available: boolean | null
+          start_time: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          start_time: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          start_time?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       checklist_items: {
         Row: {
           completed: boolean | null
@@ -585,9 +618,11 @@ export type Database = {
           full_name: string | null
           id: string
           name: string | null
+          notes: string | null
           phone: string | null
           preferences: Json | null
           role: string | null
+          status: string | null
           telefone: string | null
           tipo_usuario: string | null
         }
@@ -599,9 +634,11 @@ export type Database = {
           full_name?: string | null
           id: string
           name?: string | null
+          notes?: string | null
           phone?: string | null
           preferences?: Json | null
           role?: string | null
+          status?: string | null
           telefone?: string | null
           tipo_usuario?: string | null
         }
@@ -613,9 +650,11 @@ export type Database = {
           full_name?: string | null
           id?: string
           name?: string | null
+          notes?: string | null
           phone?: string | null
           preferences?: Json | null
           role?: string | null
+          status?: string | null
           telefone?: string | null
           tipo_usuario?: string | null
         }
@@ -689,12 +728,15 @@ export type Database = {
           created_at: string
           data_hora: string
           data_pagamento: string | null
+          feedback: string | null
           google_event_id: string | null
           guest_email: string | null
           id: string
           invitation_sent_at: string | null
           invitation_status: string | null
           notas: string | null
+          post_session_notes: string | null
+          reminder_sent_at: string | null
           status: string | null
           status_pagamento: string | null
           tipo_sessao: string
@@ -706,12 +748,15 @@ export type Database = {
           created_at?: string
           data_hora: string
           data_pagamento?: string | null
+          feedback?: string | null
           google_event_id?: string | null
           guest_email?: string | null
           id?: string
           invitation_sent_at?: string | null
           invitation_status?: string | null
           notas?: string | null
+          post_session_notes?: string | null
+          reminder_sent_at?: string | null
           status?: string | null
           status_pagamento?: string | null
           tipo_sessao: string
@@ -723,12 +768,15 @@ export type Database = {
           created_at?: string
           data_hora?: string
           data_pagamento?: string | null
+          feedback?: string | null
           google_event_id?: string | null
           guest_email?: string | null
           id?: string
           invitation_sent_at?: string | null
           invitation_status?: string | null
           notas?: string | null
+          post_session_notes?: string | null
+          reminder_sent_at?: string | null
           status?: string | null
           status_pagamento?: string | null
           tipo_sessao?: string
@@ -842,6 +890,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_settings: {
+        Row: {
+          created_at: string
+          id: string
+          settings_key: string
+          settings_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          settings_key: string
+          settings_value?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          settings_key?: string
+          settings_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
