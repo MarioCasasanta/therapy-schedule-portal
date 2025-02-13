@@ -21,7 +21,10 @@ export class AvailabilityController {
         day_of_week: availability.day_of_week,
         start_time: availability.start_time,
         end_time: availability.end_time,
-        is_available: availability.is_available
+        is_available: availability.is_available,
+        interval_minutes: availability.interval_minutes,
+        max_concurrent_sessions: availability.max_concurrent_sessions,
+        exceptions: availability.exceptions
       })
       .select()
       .single();

@@ -46,8 +46,11 @@ export type Database = {
           created_at: string
           day_of_week: number
           end_time: string
+          exceptions: Json | null
           id: string
+          interval_minutes: number
           is_available: boolean | null
+          max_concurrent_sessions: number
           start_time: string
           updated_at: string
           user_id: string | null
@@ -56,8 +59,11 @@ export type Database = {
           created_at?: string
           day_of_week: number
           end_time: string
+          exceptions?: Json | null
           id?: string
+          interval_minutes?: number
           is_available?: boolean | null
+          max_concurrent_sessions?: number
           start_time: string
           updated_at?: string
           user_id?: string | null
@@ -66,8 +72,11 @@ export type Database = {
           created_at?: string
           day_of_week?: number
           end_time?: string
+          exceptions?: Json | null
           id?: string
+          interval_minutes?: number
           is_available?: boolean | null
+          max_concurrent_sessions?: number
           start_time?: string
           updated_at?: string
           user_id?: string | null
@@ -845,6 +854,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_config: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
       }
       system_settings: {
         Row: {
