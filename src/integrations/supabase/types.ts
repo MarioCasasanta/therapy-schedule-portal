@@ -118,89 +118,6 @@ export type Database = {
           },
         ]
       }
-      client_area_content: {
-        Row: {
-          content: string
-          content_type: string
-          created_at: string
-          description: string | null
-          id: string
-          is_active: boolean | null
-          is_premium: boolean | null
-          order_index: number | null
-          section_id: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          content: string
-          content_type: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          is_premium?: boolean | null
-          order_index?: number | null
-          section_id?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          content?: string
-          content_type?: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          is_premium?: boolean | null
-          order_index?: number | null
-          section_id?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "client_area_content_section_id_fkey"
-            columns: ["section_id"]
-            isOneToOne: false
-            referencedRelation: "client_area_sections"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      client_area_sections: {
-        Row: {
-          created_at: string
-          description: string | null
-          icon: string | null
-          id: string
-          is_active: boolean | null
-          order_index: number | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          order_index?: number | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          icon?: string | null
-          id?: string
-          is_active?: boolean | null
-          order_index?: number | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       configuracoes_site: {
         Row: {
           conteudo: string
@@ -258,7 +175,7 @@ export type Database = {
           file_type: string
           id: string
           title: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -268,7 +185,7 @@ export type Database = {
           file_type: string
           id?: string
           title: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -278,7 +195,7 @@ export type Database = {
           file_type?: string
           id?: string
           title?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -442,6 +359,44 @@ export type Database = {
         }
         Relationships: []
       }
+      google_calendar_sync: {
+        Row: {
+          created_at: string
+          google_event_id: string
+          id: string
+          last_synced_at: string
+          session_id: string
+          sync_status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          google_event_id: string
+          id?: string
+          last_synced_at?: string
+          session_id: string
+          sync_status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          google_event_id?: string
+          id?: string
+          last_synced_at?: string
+          session_id?: string
+          sync_status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_sync_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
@@ -450,7 +405,7 @@ export type Database = {
           id: string
           invoice_number: string
           paid_at: string | null
-          session_id: string | null
+          session_id: string
           status: string
           user_id: string | null
         }
@@ -461,7 +416,7 @@ export type Database = {
           id?: string
           invoice_number: string
           paid_at?: string | null
-          session_id?: string | null
+          session_id: string
           status?: string
           user_id?: string | null
         }
@@ -472,7 +427,7 @@ export type Database = {
           id?: string
           invoice_number?: string
           paid_at?: string | null
-          session_id?: string | null
+          session_id?: string
           status?: string
           user_id?: string | null
         }
@@ -480,7 +435,7 @@ export type Database = {
           {
             foreignKeyName: "invoices_session_id_fkey"
             columns: ["session_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "sessoes"
             referencedColumns: ["id"]
           },
