@@ -22,3 +22,10 @@ export interface SessionFormData {
   status_pagamento: string;
   data_pagamento?: string;
 }
+
+export interface SessionListProps {
+  sessions: Session[];
+  onEdit: (session: Session) => void;
+  onDelete: (id: string) => void;
+  onSendInvite: (id: string) => void;
+}
