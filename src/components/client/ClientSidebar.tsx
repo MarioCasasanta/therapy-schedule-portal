@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,11 +18,34 @@ import {
   HelpCircle,
   LogOut
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function ClientSidebar({ className }: SidebarProps) {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+      navigate("/auth");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: error.message,
+      });
+    }
+  };
+
   return (
     <div className={cn("pb-12 border-r bg-white", className)}>
       <div className="space-y-4 py-4">
@@ -149,9 +171,7 @@ export function ClientSidebar({ className }: SidebarProps) {
             <Button
               variant="ghost"
               className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-              onClick={() => {
-                // Implementar lógica de logout
-              }}
+              onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Sair
