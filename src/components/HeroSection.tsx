@@ -1,6 +1,29 @@
+
 import { Brain, Heart, Target } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleAgendarClick = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Login necessário",
+        description: "Por favor, faça login para agendar uma sessão.",
+        variant: "default"
+      });
+      navigate("/auth");
+      return;
+    }
+    
+    navigate("/client-dashboard");
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
       <div className="absolute inset-0">
@@ -28,7 +51,10 @@ const HeroSection = () => {
             transformações logo na primeira sessão e acompanhamento 100% personalizado.
           </p>
           <div className="animate-fadeIn [animation-delay:800ms] flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1">
+            <button 
+              onClick={handleAgendarClick}
+              className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1"
+            >
               Quero agendar minha sessão
             </button>
           </div>
