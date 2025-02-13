@@ -28,7 +28,7 @@ const HeroSection = () => {
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
       <div className="absolute inset-0">
         <img
-          src="/photo-1501854140801-50d01698950b"
+          src="/photo-1649972904349-6e44c42644a7"
           alt="Background"
           className="w-full h-full object-cover opacity-10"
         />
