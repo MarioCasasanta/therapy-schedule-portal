@@ -1,6 +1,6 @@
 
 import { User, Settings, LogOut, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +18,13 @@ interface UserMenuProps {
 }
 
 export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
+  const navigate = useNavigate();
   const isAdmin = profile?.role === 'admin';
-  const profilePath = isAdmin ? "/dashboard/profile" : "/client-dashboard/profile/edit";
-  const dashboardPath = isAdmin ? "/dashboard" : "/client-dashboard";
+  
+  const onLogout = async () => {
+    await handleLogout();
+    navigate('/');
+  };
 
   return (
     <DropdownMenu>
@@ -35,20 +39,28 @@ export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link to={profilePath} className="flex items-center w-full">
+        <DropdownMenuItem asChild>
+          <Link to="/client-dashboard/profile/edit" className="flex items-center w-full">
             <User className="mr-2 h-4 w-4" />
             <span>Perfil</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Link to={dashboardPath} className="flex items-center w-full">
+        <DropdownMenuItem asChild>
+          <Link to="/client-dashboard/sessions" className="flex items-center w-full">
             <Calendar className="mr-2 h-4 w-4" />
-            <span>{isAdmin ? "Dashboard" : "Minhas Sessões"}</span>
+            <span>Minhas Sessões</span>
           </Link>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard" className="flex items-center w-full">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Dashboard Admin</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem onClick={onLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sair</span>
         </DropdownMenuItem>

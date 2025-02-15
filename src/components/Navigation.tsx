@@ -15,24 +15,34 @@ const Navigation = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Verificar sessão atual ao montar o componente
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        setProfile(data);
       }
     };
 
     checkSession();
 
-    // Configurar listener para mudanças de autenticação
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        await fetchProfile(session.user.id);
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        setProfile(data);
       } else {
         setProfile(null);
       }
@@ -41,39 +51,21 @@ const Navigation = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (userId) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (error) {
-      console.error('Error fetching profile:', error);
-      return;
-    }
-    
-    setProfile(data);
-  };
-
   const handleLogout = async () => {
     try {
-      // Primeiro limpar os estados locais
-      setUser(null);
-      setProfile(null);
-      
-      // Então fazer o signOut
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Após o signOut bem sucedido, redirecionar
+      setUser(null);
+      setProfile(null);
+      
       navigate("/");
       
       toast({
         title: "Logout realizado",
         description: "Você foi desconectado com sucesso.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro no logout:', error);
       toast({
         variant: "destructive",
