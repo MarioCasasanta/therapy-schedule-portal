@@ -1,0 +1,7 @@
+{
+    "model": "gpt-4",
+    "temperature": 0.5,
+    "max_tokens": 500,
+    "commit_message_prompt": "Analise o código alterado e gere uma mensagem de commit objetiva e explicativa.",
+    "pr_description_prompt": "Analise as mudanças e escreva uma descrição detalhada para um Pull Request."
+}

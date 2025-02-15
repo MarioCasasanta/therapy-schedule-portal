@@ -1,0 +1,26 @@
+name: ChatGPT Code Automation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Permite rodar manualmente o fluxo no GitHub Actions
+
+jobs:
+  chatgpt-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v3
+
+      - name: Instalar Dependências
+        run: npm install
+
+      - name: Executar Análise com ChatGPT
+        run: node scripts/chatgpt-commit.js
+
+      - name: Criar Pull Request
+        run: node scripts/chatgpt-pr.js
