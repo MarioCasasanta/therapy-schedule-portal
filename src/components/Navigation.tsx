@@ -15,77 +15,71 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProfile = async (userId: string) => {
-      console.log("Navigation: Fetching profile for user:", userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (error) {
-        console.error("Navigation: Profile fetch error:", error);
-        return null;
-      }
-      
-      console.log("Navigation: Profile data:", data);
-      return data;
-    };
-
     const checkSession = async () => {
       console.log("Navigation: Checking session...");
       const { data: { session } } = await supabase.auth.getSession();
-      console.log("Navigation: Session data:", session);
+      console.log("Navigation: Session:", session);
+      
+      setUser(session?.user ?? null);
       
       if (session?.user) {
-        setUser(session.user);
-        const profileData = await fetchProfile(session.user.id);
-        console.log("Navigation: Setting profile:", profileData);
-        setProfile(profileData);
-      } else {
-        console.log("Navigation: No session found");
-        setUser(null);
-        setProfile(null);
+        console.log("Navigation: Fetching profile...");
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (error) {
+          console.error("Navigation: Profile fetch error:", error);
+          return;
+        }
+        
+        console.log("Navigation: Profile found:", data);
+        setProfile(data);
       }
     };
 
-    // Checa a sessão inicial
     checkSession();
 
-    // Inscreve para mudanças de autenticação
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("Navigation: Auth state changed:", _event, session);
+      console.log("Navigation: Auth state changed", _event, session);
+      
+      setUser(session?.user ?? null);
       
       if (session?.user) {
-        setUser(session.user);
-        const profileData = await fetchProfile(session.user.id);
-        console.log("Navigation: Setting profile after auth change:", profileData);
-        setProfile(profileData);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (error) {
+          console.error("Navigation: Profile fetch error on auth change:", error);
+          return;
+        }
+        
+        setProfile(data);
       } else {
-        console.log("Navigation: Clearing user and profile data");
-        setUser(null);
         setProfile(null);
       }
     });
 
-    return () => {
-      console.log("Navigation: Unsubscribing from auth changes");
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
     try {
-      console.log("Navigation: Starting logout process");
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      console.log("Navigation: Clearing local state");
+      // Limpa os estados locais
       setUser(null);
       setProfile(null);
       
+      // Usa o navigate para redirecionar
       navigate('/', { replace: true });
       
       toast({
@@ -93,7 +87,7 @@ const Navigation = () => {
         description: "Você foi desconectado com sucesso.",
       });
     } catch (error: any) {
-      console.error('Navigation: Logout error:', error);
+      console.error('Erro no logout:', error);
       toast({
         variant: "destructive",
         title: "Erro ao sair",
@@ -101,8 +95,6 @@ const Navigation = () => {
       });
     }
   };
-
-  console.log("Navigation: Current state -", { user, profile });
 
   return (
     <nav className="fixed w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-100">
