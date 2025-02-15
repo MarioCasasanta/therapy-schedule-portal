@@ -76,12 +76,12 @@ export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: Mo
             {!isAdmin && (
               <>
                 <Link
-                  to="/client-dashboard/profile/edit"
+                  to="/client-dashboard"
                   className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   <User className="mr-2 h-4 w-4" />
-                  <span>Perfil</span>
+                  <span>Área do Cliente</span>
                 </Link>
                 <Link
                   to="/client-dashboard/sessions"

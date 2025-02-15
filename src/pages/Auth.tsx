@@ -24,12 +24,10 @@ const Auth = () => {
             .eq("id", session.user.id)
             .single();
 
-          console.log("Auth: Profile found", profile);
-
           if (profile?.role === "admin") {
-            navigate("/dashboard", { replace: true });
+            navigate("/dashboard");
           } else {
-            navigate("/client-dashboard", { replace: true });
+            navigate("/client-dashboard");
           }
         }
       } catch (error) {
@@ -62,12 +60,10 @@ const Auth = () => {
 
           if (profileError) throw profileError;
 
-          console.log("Auth: Login successful, profile:", profile);
-
           if (profile?.role === "admin") {
-            navigate("/dashboard", { replace: true });
+            navigate("/dashboard");
           } else {
-            navigate("/client-dashboard", { replace: true });
+            navigate("/client-dashboard");
           }
         }
       } else {
