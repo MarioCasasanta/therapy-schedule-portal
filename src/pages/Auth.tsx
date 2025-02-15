@@ -17,16 +17,21 @@ const Auth = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         // Verificar o role do usuário
-        const { data: profile } = await supabase
+        const { data: profiles, error } = await supabase
           .from("profiles")
           .select("role")
-          .eq("id", session.user.id)
-          .maybeSingle();
+          .eq("id", session.user.id);
 
-        if (profile?.role === "admin") {
-          navigate("/dashboard");
+        console.log("Profile data:", profiles); // Debug log
+
+        if (profiles && profiles.length > 0) {
+          if (profiles[0].role === "admin") {
+            navigate("/dashboard");
+          } else {
+            navigate("/client-dashboard");
+          }
         } else {
-          navigate("/client-dashboard");
+          console.log("No profile found for user:", session.user.id);
         }
       }
     };
@@ -49,20 +54,27 @@ const Auth = () => {
 
         if (session) {
           // Verificar o role do usuário após login
-          const { data: profile, error: profileError } = await supabase
+          const { data: profiles, error: profileError } = await supabase
             .from("profiles")
             .select("role")
-            .eq("id", session.user.id)
-            .maybeSingle();
+            .eq("id", session.user.id);
 
           if (profileError) throw profileError;
 
-          console.log("Profile data:", profile); // Para ajudar no debug
+          console.log("Profile data after login:", profiles); // Debug log
 
-          if (profile?.role === "admin") {
-            navigate("/dashboard");
+          if (profiles && profiles.length > 0) {
+            if (profiles[0].role === "admin") {
+              navigate("/dashboard");
+            } else {
+              navigate("/client-dashboard");
+            }
           } else {
-            navigate("/client-dashboard");
+            toast({
+              variant: "destructive",
+              title: "Erro",
+              description: "Perfil não encontrado.",
+            });
           }
         }
       } else {
@@ -77,7 +89,7 @@ const Auth = () => {
         });
       }
     } catch (error: any) {
-      console.error("Auth error:", error); // Para ajudar no debug
+      console.error("Auth error:", error); // Debug log
       toast({
         variant: "destructive",
         title: "Erro",
