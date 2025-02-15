@@ -56,9 +56,9 @@ const Navigation = () => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
+      console.log("Logout successful");
       setUser(null);
       setProfile(null);
-      
       navigate("/");
       
       toast({
