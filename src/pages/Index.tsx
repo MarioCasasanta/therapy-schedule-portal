@@ -1,6 +1,6 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
@@ -11,31 +11,49 @@ import ContactSection from "@/components/ContactSection";
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // Buscar o perfil do usuário para verificar o role
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .maybeSingle();
+    // Só verificar a sessão se estivermos na página inicial
+    if (location.pathname === "/") {
+      const checkSession = async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            console.log("Index: Session found, checking profile");
+            // Buscar o perfil do usuário para verificar o role
+            const { data: profile, error } = await supabase
+              .from("profiles")
+              .select("role")
+              .eq("id", session.user.id)
+              .single();
 
-        console.log("Session:", session); // Para ajudar no debug
-        console.log("Profile:", profile); // Para ajudar no debug
+            if (error) {
+              console.error("Index: Profile fetch error:", error);
+              return;
+            }
 
-        if (profile?.role === "admin") {
-          navigate("/dashboard");
-        } else {
-          navigate("/client-dashboard");
+            console.log("Index: Profile found:", profile);
+
+            if (profile?.role === "admin") {
+              navigate("/dashboard");
+            } else {
+              navigate("/client-dashboard");
+            }
+          }
+        } catch (error) {
+          console.error("Index: Check session error:", error);
         }
-      }
-    };
+      };
 
-    checkSession();
-  }, [navigate]);
+      checkSession();
+    }
+  }, [navigate, location]);
+
+  // Se não estiver na página inicial, não fazer nada
+  if (location.pathname !== "/") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-white">
