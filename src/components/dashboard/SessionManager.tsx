@@ -33,7 +33,7 @@ export const SessionManager = ({ selectedDate, sessions, setSessions }: SessionM
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<any>(null);
-  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [sessionToDelete, setSessionToDelete] = useState<any>(null);
 
   const handleSubmit = async (formData: any) => {
     const session = editingSession?.id
@@ -78,7 +78,7 @@ export const SessionManager = ({ selectedDate, sessions, setSessions }: SessionM
     const { error } = await supabase
       .from("sessoes")
       .delete()
-      .eq("id", sessionToDelete);
+      .eq("id", sessionToDelete.id);
 
     if (error) {
       toast({
@@ -94,7 +94,7 @@ export const SessionManager = ({ selectedDate, sessions, setSessions }: SessionM
       description: "Sessão excluída com sucesso!",
     });
 
-    const updatedSessions = sessions.filter((s) => s.id !== sessionToDelete);
+    const updatedSessions = sessions.filter((s) => s.id !== sessionToDelete.id);
     setSessions(updatedSessions);
     setIsDeleteDialogOpen(false);
     setSessionToDelete(null);
@@ -135,8 +135,8 @@ export const SessionManager = ({ selectedDate, sessions, setSessions }: SessionM
           setEditingSession(session);
           setIsFormOpen(true);
         }}
-        onDelete={(id) => {
-          setSessionToDelete(id);
+        onDelete={(session) => {
+          setSessionToDelete(session);
           setIsDeleteDialogOpen(true);
         }}
         onSendInvite={handleSendInvite}
