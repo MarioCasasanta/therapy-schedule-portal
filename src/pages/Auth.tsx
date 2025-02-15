@@ -14,24 +14,31 @@ const Auth = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .single();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single();
 
-        if (profile?.role === "admin") {
-          window.location.href = "/dashboard";
-        } else {
-          window.location.href = "/client-dashboard";
+          console.log("Auth: Profile found", profile);
+
+          if (profile?.role === "admin") {
+            navigate("/dashboard", { replace: true });
+          } else {
+            navigate("/client-dashboard", { replace: true });
+          }
         }
+      } catch (error) {
+        console.error("Auth check session error:", error);
       }
     };
 
     checkSession();
-  }, []);
+  }, [navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,10 +62,12 @@ const Auth = () => {
 
           if (profileError) throw profileError;
 
+          console.log("Auth: Login successful, profile:", profile);
+
           if (profile?.role === "admin") {
-            window.location.href = "/dashboard";
+            navigate("/dashboard", { replace: true });
           } else {
-            window.location.href = "/client-dashboard";
+            navigate("/client-dashboard", { replace: true });
           }
         }
       } else {
