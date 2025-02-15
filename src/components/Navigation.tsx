@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DesktopNav } from "./navigation/DesktopNav";
@@ -12,6 +12,7 @@ const Navigation = () => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -52,17 +53,15 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      // Primeiro limpa os estados
-      setUser(null);
-      setProfile(null);
-      
-      // Depois faz o signOut
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Aguarda um pouco antes de redirecionar
-      await new Promise(resolve => setTimeout(resolve, 100));
-      window.location.replace('/');
+      // Limpa os estados locais
+      setUser(null);
+      setProfile(null);
+      
+      // Usa o navigate para redirecionar
+      navigate('/', { replace: true });
       
       toast({
         title: "Logout realizado com sucesso",
