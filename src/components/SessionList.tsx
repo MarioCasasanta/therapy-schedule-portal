@@ -1,10 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Mail, Edit, Trash2, CreditCard } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@/types/session";
 import {
   Dialog,
   DialogContent,
@@ -13,101 +14,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { PaymentElement } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe("pk_test_your_publishable_key");
-
-interface Session {
-  id: string;
-  data_hora: string;
-  tipo_sessao: string;
-  guest_email?: string;
-  invitation_status?: string;
-  notas?: string;
-  valor?: number;
-  status_pagamento?: string;
-  data_pagamento?: string;
-}
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
 
 interface SessionListProps {
   sessions: Session[];
   onEdit: (session: Session) => void;
-  onDelete: (id: string) => void;
+  onDelete: (session: Session) => void;
   onSendInvite: (session: Session) => void;
   isClientView?: boolean;
   onPayment?: (session: Session) => void;
 }
-
-const PaymentForm = ({ session, onSuccess, onCancel }: { 
-  session: Session; 
-  onSuccess: () => void;
-  onCancel: () => void;
-}) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!stripe || !elements) return;
-
-    setIsProcessing(true);
-    try {
-      const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
-        elements,
-        params: {
-          type: 'card',
-        },
-      });
-
-      if (stripeError) {
-        throw stripeError;
-      }
-
-      const { data, error } = await supabase.functions.invoke('process-payment', {
-        body: { 
-          session_id: session.id,
-          payment_method: paymentMethod.id,
-        },
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Sucesso!",
-        description: "Pagamento processado com sucesso.",
-      });
-
-      onSuccess();
-    } catch (error: any) {
-      console.error('Erro no pagamento:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro no pagamento",
-        description: error.message || "Não foi possível processar o pagamento.",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <PaymentElement />
-      <div className="mt-4 space-x-2">
-        <Button type="submit" disabled={isProcessing}>
-          {isProcessing ? "Processando..." : "Pagar"}
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancelar
-        </Button>
-      </div>
-    </form>
-  );
-};
 
 export const SessionList = ({ 
   sessions, 
@@ -160,11 +80,7 @@ export const SessionList = ({
                     {session.invitation_status && (
                       <Badge 
                         variant={session.invitation_status === "accepted" ? "default" : "secondary"}
-                        className={`ml-2 ${
-                          session.invitation_status === "accepted" 
-                            ? "bg-green-500 hover:bg-green-600" 
-                            : "bg-yellow-500 hover:bg-yellow-600"
-                        }`}
+                        className="ml-2"
                       >
                         {session.invitation_status}
                       </Badge>
@@ -218,7 +134,7 @@ export const SessionList = ({
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => onDelete(session.id)}
+                      onClick={() => onDelete(session)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -238,18 +154,14 @@ export const SessionList = ({
               Você está prestes a pagar a sessão no valor de R$ {paymentSession?.valor?.toFixed(2)}
             </DialogDescription>
           </DialogHeader>
-          {paymentSession && (
+          {paymentSession && stripePromise && (
             <Elements stripe={stripePromise}>
-              <PaymentForm 
-                session={paymentSession}
-                onSuccess={() => {
-                  setPaymentSession(null);
-                  if (onPayment) {
-                    onPayment(paymentSession);
-                  }
-                }}
-                onCancel={() => setPaymentSession(null)}
-              />
+              <PaymentElement />
+              <div className="mt-4">
+                <Button className="w-full">
+                  Pagar
+                </Button>
+              </div>
             </Elements>
           )}
         </DialogContent>

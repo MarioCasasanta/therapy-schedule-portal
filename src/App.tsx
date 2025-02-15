@@ -14,6 +14,7 @@ import Profile from "@/pages/admin/Profile";
 import ClientSessions from "@/pages/client/ClientSessions";
 import ClientSchedule from "@/pages/client/ClientSchedule";
 import ClientProfile from "@/pages/client/Profile";
+import ChatGPTIntegration from "@/pages/Documentation/ChatGPTIntegration";
 import NotFound from "@/pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/docs/chatgpt-integration" element={<ChatGPTIntegration />} />
         
         {/* Admin Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
