@@ -17,7 +17,8 @@ import {
   History,
   Edit,
   HelpCircle,
-  LogOut
+  LogOut,
+  ArrowLeft
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,7 +38,7 @@ export function ClientSidebar({ className }: SidebarProps) {
         title: "Logout realizado",
         description: "Você foi desconectado com sucesso.",
       });
-      navigate("/auth");
+      window.location.href = '/';
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -51,6 +52,15 @@ export function ClientSidebar({ className }: SidebarProps) {
     <div className={cn("pb-12 border-r bg-white", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
+          <Button
+            variant="ghost"
+            className="w-full justify-start mb-6"
+            onClick={() => window.location.href = '/'}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar ao Site
+          </Button>
+
           <h2 className="mb-2 px-4 text-lg font-semibold">Área do Cliente</h2>
           <div className="space-y-1">
             <NavLink to="/client-dashboard" end>

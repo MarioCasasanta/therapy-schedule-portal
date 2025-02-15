@@ -112,8 +112,8 @@ export const WeeklyCalendar = ({ onSelectSlot }: WeeklyCalendarProps) => {
         ))}
 
         {availableSlots.map((slot) => (
-          <>
-            <div key={`time-${slot.time}`} className="text-right pr-2 text-sm text-gray-600">
+          <React.Fragment key={`time-${slot.time}`}>
+            <div className="text-right pr-2 text-sm text-gray-600">
               {slot.time}
             </div>
             {weekDays.map((day) => (
@@ -126,7 +126,7 @@ export const WeeklyCalendar = ({ onSelectSlot }: WeeklyCalendarProps) => {
                 Disponível
               </Button>
             ))}
-          </>
+          </React.Fragment>
         ))}
       </div>
     </div>
