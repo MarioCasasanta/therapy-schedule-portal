@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
 import { useLocation } from "react-router-dom";
@@ -79,7 +78,6 @@ const NewSession = () => {
               <CardContent>
                 <WeeklyCalendar
                   onSelectSlot={handleSlotSelect}
-                  availableSlots={availableSlots}
                 />
               </CardContent>
             </Card>

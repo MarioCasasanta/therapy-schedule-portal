@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { User, Settings, LogOut, Calendar } from "lucide-react";
 
@@ -12,13 +11,13 @@ interface MobileNavProps {
 
 export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: MobileNavProps) => {
   const navigate = useNavigate();
+  const isAdmin = profile?.role === 'admin';
   
   if (!isOpen) return null;
 
   const handleLogoutClick = async () => {
     await handleLogout();
     setIsOpen(false);
-    navigate('/');
   };
 
   return (
@@ -27,46 +26,30 @@ export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: Mo
         {!user ? (
           <>
             <a
-              href="#"
+              href="#services"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#services')?.scrollIntoView({ behavior: 'smooth' });
-                setIsOpen(false);
-              }}
+              onClick={() => setIsOpen(false)}
             >
               Serviços
             </a>
             <a
-              href="#"
+              href="#about"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
-                setIsOpen(false);
-              }}
+              onClick={() => setIsOpen(false)}
             >
               Sobre
             </a>
             <a
-              href="#"
+              href="#testimonials"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#testimonials')?.scrollIntoView({ behavior: 'smooth' });
-                setIsOpen(false);
-              }}
+              onClick={() => setIsOpen(false)}
             >
               Depoimentos
             </a>
             <a
-              href="#"
+              href="#contact"
               className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
-                setIsOpen(false);
-              }}
+              onClick={() => setIsOpen(false)}
             >
               Contato
             </a>
@@ -80,35 +63,39 @@ export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: Mo
           </>
         ) : (
           <>
-            <Link
-              to="/client-dashboard/profile/edit"
-              className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              <User className="mr-2 h-4 w-4" />
-              <span>Perfil</span>
-            </Link>
-            <Link
-              to="/client-dashboard/sessions"
-              className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              <Calendar className="mr-2 h-4 w-4" />
-              <span>Minhas Sessões</span>
-            </Link>
-            {profile?.role === 'admin' && (
+            {isAdmin && (
               <Link
                 to="/dashboard"
                 className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 <Settings className="mr-2 h-4 w-4" />
-                <span>Dashboard Admin</span>
+                <span>Dashboard</span>
               </Link>
+            )}
+            {!isAdmin && (
+              <>
+                <Link
+                  to="/client-dashboard/profile/edit"
+                  className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </Link>
+                <Link
+                  to="/client-dashboard/sessions"
+                  className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <span>Minhas Sessões</span>
+                </Link>
+              </>
             )}
             <button
               onClick={handleLogoutClick}
-              className="flex items-center w-full px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+              className="flex items-center w-full px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
             >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sair</span>
