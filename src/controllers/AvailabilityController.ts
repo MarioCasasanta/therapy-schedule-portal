@@ -32,4 +32,15 @@ export class AvailabilityController {
     if (error) throw error;
     return data as Availability;
   }
+
+  static async getByDayOfWeek(dayOfWeek: number) {
+    const { data, error } = await supabase
+      .from("availability")
+      .select("*")
+      .eq("day_of_week", dayOfWeek)
+      .eq("is_available", true);
+
+    if (error) throw error;
+    return data as Availability[];
+  }
 }

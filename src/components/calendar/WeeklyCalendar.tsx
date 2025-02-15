@@ -5,6 +5,8 @@ import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { AvailabilityController } from "@/controllers/AvailabilityController";
+import { useToast } from "@/components/ui/use-toast";
 
 interface TimeSlot {
   time: string;
@@ -13,13 +15,15 @@ interface TimeSlot {
 
 interface WeeklyCalendarProps {
   onSelectSlot: (date: Date, time: string) => void;
-  availableSlots?: TimeSlot[];
+  initialAvailableSlots?: TimeSlot[];
 }
 
-export const WeeklyCalendar = ({ onSelectSlot, availableSlots = [] }: WeeklyCalendarProps) => {
+export const WeeklyCalendar = ({ onSelectSlot, initialAvailableSlots = [] }: WeeklyCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 0 }));
   const [weekDays, setWeekDays] = useState<Date[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>(initialAvailableSlots);
+  const { toast } = useToast();
 
   useEffect(() => {
     const days = [];
@@ -28,6 +32,41 @@ export const WeeklyCalendar = ({ onSelectSlot, availableSlots = [] }: WeeklyCale
     }
     setWeekDays(days);
   }, [weekStart]);
+
+  useEffect(() => {
+    const loadAvailability = async () => {
+      try {
+        const dayOfWeek = selectedDate.getDay();
+        const availability = await AvailabilityController.getByDayOfWeek(dayOfWeek);
+        
+        if (availability.length > 0) {
+          const slots: TimeSlot[] = [];
+          availability.forEach(slot => {
+            const [startHour] = slot.start_time.split(':');
+            const [endHour] = slot.end_time.split(':');
+            const start = parseInt(startHour);
+            const end = parseInt(endHour);
+            
+            for (let hour = start; hour < end; hour++) {
+              slots.push({
+                time: `${hour.toString().padStart(2, '0')}:00`,
+                available: true
+              });
+            }
+          });
+          setAvailableSlots(slots);
+        }
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar disponibilidade",
+          description: error.message,
+        });
+      }
+    };
+
+    loadAvailability();
+  }, [selectedDate, toast]);
 
   const handlePreviousWeek = () => {
     setWeekStart(addDays(weekStart, -7));
@@ -78,25 +117,23 @@ export const WeeklyCalendar = ({ onSelectSlot, availableSlots = [] }: WeeklyCale
           </div>
         ))}
 
-        {availableSlots
-          .filter(slot => slot.available)
-          .map((slot) => (
-            <>
-              <div key={`time-${slot.time}`} className="text-right pr-2 text-sm text-gray-600">
-                {slot.time}
-              </div>
-              {weekDays.map((day) => (
-                <Button
-                  key={`${day.toISOString()}-${slot.time}`}
-                  variant="outline"
-                  className="h-8 text-xs hover:bg-blue-50 hover:text-blue-600"
-                  onClick={() => onSelectSlot(day, slot.time)}
-                >
-                  Disponível
-                </Button>
-              ))}
-            </>
-          ))}
+        {availableSlots.map((slot) => (
+          <>
+            <div key={`time-${slot.time}`} className="text-right pr-2 text-sm text-gray-600">
+              {slot.time}
+            </div>
+            {weekDays.map((day) => (
+              <Button
+                key={`${day.toISOString()}-${slot.time}`}
+                variant="outline"
+                className="h-8 text-xs hover:bg-blue-50 hover:text-blue-600"
+                onClick={() => onSelectSlot(day, slot.time)}
+              >
+                Disponível
+              </Button>
+            ))}
+          </>
+        ))}
       </div>
     </div>
   );
