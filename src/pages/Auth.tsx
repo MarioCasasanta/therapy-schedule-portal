@@ -14,25 +14,38 @@ const Auth = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // Verificar o role do usuário
-        const { data: profiles, error } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id);
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          return;
+        }
 
-        console.log("Profile data:", profiles); // Debug log
+        if (session) {
+          console.log("Session found:", session.user.id);
+          
+          const { data: profiles, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
 
-        if (profiles && profiles.length > 0) {
-          if (profiles[0].role === "admin") {
+          if (profileError) {
+            console.error("Profile fetch error:", profileError);
+            return;
+          }
+
+          console.log("Profile found:", profiles);
+
+          if (profiles?.role === "admin") {
             navigate("/dashboard");
           } else {
             navigate("/client-dashboard");
           }
-        } else {
-          console.log("No profile found for user:", session.user.id);
         }
+      } catch (error) {
+        console.error("Check session error:", error);
       }
     };
 
@@ -45,54 +58,58 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data: { session }, error } = await supabase.auth.signInWithPassword({
+        console.log("Attempting login for:", email);
+        
+        const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
-        if (error) throw error;
+        if (loginError) {
+          console.error("Login error:", loginError);
+          throw loginError;
+        }
 
         if (session) {
-          // Verificar o role do usuário após login
-          const { data: profiles, error: profileError } = await supabase
+          console.log("Login successful, fetching profile for:", session.user.id);
+          
+          const { data: profile, error: profileError } = await supabase
             .from("profiles")
-            .select("role")
-            .eq("id", session.user.id);
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
 
-          if (profileError) throw profileError;
+          if (profileError) {
+            console.error("Profile fetch error:", profileError);
+            throw profileError;
+          }
 
-          console.log("Profile data after login:", profiles); // Debug log
+          console.log("Profile fetched:", profile);
 
-          if (profiles && profiles.length > 0) {
-            if (profiles[0].role === "admin") {
-              navigate("/dashboard");
-            } else {
-              navigate("/client-dashboard");
-            }
+          if (profile?.role === "admin") {
+            navigate("/dashboard");
           } else {
-            toast({
-              variant: "destructive",
-              title: "Erro",
-              description: "Perfil não encontrado.",
-            });
+            navigate("/client-dashboard");
           }
         }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
         });
-        if (error) throw error;
+        
+        if (signUpError) throw signUpError;
+        
         toast({
           title: "Cadastro realizado com sucesso!",
           description: "Verifique seu email para confirmar o cadastro.",
         });
       }
     } catch (error: any) {
-      console.error("Auth error:", error); // Debug log
+      console.error("Auth error:", error);
       toast({
         variant: "destructive",
-        title: "Erro",
+        title: "Erro na autenticação",
         description: error.message,
       });
     } finally {
