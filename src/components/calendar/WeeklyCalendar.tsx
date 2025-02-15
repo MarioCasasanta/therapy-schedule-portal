@@ -37,12 +37,6 @@ export const WeeklyCalendar = ({ onSelectSlot, availableSlots = [] }: WeeklyCale
     setWeekStart(addDays(weekStart, 7));
   };
 
-  const timeSlots = [
-    "08:00", "09:00", "10:00", "11:00", "12:00",
-    "13:00", "14:00", "15:00", "16:00", "17:00",
-    "18:00", "19:00", "20:00"
-  ];
-
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex justify-between items-center mb-4">
@@ -84,34 +78,25 @@ export const WeeklyCalendar = ({ onSelectSlot, availableSlots = [] }: WeeklyCale
           </div>
         ))}
 
-        {timeSlots.map((time) => (
-          <>
-            <div key={`time-${time}`} className="text-right pr-2 text-sm text-gray-600">
-              {time}
-            </div>
-            {weekDays.map((day) => {
-              const isAvailable = availableSlots.some(
-                slot => slot.time === time && slot.available
-              );
-              return (
+        {availableSlots
+          .filter(slot => slot.available)
+          .map((slot) => (
+            <>
+              <div key={`time-${slot.time}`} className="text-right pr-2 text-sm text-gray-600">
+                {slot.time}
+              </div>
+              {weekDays.map((day) => (
                 <Button
-                  key={`${day.toISOString()}-${time}`}
+                  key={`${day.toISOString()}-${slot.time}`}
                   variant="outline"
-                  className={cn(
-                    "h-8 text-xs",
-                    isAvailable
-                      ? "hover:bg-blue-50 hover:text-blue-600"
-                      : "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={!isAvailable}
-                  onClick={() => isAvailable && onSelectSlot(day, time)}
+                  className="h-8 text-xs hover:bg-blue-50 hover:text-blue-600"
+                  onClick={() => onSelectSlot(day, slot.time)}
                 >
-                  {isAvailable ? "Disponível" : "Indisponível"}
+                  Disponível
                 </Button>
-              );
-            })}
-          </>
-        ))}
+              ))}
+            </>
+          ))}
       </div>
     </div>
   );
