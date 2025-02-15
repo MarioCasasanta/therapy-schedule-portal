@@ -24,18 +24,27 @@ async function generateCommitMessage() {
     });
 
     const data = await response.json();
-    return data.choices[0].message.content;
+
+    if (!data || !data.choices || data.choices.length === 0) {
+        throw new Error("Erro: Resposta inválida da OpenAI. Verifique sua API Key e tente novamente.");
+    }
+
+    return data.choices[0].message.content.trim();
 }
 
 async function commitChanges() {
-    const commitMessage = await generateCommitMessage();
-    console.log(`📌 Mensagem de commit gerada: ${commitMessage}`);
+    try {
+        const commitMessage = await generateCommitMessage();
+        console.log(`📌 Mensagem de commit gerada: ${commitMessage}`);
 
-    execSync("git add .");
-    execSync(`git commit -m "${commitMessage}"`);
-    execSync("git push origin main");
+        execSync("git add .");
+        execSync(`git commit -m "${commitMessage}"`);
+        execSync("git push origin main");
 
-    console.log("✅ Commit enviado com sucesso!");
+        console.log("✅ Commit enviado com sucesso!");
+    } catch (error) {
+        console.error("❌ Erro ao gerar commit:", error.message);
+    }
 }
 
 commitChanges();
