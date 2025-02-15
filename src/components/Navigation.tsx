@@ -52,9 +52,9 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
       window.location.href = '/';
       
       toast({

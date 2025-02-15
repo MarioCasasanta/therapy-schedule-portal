@@ -35,7 +35,7 @@ export const DesktopNav = ({ user, profile, handleLogout }: DesktopNavProps) => 
       }}>
         Contato
       </a>
-      {profile?.role === 'admin' && (
+      {user && profile?.role === 'admin' && (
         <Link to="/dashboard" className="text-sage-600 hover:text-sage-800 transition-colors">
           Dashboard
         </Link>
