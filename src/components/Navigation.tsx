@@ -53,18 +53,8 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      console.log("Logout successful");
-      setUser(null);
-      setProfile(null);
-      navigate("/");
-      
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso.",
-      });
+      await supabase.auth.signOut();
+      window.location.href = '/';
     } catch (error: any) {
       console.error('Erro no logout:', error);
       toast({

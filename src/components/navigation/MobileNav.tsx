@@ -12,11 +12,6 @@ interface MobileNavProps {
 export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: MobileNavProps) => {
   if (!isOpen) return null;
 
-  const onLogout = async () => {
-    await handleLogout();
-    setIsOpen(false);
-  };
-
   return (
     <div className="md:hidden bg-white border-b border-gray-100">
       <div className="px-2 pt-2 pb-3 space-y-1">
@@ -100,7 +95,7 @@ export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: Mo
               </Link>
             )}
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               className="block w-full text-left px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
             >
               Sair
