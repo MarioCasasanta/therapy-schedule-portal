@@ -23,6 +23,9 @@ const Navigation = () => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        // Aguarda para garantir que o Supabase atualizou a sessão
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        
         console.log("Navigation: Fetching profile...");
         const { data, error } = await supabase
           .from('profiles')
@@ -50,6 +53,9 @@ const Navigation = () => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        // Aguarda para garantir que o Supabase atualizou a sessão
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -78,6 +84,9 @@ const Navigation = () => {
       // Limpa os estados locais
       setUser(null);
       setProfile(null);
+      
+      // Aguarda para garantir que o logout foi processado
+      await new Promise((resolve) => setTimeout(resolve, 500));
       
       // Usa o navigate para redirecionar
       navigate('/', { replace: true });

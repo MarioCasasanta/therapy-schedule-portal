@@ -16,18 +16,29 @@ const Auth = () => {
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log("Auth: Checking session", session);
         
         if (session?.user) {
-          const { data: profile } = await supabase
+          // Aguarda um pequeno tempo para garantir que o Supabase atualizou a sessão
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          const { data: profile, error } = await supabase
             .from("profiles")
             .select("role")
             .eq("id", session.user.id)
             .single();
 
+          console.log("Auth: Profile after login", profile);
+
+          if (error) {
+            console.error("Auth: Profile fetch error", error);
+            return;
+          }
+
           if (profile?.role === "admin") {
-            navigate("/dashboard");
+            navigate("/dashboard", { replace: true });
           } else {
-            navigate("/client-dashboard");
+            navigate("/client-dashboard", { replace: true });
           }
         }
       } catch (error) {
@@ -36,6 +47,17 @@ const Auth = () => {
     };
 
     checkSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth: Auth state changed", event, session);
+      if (session?.user) {
+        checkSession();
+      }
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -52,18 +74,23 @@ const Auth = () => {
         if (loginError) throw loginError;
 
         if (session) {
+          // Aguarda um pequeno tempo para garantir que o Supabase atualizou a sessão
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("role")
             .eq("id", session.user.id)
             .single();
 
+          console.log("Auth: Profile after login", profile);
+
           if (profileError) throw profileError;
 
           if (profile?.role === "admin") {
-            navigate("/dashboard");
+            navigate("/dashboard", { replace: true });
           } else {
-            navigate("/client-dashboard");
+            navigate("/client-dashboard", { replace: true });
           }
         }
       } else {
