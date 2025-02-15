@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DesktopNav } from "./navigation/DesktopNav";
@@ -12,7 +12,6 @@ const Navigation = () => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -58,7 +57,7 @@ const Navigation = () => {
       
       setUser(null);
       setProfile(null);
-      navigate('/');
+      window.location.href = '/';
       
       toast({
         title: "Logout realizado com sucesso",

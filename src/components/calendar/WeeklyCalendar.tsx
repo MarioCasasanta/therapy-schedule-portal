@@ -6,23 +6,17 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AvailabilityController } from "@/controllers/AvailabilityController";
-import { useToast } from "@/components/ui/use-toast";
-
-interface TimeSlot {
-  time: string;
-  available: boolean;
-}
+import { useToast } from "@/hooks/use-toast";
 
 interface WeeklyCalendarProps {
   onSelectSlot: (date: Date, time: string) => void;
-  initialAvailableSlots?: TimeSlot[];
 }
 
-export const WeeklyCalendar = ({ onSelectSlot, initialAvailableSlots = [] }: WeeklyCalendarProps) => {
+export const WeeklyCalendar = ({ onSelectSlot }: WeeklyCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 0 }));
   const [weekDays, setWeekDays] = useState<Date[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>(initialAvailableSlots);
+  const [availableSlots, setAvailableSlots] = useState<{ time: string; available: boolean; }[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -40,7 +34,7 @@ export const WeeklyCalendar = ({ onSelectSlot, initialAvailableSlots = [] }: Wee
         const availability = await AvailabilityController.getByDayOfWeek(dayOfWeek);
         
         if (availability.length > 0) {
-          const slots: TimeSlot[] = [];
+          const slots: { time: string; available: boolean; }[] = [];
           availability.forEach(slot => {
             const [startHour] = slot.start_time.split(':');
             const [endHour] = slot.end_time.split(':');
