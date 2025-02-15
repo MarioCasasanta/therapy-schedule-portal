@@ -16,15 +16,26 @@ const Navigation = () => {
 
   useEffect(() => {
     const checkSession = async () => {
+      console.log("Navigation: Checking session...");
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("Navigation: Session:", session);
+      
       setUser(session?.user ?? null);
+      
       if (session?.user) {
-        const { data } = await supabase
+        console.log("Navigation: Fetching profile...");
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
         
+        if (error) {
+          console.error("Navigation: Profile fetch error:", error);
+          return;
+        }
+        
+        console.log("Navigation: Profile found:", data);
         setProfile(data);
       }
     };
@@ -34,13 +45,21 @@ const Navigation = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log("Navigation: Auth state changed", _event, session);
+      
       setUser(session?.user ?? null);
+      
       if (session?.user) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
+        
+        if (error) {
+          console.error("Navigation: Profile fetch error on auth change:", error);
+          return;
+        }
         
         setProfile(data);
       } else {

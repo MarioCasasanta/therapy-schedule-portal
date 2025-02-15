@@ -35,11 +35,8 @@ const Index = () => {
 
             console.log("Index: Profile found:", profile);
 
-            if (profile?.role === "admin") {
-              navigate("/dashboard");
-            } else {
-              navigate("/client-dashboard");
-            }
+            // Removido o redirecionamento automático para permitir
+            // que o usuário veja a página inicial mesmo logado
           }
         } catch (error) {
           console.error("Index: Check session error:", error);
@@ -49,11 +46,6 @@ const Index = () => {
       checkSession();
     }
   }, [navigate, location]);
-
-  // Se não estiver na página inicial, não fazer nada
-  if (location.pathname !== "/") {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-white">
