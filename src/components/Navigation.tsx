@@ -52,10 +52,16 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
       setUser(null);
       setProfile(null);
-      window.location.href = '/';
+      
+      // Forçar o redirecionamento após o logout
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
       
       toast({
         title: "Logout realizado com sucesso",

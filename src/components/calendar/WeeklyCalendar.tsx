@@ -10,11 +10,12 @@ import { useToast } from "@/hooks/use-toast";
 
 interface WeeklyCalendarProps {
   onSelectSlot: (date: Date, time: string) => void;
+  initialDate?: Date;
 }
 
-export const WeeklyCalendar = ({ onSelectSlot }: WeeklyCalendarProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 0 }));
+export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: WeeklyCalendarProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
+  const [weekStart, setWeekStart] = useState(startOfWeek(initialDate, { weekStartsOn: 0 }));
   const [weekDays, setWeekDays] = useState<Date[]>([]);
   const [availableSlots, setAvailableSlots] = useState<{ time: string; available: boolean; }[]>([]);
   const { toast } = useToast();
@@ -49,6 +50,8 @@ export const WeeklyCalendar = ({ onSelectSlot }: WeeklyCalendarProps) => {
             }
           });
           setAvailableSlots(slots);
+        } else {
+          setAvailableSlots([]);
         }
       } catch (error: any) {
         toast({

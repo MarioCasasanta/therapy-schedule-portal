@@ -33,18 +33,22 @@ export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/client-dashboard/profile/edit" className="flex items-center w-full">
-            <User className="mr-2 h-4 w-4" />
-            <span>Perfil</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/client-dashboard/sessions" className="flex items-center w-full">
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Minhas Sessões</span>
-          </Link>
-        </DropdownMenuItem>
+        {!isAdmin && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/client-dashboard/profile/edit" className="flex items-center w-full">
+                <User className="mr-2 h-4 w-4" />
+                <span>Perfil</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/client-dashboard/sessions" className="flex items-center w-full">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span>Minhas Sessões</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
         {isAdmin && (
           <DropdownMenuItem asChild>
             <Link to="/dashboard" className="flex items-center w-full">
@@ -54,7 +58,10 @@ export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+        <DropdownMenuItem 
+          onClick={handleLogout} 
+          className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sair</span>
         </DropdownMenuItem>
