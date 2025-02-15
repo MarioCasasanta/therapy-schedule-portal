@@ -14,43 +14,24 @@ const Auth = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profile?.role === "admin") {
+          window.location.href = "/dashboard";
+        } else {
+          window.location.href = "/client-dashboard";
         }
-
-        if (session) {
-          console.log("Session found:", session.user.id);
-          
-          const { data: profiles, error: profileError } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
-
-          if (profileError) {
-            console.error("Profile fetch error:", profileError);
-            return;
-          }
-
-          console.log("Profile found:", profiles);
-
-          if (profiles?.role === "admin") {
-            navigate("/dashboard");
-          } else {
-            navigate("/client-dashboard");
-          }
-        }
-      } catch (error) {
-        console.error("Check session error:", error);
       }
     };
 
     checkSession();
-  }, [navigate]);
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,38 +39,26 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        console.log("Attempting login for:", email);
-        
         const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
-        if (loginError) {
-          console.error("Login error:", loginError);
-          throw loginError;
-        }
+        if (loginError) throw loginError;
 
         if (session) {
-          console.log("Login successful, fetching profile for:", session.user.id);
-          
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
-            .select("*")
+            .select("role")
             .eq("id", session.user.id)
             .single();
 
-          if (profileError) {
-            console.error("Profile fetch error:", profileError);
-            throw profileError;
-          }
-
-          console.log("Profile fetched:", profile);
+          if (profileError) throw profileError;
 
           if (profile?.role === "admin") {
-            navigate("/dashboard");
+            window.location.href = "/dashboard";
           } else {
-            navigate("/client-dashboard");
+            window.location.href = "/client-dashboard";
           }
         }
       } else {
