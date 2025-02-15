@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
 
@@ -12,6 +12,7 @@ const Navigation = () => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -57,7 +58,12 @@ const Navigation = () => {
       
       setUser(null);
       setProfile(null);
-      window.location.replace('/');
+      navigate('/');
+      
+      toast({
+        title: "Logout realizado com sucesso",
+        description: "Você foi desconectado com sucesso.",
+      });
     } catch (error: any) {
       console.error('Erro no logout:', error);
       toast({

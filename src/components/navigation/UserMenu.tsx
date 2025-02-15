@@ -1,6 +1,6 @@
 
 import { User, Settings, LogOut, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,13 @@ interface UserMenuProps {
 }
 
 export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
+  const navigate = useNavigate();
   const isAdmin = profile?.role === 'admin';
+
+  const handleLogoutClick = async () => {
+    await handleLogout();
+    navigate('/');
+  };
 
   return (
     <DropdownMenu>
@@ -54,7 +60,7 @@ export const UserMenu = ({ user, profile, handleLogout }: UserMenuProps) => {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem onClick={handleLogoutClick}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sair</span>
         </DropdownMenuItem>

@@ -1,5 +1,6 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { User, Settings, LogOut, Calendar } from "lucide-react";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -10,7 +11,15 @@ interface MobileNavProps {
 }
 
 export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: MobileNavProps) => {
+  const navigate = useNavigate();
+  
   if (!isOpen) return null;
+
+  const handleLogoutClick = async () => {
+    await handleLogout();
+    setIsOpen(false);
+    navigate('/');
+  };
 
   return (
     <div className="md:hidden bg-white border-b border-gray-100">
@@ -73,32 +82,36 @@ export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: Mo
           <>
             <Link
               to="/client-dashboard/profile/edit"
-              className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+              className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Perfil
+              <User className="mr-2 h-4 w-4" />
+              <span>Perfil</span>
             </Link>
             <Link
               to="/client-dashboard/sessions"
-              className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+              className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Minhas Sessões
+              <Calendar className="mr-2 h-4 w-4" />
+              <span>Minhas Sessões</span>
             </Link>
             {profile?.role === 'admin' && (
               <Link
                 to="/dashboard"
-                className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+                className="flex items-center px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
                 onClick={() => setIsOpen(false)}
               >
-                Dashboard Admin
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Dashboard Admin</span>
               </Link>
             )}
             <button
-              onClick={handleLogout}
-              className="block w-full text-left px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+              onClick={handleLogoutClick}
+              className="flex items-center w-full px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
             >
-              Sair
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Sair</span>
             </button>
           </>
         )}
