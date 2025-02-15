@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
+
+import { Link } from "react-router-dom";
 import { User, Settings, LogOut, Calendar } from "lucide-react";
 
 interface MobileNavProps {
@@ -10,7 +11,6 @@ interface MobileNavProps {
 }
 
 export const MobileNav = ({ isOpen, setIsOpen, user, profile, handleLogout }: MobileNavProps) => {
-  const navigate = useNavigate();
   const isAdmin = profile?.role === 'admin';
   
   if (!isOpen) return null;
