@@ -461,19 +461,66 @@ supabase functions deploy process-payment
 - JWT tokens via Supabase Auth
 - Refresh tokens automáticos
 - Sessions persistentes
+- Gerenciamento de logout com limpeza de estados
+- Redirecionamento pós-logout
 
 ### 8.2 Row Level Security
 Todas as tabelas têm RLS habilitado com políticas específicas:
-- Clientes só acessam seus próprios dados
-- Terapeutas têm acesso controlado
-- Dados sensíveis são protegidos
+```sql
+-- Usuários podem ler seu próprio perfil
+CREATE POLICY "Users can read own profile"
+ON profiles
+FOR SELECT
+USING (auth.uid() = id);
 
-### 8.3 CORS e Headers
+-- Usuários podem atualizar seu próprio perfil
+CREATE POLICY "Users can update own profile"
+ON profiles
+FOR UPDATE
+USING (auth.uid() = id);
+```
+
+### 8.3 Gerenciamento de Sessão
 ```typescript
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
+// Exemplo de gerenciamento de sessão no Navigation.tsx
+const checkSession = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  if (session?.user) {
+    setUser(session.user);
+    
+    // Aguarda sincronização com Supabase
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+    
+    if (!error && data) {
+      setProfile(data);
+    }
+  } else {
+    setUser(null);
+    setProfile(null);
+  }
 };
+```
+
+### 8.4 Controle de Acesso
+- Verificação de roles para acesso ao Dashboard
+- Separação de interfaces admin/cliente
+- Proteção de rotas baseada em perfil
+- Menu adaptativo baseado em permissões
+
+```typescript
+// Exemplo de verificação de role para exibição do Dashboard
+const isAdmin = profile?.role === 'admin';
+
+{user && isAdmin && (
+  <Link to="/dashboard">Dashboard</Link>
+)}
 ```
 
 ## 9. Logs e Monitoramento
@@ -639,4 +686,27 @@ jobs:
       - uses: actions/checkout@v2
       - name: Deploy to Vercel
         run: vercel --prod
+```
+
+## Apêndice D: Logs e Debug
+
+### D.1 Logs de Autenticação
+```typescript
+console.log("Navigation: Checking session...");
+console.log("Navigation: Session:", session);
+console.log("Navigation: Fetching profile...");
+console.log("Navigation: Profile found:", data);
+console.log("Navigation: Auth state changed", _event, session);
+```
+
+### D.2 Gerenciamento de Erros
+```typescript
+catch (error: any) {
+  console.error('Erro no logout:', error);
+  toast({
+    variant: "destructive",
+    title: "Erro ao sair",
+    description: error.message,
+  });
+}
 ```
