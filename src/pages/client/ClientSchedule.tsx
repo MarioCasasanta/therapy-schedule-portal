@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { ClientSidebar } from "@/components/dashboard/ClientSidebar";
+import { ClientSidebar } from "@/components/client/ClientSidebar";
 import { useLocation } from "react-router-dom";
 import { WeeklyCalendar } from "@/components/calendar/WeeklyCalendar";
 
