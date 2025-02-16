@@ -1,4 +1,3 @@
-
 # Além do Apego - Documentação Técnica
 Plataforma de Agendamento Terapêutico
 
@@ -31,12 +30,65 @@ Fornecer uma plataforma completa para terapeutas gerenciarem seus atendimentos, 
 
 ### 1.4 Funcionalidades Principais
 - Agendamento de sessões
+  - Calendário interativo
+  - Seleção de horários disponíveis
+  - Confirmação automática
+  - Lembretes por email
+  - Sincronização com Google Calendar
+  
 - Gestão de clientes
+  - Perfis detalhados
+  - Histórico de sessões
+  - Notas de progresso
+  - Documentos anexados
+  - Histórico de pagamentos
+
 - Processamento de pagamentos via Stripe
+  - Múltiplos métodos de pagamento
+  - Faturas automáticas
+  - Relatórios financeiros
+  - Gestão de reembolsos
+  - Recibos digitais
+
 - Diário emocional para clientes
+  - Registro diário de humor
+  - Upload de áudios/textos
+  - Visualização de progresso
+  - Compartilhamento com terapeuta
+  - Exportação de dados
+
 - Dashboard administrativo
-- Sistema de notificações
-- Relatórios financeiros
+  - Métricas em tempo real
+  - Gestão financeira
+  - Relatórios personalizados
+  - Controle de agenda
+  - Análise de performance
+
+### 1.5 Diferenciais Competitivos
+1. **Experiência Personalizada**
+   - Interface intuitiva adaptada para terapeutas
+   - Fluxos otimizados para agendamento
+   - Design centrado no usuário
+
+2. **Integração Completa**
+   - Sistema unificado de pagamentos
+   - Sincronização com calendário
+   - Notificações multicanal
+
+3. **Segurança e Privacidade**
+   - Criptografia de dados sensíveis
+   - Conformidade com LGPD
+   - Backups automáticos
+
+4. **Ferramentas Especializadas**
+   - Diário emocional integrado
+   - Prontuário digital
+   - Análise de progresso
+
+5. **Escalabilidade**
+   - Arquitetura serverless
+   - Performance otimizada
+   - Multitenancy preparado
 
 ## 2. Arquitetura do Sistema
 
@@ -183,6 +235,33 @@ USING (EXISTS (
 CREATE POLICY "Clients can only view own sessions"
 ON sessoes FOR SELECT
 USING (cliente_id = auth.uid());
+```
+
+### 3.4 Índices e Performance
+
+#### Índices Principais
+```sql
+-- Otimização de busca por sessões
+CREATE INDEX idx_sessoes_cliente_data ON sessoes (cliente_id, data_hora);
+
+-- Otimização de busca por pagamentos
+CREATE INDEX idx_pagamentos_status ON pagamentos (status, data_pagamento);
+
+-- Otimização de busca por notificações
+CREATE INDEX idx_notifications_user ON notifications (user_id, scheduled_for);
+```
+
+#### Constraints e Validações
+```sql
+-- Garantir valores válidos para status
+ALTER TABLE sessoes 
+ADD CONSTRAINT valid_session_status 
+CHECK (status IN ('agendado', 'confirmado', 'cancelado', 'finalizado'));
+
+-- Garantir data_hora futura para novas sessões
+ALTER TABLE sessoes 
+ADD CONSTRAINT future_session_date 
+CHECK (data_hora > CURRENT_TIMESTAMP);
 ```
 
 ## 4. Mapa de Navegação
@@ -482,5 +561,82 @@ try {
 }
 ```
 
+## Apêndice C: Configuração de Ambiente
+
+### C.1 Requisitos de Sistema
+- Node.js 18+
+- npm 9+
+- Git
+- PostgreSQL 15+ (desenvolvimento local)
+
+### C.2 Configuração Local
+```bash
+# Clone o repositório
+git clone git@github.com:usuario/alem-do-apego.git
+
+# Instale as dependências
+cd alem-do-apego
+npm install
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite .env com suas credenciais
+
+# Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+### C.3 Scripts de Manutenção
+```bash
+# Atualizar dependências
+npm update
+
+# Limpar cache
+npm run clean
+
+# Verificar tipos
+npm run typecheck
+
+# Executar linter
+npm run lint
+```
+
+### C.4 Backups e Recuperação
+```bash
+# Backup do banco
+pg_dump -U postgres alem_do_apego > backup.sql
+
+# Restaurar backup
+psql -U postgres alem_do_apego < backup.sql
+```
+
 ---
 Última atualização: Fevereiro 2024
+
+## 7.4 Pipeline CI/CD
+
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Tests
+        run: npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to Vercel
+        run: vercel --prod
+```
