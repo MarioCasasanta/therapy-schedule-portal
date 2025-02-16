@@ -9,6 +9,7 @@ interface DesktopNavProps {
 }
 
 export const DesktopNav = ({ user, profile, handleLogout }: DesktopNavProps) => {
+  // Verifica se o usuário é admin usando a role do perfil
   const isAdmin = profile?.role === 'admin';
 
   return (

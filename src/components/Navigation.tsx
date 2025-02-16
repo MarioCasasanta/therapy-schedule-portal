@@ -20,9 +20,9 @@ const Navigation = () => {
       const { data: { session } } = await supabase.auth.getSession();
       console.log("Navigation: Session:", session);
       
-      setUser(session?.user ?? null);
-      
       if (session?.user) {
+        setUser(session.user);
+        
         // Aguarda para garantir que o Supabase atualizou a sessão
         await new Promise((resolve) => setTimeout(resolve, 500));
         
@@ -40,6 +40,9 @@ const Navigation = () => {
         
         console.log("Navigation: Profile found:", data);
         setProfile(data);
+      } else {
+        setUser(null);
+        setProfile(null);
       }
     };
 
@@ -50,9 +53,9 @@ const Navigation = () => {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("Navigation: Auth state changed", _event, session);
       
-      setUser(session?.user ?? null);
-      
       if (session?.user) {
+        setUser(session.user);
+        
         // Aguarda para garantir que o Supabase atualizou a sessão
         await new Promise((resolve) => setTimeout(resolve, 500));
         
@@ -69,6 +72,7 @@ const Navigation = () => {
         
         setProfile(data);
       } else {
+        setUser(null);
         setProfile(null);
       }
     });
@@ -84,6 +88,9 @@ const Navigation = () => {
       // Limpa os estados locais
       setUser(null);
       setProfile(null);
+      
+      // Fecha o menu mobile se estiver aberto
+      setIsOpen(false);
       
       // Aguarda para garantir que o logout foi processado
       await new Promise((resolve) => setTimeout(resolve, 500));
