@@ -15,83 +15,44 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkSession = async () => {
-      console.log("Navigation: Checking session...");
+    const fetchProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      console.log("Navigation: Session:", session);
-      
       if (session?.user) {
         setUser(session.user);
-        
-        console.log("Navigation: Fetching profile...");
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
-        
-        if (error) {
-          console.error("Navigation: Profile fetch error:", error);
-          return;
-        }
-        
-        console.log("Navigation: Profile found:", data);
-        setProfile(data);
+        if (!error) setProfile(data);
       } else {
         setUser(null);
         setProfile(null);
       }
     };
 
-    checkSession();
+    fetchProfile();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("Navigation: Auth state changed", _event, session);
-      
-      if (session?.user) {
-        setUser(session.user);
-        
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (error) {
-          console.error("Navigation: Profile fetch error on auth change:", error);
-          return;
-        }
-        
-        setProfile(data);
-      } else {
-        setUser(null);
-        setProfile(null);
-      }
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => fetchProfile());
 
-    return () => subscription.unsubscribe();
+    return () => authListener.subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
     try {
-      setIsOpen(false); // Fecha o menu mobile se estiver aberto
-      
+      setIsOpen(false);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
       setUser(null);
       setProfile(null);
-      
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
       
       toast({
         title: "Logout realizado com sucesso",
         description: "Você foi desconectado com sucesso.",
       });
     } catch (error: any) {
-      console.error('Erro no logout:', error);
       toast({
         variant: "destructive",
         title: "Erro ao sair",

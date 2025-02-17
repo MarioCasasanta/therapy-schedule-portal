@@ -14,39 +14,23 @@ const Auth = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log("Auth: Checking session", session);
-        
-        if (session?.user) {
-          const { data: profile, error } = await supabase
-            .from("profiles")
-            .select("role")
-            .eq("id", session.user.id)
-            .single();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
 
-          console.log("Auth: Profile after login", profile);
-
-          if (error) {
-            console.error("Auth: Profile fetch error", error);
-            return;
-          }
-
-          if (profile?.role === "admin") {
-            navigate("/dashboard", { replace: true });
-          } else {
-            navigate("/client-dashboard", { replace: true });
-          }
+        if (!error && profile) {
+          navigate(profile.role === "admin" ? "/dashboard" : "/client-dashboard", { replace: true });
         }
-      } catch (error) {
-        console.error("Auth check session error:", error);
       }
     };
 
     checkSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth: Auth state changed", event, session);
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         checkSession();
       }
@@ -63,49 +47,32 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (loginError) throw loginError;
+        const { data: { session }, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
 
         if (session) {
-          const { data: profile, error: profileError } = await supabase
+          const { data: profile } = await supabase
             .from("profiles")
             .select("role")
             .eq("id", session.user.id)
             .single();
 
-          console.log("Auth: Profile after login", profile);
-
-          if (profileError) throw profileError;
-
-          if (profile?.role === "admin") {
-            navigate("/dashboard", { replace: true });
-          } else {
-            navigate("/client-dashboard", { replace: true });
-          }
+          navigate(profile?.role === "admin" ? "/dashboard" : "/client-dashboard", { replace: true });
         }
       } else {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        
-        if (signUpError) throw signUpError;
-        
-        toast({
-          title: "Cadastro realizado com sucesso!",
-          description: "Verifique seu email para confirmar o cadastro.",
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+
+        toast({ 
+          title: "Cadastro realizado!", 
+          description: "Verifique seu e-mail para ativar a conta." 
         });
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro na autenticação",
-        description: error.message,
+      toast({ 
+        variant: "destructive", 
+        title: "Erro na autenticação", 
+        description: error.message 
       });
     } finally {
       setLoading(false);
