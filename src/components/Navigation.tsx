@@ -76,18 +76,14 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      // Primeiro limpa os estados locais
-      setUser(null);
-      setProfile(null);
+      setIsOpen(false); // Fecha o menu mobile se estiver aberto
       
-      // Fecha o menu mobile se estiver aberto
-      setIsOpen(false);
-      
-      // Então faz o logout no Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Redireciona para a home
+      setUser(null);
+      setProfile(null);
+      
       navigate('/', { replace: true });
       
       toast({

@@ -19,9 +19,6 @@ const Auth = () => {
         console.log("Auth: Checking session", session);
         
         if (session?.user) {
-          // Aguarda um pequeno tempo para garantir que o Supabase atualizou a sessão
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
           const { data: profile, error } = await supabase
             .from("profiles")
             .select("role")
@@ -74,9 +71,6 @@ const Auth = () => {
         if (loginError) throw loginError;
 
         if (session) {
-          // Aguarda um pequeno tempo para garantir que o Supabase atualizou a sessão
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("role")
