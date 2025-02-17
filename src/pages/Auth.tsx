@@ -14,18 +14,16 @@ const Auth = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      
+
       if (error) {
-        console.error("Erro ao obter sessão:", error);
+        console.error("❌ Erro ao obter sessão:", error);
         return;
       }
 
       if (!session?.user) {
-        console.log("Nenhum usuário autenticado.");
+        console.log("❌ Nenhum usuário autenticado.");
         return;
       }
-
-      console.log("Usuário autenticado:", session.user);
 
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
@@ -34,18 +32,16 @@ const Auth = () => {
         .single();
 
       if (profileError || !profile) {
-        console.error("Erro ao buscar perfil do usuário:", profileError);
+        console.error("❌ Erro ao buscar perfil do usuário:", profileError);
         return;
       }
-
-      console.log("Perfil do usuário:", profile);
 
       navigate(profile.role === "admin" ? "/dashboard" : "/client-dashboard", { replace: true });
     };
 
     checkSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         checkSession();
       }
@@ -62,36 +58,36 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data: { session }, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-        if (error) throw error;
-        if (!session) throw new Error("Erro: sessão não criada.");
+        if (loginError) throw loginError;
 
-        console.log("Usuário autenticado com sucesso:", session.user);
-
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .single();
-
-        if (profileError || !profile) {
-          throw new Error("Erro ao buscar perfil do usuário.");
+        if (session) {
+          navigate("/dashboard", { replace: true });
         }
-
-        console.log("Perfil do usuário:", profile);
-
-        navigate(profile.role === "admin" ? "/dashboard" : "/client-dashboard", { replace: true });
-
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
 
-        toast({ title: "Cadastro realizado!", description: "Verifique seu e-mail para ativar a conta." });
+        if (signUpError) throw signUpError;
+
+        toast({
+          title: "Cadastro realizado com sucesso!",
+          description: "Verifique seu email para confirmar o cadastro.",
+        });
       }
     } catch (error: any) {
-      console.error("Erro na autenticação:", error);
-      toast({ variant: "destructive", title: "Erro", description: error.message });
+      console.error("Auth error:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro na autenticação",
+        description: error.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -138,12 +134,6 @@ const Auth = () => {
             {loading ? "Carregando..." : isLogin ? "Entrar" : "Cadastrar"}
           </button>
         </form>
-        <button
-          onClick={() => setIsLogin(!isLogin)}
-          className="mt-4 text-sm text-sage-600 hover:text-sage-700 w-full text-center"
-        >
-          {isLogin ? "Não tem uma conta? Cadastre-se" : "Já tem uma conta? Faça login"}
-        </button>
       </div>
     </div>
   );
