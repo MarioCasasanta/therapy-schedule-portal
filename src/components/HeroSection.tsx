@@ -44,7 +44,7 @@ const HeroSection = () => {
             Além do Apego: Transforme sua vida através da terapia!
           </h1>
           <p className="animate-fadeIn [animation-delay:600ms] text-lg md:text-xl text-gray-600 mb-4">
-            Sofrendo com traumas, ansiedade, depressão ou conflitos pessoais?
+            Você está sofrendo com traumas, ansiedade, depressão ou conflitos pessoais?
           </p>
           <p className="animate-fadeIn [animation-delay:600ms] text-lg md:text-xl text-gray-600 mb-8">
             Chegou a hora de dar um basta! Descubra o método de terapia que oferece resultados rápidos, 
