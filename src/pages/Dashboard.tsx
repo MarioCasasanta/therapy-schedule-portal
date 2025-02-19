@@ -14,8 +14,18 @@ const Dashboard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const logAccess = async () => {
-      if (user?.id) {
+    const checkAuthAndLog = async () => {
+      if (!loading && !user) {
+        navigate("/auth", { replace: true });
+        return;
+      }
+
+      if (!loading && profile && profile.role !== 'admin') {
+        navigate("/client-dashboard", { replace: true });
+        return;
+      }
+
+      if (!loading && user && profile?.role === 'admin') {
         try {
           await supabase.from('access_logs').insert([{
             user_id: user.id,
@@ -28,15 +38,7 @@ const Dashboard = () => {
       }
     };
 
-    if (!loading) {
-      if (!user) {
-        navigate("/auth", { replace: true });
-      } else if (profile?.role !== 'admin') {
-        navigate("/client-dashboard", { replace: true });
-      } else {
-        logAccess();
-      }
-    }
+    checkAuthAndLog();
   }, [user, profile, loading, navigate]);
 
   const handleLogout = async () => {
