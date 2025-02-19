@@ -10,9 +10,12 @@ import {
   Bell,
   Settings,
   UserCircle,
-  ArrowLeft
+  ArrowLeft,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AdminSidebarProps {
   currentPath: string;
@@ -20,6 +23,7 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ currentPath }: AdminSidebarProps) {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
@@ -36,9 +40,26 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
     window.location.href = "/";
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logout realizado com sucesso",
+        description: "Você foi desconectado com sucesso.",
+      });
+      navigate("/", { replace: true });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: error.message,
+      });
+    }
+  };
+
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-4">
-      <div className="space-y-4">
+    <div className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col h-full">
+      <div className="space-y-4 flex-grow">
         <Button
           variant="ghost"
           className="w-full justify-start"
@@ -65,6 +86,15 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
           ))}
         </div>
       </div>
+
+      <Button
+        variant="ghost"
+        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+        onClick={handleLogout}
+      >
+        <LogOut className="mr-2 h-4 w-4" />
+        Sair
+      </Button>
     </div>
   );
 }
