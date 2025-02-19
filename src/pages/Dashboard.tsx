@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
@@ -7,7 +8,21 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
+  const logAccess = useCallback(async (userId: string) => {
+    try {
+      await supabase.from('access_logs').insert([{
+        user_id: userId,
+        page_accessed: 'dashboard',
+        component_accessed: 'admin_dashboard'
+      }]);
+    } catch (error) {
+      console.error("Erro ao registrar acesso:", error);
+    }
+  }, []);
+
   useEffect(() => {
+    let isAuthenticated = false;
+
     const checkAuth = async () => {
       try {
         console.log("🔍 Verificando autenticação...");
@@ -39,12 +54,16 @@ const Dashboard = () => {
           return;
         }
 
-        console.log("✅ Perfil encontrado:", profile);
-
         if (profile.role !== 'admin') {
           console.warn("⚠️ Usuário não é admin. Redirecionando...");
           navigate("/client-dashboard", { replace: true });
           return;
+        }
+
+        // Registra o acesso apenas uma vez após confirmar que é um admin
+        if (!isAuthenticated) {
+          await logAccess(session.user.id);
+          isAuthenticated = true;
         }
 
         setIsLoading(false);
@@ -55,7 +74,7 @@ const Dashboard = () => {
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, logAccess]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen text-xl">Carregando...</div>;
