@@ -149,119 +149,231 @@ graph TD
 
 ## 3. Estrutura do Banco de Dados
 
-### 3.1 Diagrama ER
-```mermaid
-erDiagram
-    profiles ||--o{ sessoes : tem
-    profiles ||--o{ pagamentos : realiza
-    sessoes ||--o{ pagamentos : gera
-    profiles ||--o{ notifications : recebe
-    profiles ||--o{ emotional_diary : mantém
-    sessoes ||--|{ google_calendar_sync : sincroniza
-```
+### 3.1 Schema Completo
 
-### 3.2 Tabelas Principais
+#### Tabelas Principais
 
-#### profiles
+##### profiles
 ```sql
 CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users,
+  id UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
   email TEXT,
-  full_name TEXT,
-  role TEXT,
-  status TEXT DEFAULT 'active',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  phone TEXT,
   avatar_url TEXT,
-  preferences JSONB DEFAULT '{}'
+  notes TEXT,
+  status TEXT DEFAULT 'active',
+  tipo_usuario VARCHAR DEFAULT 'cliente',
+  telefone VARCHAR,
+  role TEXT,
+  name TEXT,
+  full_name TEXT,
+  preferences JSONB DEFAULT '{}',
+  data_nascimento DATE
 );
 ```
 
-#### sessoes
+##### sessoes
 ```sql
 CREATE TABLE sessoes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   cliente_id UUID REFERENCES profiles(id),
   data_hora TIMESTAMPTZ NOT NULL,
-  tipo_sessao TEXT NOT NULL,
-  status TEXT DEFAULT 'agendado',
-  valor NUMERIC,
-  status_pagamento TEXT DEFAULT 'pendente',
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  invitation_sent_at TIMESTAMPTZ,
+  valor NUMERIC DEFAULT 0.0,
+  data_pagamento TIMESTAMPTZ,
+  reminder_sent_at TIMESTAMPTZ,
+  tipo_sessao VARCHAR NOT NULL,
+  status VARCHAR DEFAULT 'agendado',
   notas TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  google_event_id TEXT,
+  guest_email TEXT,
+  invitation_status TEXT DEFAULT 'pending',
+  status_pagamento TEXT DEFAULT 'pendente',
+  post_session_notes TEXT,
+  feedback TEXT
 );
 ```
 
-#### pagamentos
+##### availability
+```sql
+CREATE TABLE availability (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  day_of_week INTEGER NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  interval_minutes INTEGER DEFAULT 60 NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  exceptions JSONB DEFAULT '[]',
+  user_id UUID,
+  is_available BOOLEAN DEFAULT true,
+  max_concurrent_sessions INTEGER DEFAULT 1 NOT NULL
+);
+```
+
+##### pagamentos
 ```sql
 CREATE TABLE pagamentos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sessao_id UUID REFERENCES sessoes(id),
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  data_pagamento TIMESTAMPTZ,
   cliente_id UUID REFERENCES profiles(id),
   valor NUMERIC NOT NULL,
-  status TEXT DEFAULT 'pendente',
-  metodo_pagamento TEXT,
-  data_pagamento TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  status VARCHAR DEFAULT 'pendente',
+  metodo_pagamento VARCHAR,
+  sessao_id UUID REFERENCES sessoes(id)
 );
 ```
 
-### 3.3 Políticas de Segurança (RLS)
-
-#### Profiles
+##### notifications
 ```sql
--- Usuários podem ler seu próprio perfil
-CREATE POLICY "Users can read own profile"
-ON profiles FOR SELECT
-USING (auth.uid() = id);
-
--- Usuários podem atualizar seu próprio perfil
-CREATE POLICY "Users can update own profile"
-ON profiles FOR UPDATE
-USING (auth.uid() = id);
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type TEXT DEFAULT 'session_reminder' NOT NULL,
+  title TEXT NOT NULL,
+  user_id UUID NOT NULL,
+  read BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()),
+  related_session_id UUID REFERENCES sessoes(id),
+  scheduled_for TIMESTAMPTZ,
+  message TEXT NOT NULL
+);
 ```
 
-#### Sessões
-```sql
--- Terapeutas podem ver todas as sessões
-CREATE POLICY "Therapists can view all sessions"
-ON sessoes FOR SELECT
-USING (EXISTS (
-  SELECT 1 FROM profiles
-  WHERE id = auth.uid() AND role = 'terapeuta'
-));
+#### Tabelas de Suporte
 
--- Clientes só veem suas próprias sessões
-CREATE POLICY "Clients can only view own sessions"
+##### access_logs
+```sql
+CREATE TABLE access_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  accessed_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  page_accessed TEXT NOT NULL,
+  user_id UUID,
+  component_accessed TEXT
+);
+```
+
+##### system_config
+```sql
+CREATE TABLE system_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key TEXT NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  value JSONB DEFAULT '{}' NOT NULL
+);
+```
+
+### 3.2 Políticas de Segurança (RLS)
+
+#### profiles
+```sql
+-- Permite que usuários autenticados vejam seus próprios perfis
+CREATE POLICY "Usuários podem ver seus próprios perfis"
+ON profiles FOR SELECT
+TO authenticated
+USING (auth.uid() = id);
+
+-- Permite que usuários autenticados atualizem seus próprios perfis
+CREATE POLICY "Usuários podem atualizar seus próprios perfis"
+ON profiles FOR UPDATE
+TO authenticated
+USING (auth.uid() = id)
+WITH CHECK (auth.uid() = id);
+```
+
+#### sessoes
+```sql
+-- Permite que terapeutas vejam todas as sessões
+CREATE POLICY "Terapeutas podem ver todas as sessões"
 ON sessoes FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid()
+    AND role = 'admin'
+  )
+);
+
+-- Permite que clientes vejam apenas suas próprias sessões
+CREATE POLICY "Clientes podem ver suas próprias sessões"
+ON sessoes FOR SELECT
+TO authenticated
 USING (cliente_id = auth.uid());
 ```
 
-### 3.4 Índices e Performance
+### 3.3 Funções e Triggers
 
-#### Índices Principais
+#### handle_new_user()
 ```sql
--- Otimização de busca por sessões
-CREATE INDEX idx_sessoes_cliente_data ON sessoes (cliente_id, data_hora);
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, role)
+  VALUES (new.id, new.email, 'cliente')
+  ON CONFLICT (id) DO NOTHING;
+  RETURN new;
+END;
+$$;
 
--- Otimização de busca por pagamentos
-CREATE INDEX idx_pagamentos_status ON pagamentos (status, data_pagamento);
-
--- Otimização de busca por notificações
-CREATE INDEX idx_notifications_user ON notifications (user_id, scheduled_for);
+-- Trigger para criar perfil ao criar usuário
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 ```
 
-#### Constraints e Validações
+#### update_updated_at_column()
 ```sql
--- Garantir valores válidos para status
-ALTER TABLE sessoes 
-ADD CONSTRAINT valid_session_status 
-CHECK (status IN ('agendado', 'confirmado', 'cancelado', 'finalizado'));
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.updated_at = timezone('utc'::text, now());
+    RETURN NEW;
+END;
+$$;
 
--- Garantir data_hora futura para novas sessões
-ALTER TABLE sessoes 
-ADD CONSTRAINT future_session_date 
-CHECK (data_hora > CURRENT_TIMESTAMP);
+-- Aplicado em várias tabelas para atualizar o updated_at
+CREATE TRIGGER update_sessoes_updated_at
+    BEFORE UPDATE ON sessoes
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+```
+
+### 3.4 Views
+
+#### session_statistics
+```sql
+CREATE VIEW session_statistics AS
+SELECT
+  cliente_id,
+  COUNT(*) FILTER (WHERE data_hora > CURRENT_TIMESTAMP) as upcoming_sessions,
+  COUNT(*) FILTER (WHERE status_pagamento = 'pago') as paid_sessions,
+  COUNT(*) as total_sessions,
+  SUM(valor) FILTER (WHERE status_pagamento = 'pendente') as total_pending,
+  SUM(valor) FILTER (WHERE status_pagamento = 'pago') as total_paid,
+  COUNT(*) FILTER (WHERE status_pagamento = 'pendente') as pending_sessions,
+  COUNT(*) FILTER (WHERE data_hora < CURRENT_TIMESTAMP) as past_sessions
+FROM sessoes
+GROUP BY cliente_id;
+```
+
+### 3.5 Índices
+
+```sql
+CREATE INDEX idx_sessoes_cliente_id ON sessoes(cliente_id);
+CREATE INDEX idx_sessoes_data_hora ON sessoes(data_hora);
+CREATE INDEX idx_profiles_role ON profiles(role);
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_availability_user_id ON availability(user_id);
 ```
 
 ## 4. Mapa de Navegação
