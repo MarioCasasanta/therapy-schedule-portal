@@ -1,44 +1,12 @@
 
 import { useState } from "react";
-import { Menu, X, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, profile, loading } = useAuth();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      setIsOpen(false);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      navigate("/", { replace: true });
-      
-      toast({
-        title: "Logout realizado com sucesso",
-        description: "Você foi desconectado com sucesso.",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao sair",
-        description: error.message,
-      });
-    }
-  };
-
-  if (loading) {
-    return null;
-  }
 
   return (
     <nav className="fixed w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-100">
@@ -63,33 +31,12 @@ const Navigation = () => {
             <a href="#contact" className="text-sage-600 hover:text-sage-800 transition-colors">
               Contato
             </a>
-            
-            {profile?.role === 'admin' && (
-              <Link 
-                to="/dashboard" 
-                className="text-sage-600 hover:text-sage-800 transition-colors font-medium"
-              >
-                Dashboard
-              </Link>
-            )}
-            
-            {user ? (
-              <Button 
-                variant="outline"
-                onClick={handleLogout}
-                className="flex items-center gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Sair
-              </Button>
-            ) : (
-              <Link 
-                to="/auth" 
-                className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
-              >
-                Entrar
-              </Link>
-            )}
+            <Link 
+              to="/auth" 
+              className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+            >
+              Entrar
+            </Link>
           </div>
 
           <div className="md:hidden flex items-center">
@@ -103,13 +50,7 @@ const Navigation = () => {
         </div>
       </div>
 
-      <MobileNav
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        user={user}
-        profile={profile}
-        handleLogout={handleLogout}
-      />
+      <MobileNav isOpen={isOpen} setIsOpen={setIsOpen} />
     </nav>
   );
 };
