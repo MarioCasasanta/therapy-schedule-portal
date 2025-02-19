@@ -1,42 +1,19 @@
 
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { useState } from "react";
+import { Menu, X, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        if (!error) setProfile(data);
-      } else {
-        setUser(null);
-        setProfile(null);
-      }
-    };
-
-    fetchProfile();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(() => fetchProfile());
-
-    return () => authListener.subscription.unsubscribe();
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -44,8 +21,6 @@ const Navigation = () => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      setUser(null);
-      setProfile(null);
       navigate("/", { replace: true });
       
       toast({
@@ -61,6 +36,10 @@ const Navigation = () => {
     }
   };
 
+  if (loading) {
+    return null;
+  }
+
   return (
     <nav className="fixed w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,7 +50,47 @@ const Navigation = () => {
             </Link>
           </div>
           
-          <DesktopNav user={user} profile={profile} handleLogout={handleLogout} />
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#services" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Serviços
+            </a>
+            <a href="#about" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Sobre
+            </a>
+            <a href="#testimonials" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Depoimentos
+            </a>
+            <a href="#contact" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Contato
+            </a>
+            
+            {profile?.role === 'admin' && (
+              <Link 
+                to="/dashboard" 
+                className="text-sage-600 hover:text-sage-800 transition-colors font-medium"
+              >
+                Dashboard
+              </Link>
+            )}
+            
+            {user ? (
+              <Button 
+                variant="outline"
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </Button>
+            ) : (
+              <Link 
+                to="/auth" 
+                className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+              >
+                Entrar
+              </Link>
+            )}
+          </div>
 
           <div className="md:hidden flex items-center">
             <button
