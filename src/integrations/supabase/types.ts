@@ -982,6 +982,10 @@ export type Database = {
       }
     }
     Functions: {
+      get_complete_schema: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       is_admin: {
         Args: {
           user_id: string
