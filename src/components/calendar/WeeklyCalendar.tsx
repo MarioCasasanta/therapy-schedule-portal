@@ -98,6 +98,18 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
     return availableSlotsByDay[formattedDate]?.length > 0;
   });
 
+  // Organiza os slots em colunas para exibição
+  const organizeAvailableSlotsInColumns = (slots: {time: string; available: boolean}[]) => {
+    const columns = [[], [], []]; // 3 colunas
+    
+    slots.forEach((slot, index) => {
+      const columnIndex = index % 3;
+      columns[columnIndex].push(slot);
+    });
+    
+    return columns;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex justify-between items-center mb-6">
@@ -186,6 +198,7 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
               availableDays.map((day) => {
                 const formattedDate = format(day, 'yyyy-MM-dd');
                 const slots = availableSlotsByDay[formattedDate] || [];
+                const slotColumns = organizeAvailableSlotsInColumns(slots);
                 
                 return (
                   <Card key={day.toISOString()} className="hover:border-primary">
@@ -202,20 +215,24 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
                             {slots.length} horários
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-1">
-                          {slots.slice(0, 6).map((slot, index) => (
-                            <span 
-                              key={index} 
-                              className="text-xs bg-primary/10 text-primary px-2 py-1 rounded"
-                            >
-                              {slot.time}
-                            </span>
+                        <div className="grid grid-cols-3 gap-2">
+                          {slotColumns.map((column, colIndex) => (
+                            <div key={colIndex} className="flex flex-col gap-1">
+                              {column.slice(0, 2).map((slot, index) => (
+                                <span 
+                                  key={index} 
+                                  className="text-xs bg-primary/10 text-primary px-2 py-1 rounded text-center"
+                                >
+                                  {slot.time}
+                                </span>
+                              ))}
+                              {column.length > 2 && (
+                                <span className="text-xs bg-gray-100 px-2 py-1 rounded text-center">
+                                  +{column.length - 2} mais
+                                </span>
+                              )}
+                            </div>
                           ))}
-                          {slots.length > 6 && (
-                            <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                              +{slots.length - 6} mais
-                            </span>
-                          )}
                         </div>
                       </div>
                     </CardContent>
