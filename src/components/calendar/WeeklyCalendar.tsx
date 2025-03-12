@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from "react";
-import { addDays, format, startOfWeek, isSameDay } from "date-fns";
+import { addDays, format, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { AvailabilityController } from "@/controllers/AvailabilityController";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface WeeklyCalendarProps {
   onSelectSlot: (date: Date, time: string) => void;
@@ -14,10 +15,10 @@ interface WeeklyCalendarProps {
 }
 
 export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: WeeklyCalendarProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [weekStart, setWeekStart] = useState(startOfWeek(initialDate, { weekStartsOn: 0 }));
   const [weekDays, setWeekDays] = useState<Date[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<{ time: string; available: boolean; }[]>([]);
+  const [availableSlotsByDay, setAvailableSlotsByDay] = useState<{[key: string]: {time: string; available: boolean}[]}>({}); 
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,30 +30,38 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
   }, [weekStart]);
 
   useEffect(() => {
-    const loadAvailability = async () => {
+    const loadAllAvailability = async () => {
       try {
-        const dayOfWeek = selectedDate.getDay();
-        const availability = await AvailabilityController.getByDayOfWeek(dayOfWeek);
+        const slotsByDay: {[key: string]: {time: string; available: boolean}[]} = {};
         
-        if (availability.length > 0) {
-          const slots: { time: string; available: boolean; }[] = [];
-          availability.forEach(slot => {
-            const [startHour] = slot.start_time.split(':');
-            const [endHour] = slot.end_time.split(':');
-            const start = parseInt(startHour);
-            const end = parseInt(endHour);
-            
-            for (let hour = start; hour < end; hour++) {
-              slots.push({
-                time: `${hour.toString().padStart(2, '0')}:00`,
-                available: true
-              });
-            }
-          });
-          setAvailableSlots(slots);
-        } else {
-          setAvailableSlots([]);
+        // Load availability for each day of the week
+        for (const day of weekDays) {
+          const dayOfWeek = day.getDay();
+          const availability = await AvailabilityController.getByDayOfWeek(dayOfWeek);
+          const formattedDate = format(day, 'yyyy-MM-dd');
+          
+          if (availability.length > 0) {
+            const slots: { time: string; available: boolean; }[] = [];
+            availability.forEach(slot => {
+              const [startHour] = slot.start_time.split(':');
+              const [endHour] = slot.end_time.split(':');
+              const start = parseInt(startHour);
+              const end = parseInt(endHour);
+              
+              for (let hour = start; hour < end; hour++) {
+                slots.push({
+                  time: `${hour.toString().padStart(2, '0')}:00`,
+                  available: true
+                });
+              }
+            });
+            slotsByDay[formattedDate] = slots;
+          } else {
+            slotsByDay[formattedDate] = [];
+          }
         }
+        
+        setAvailableSlotsByDay(slotsByDay);
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -62,8 +71,10 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
       }
     };
 
-    loadAvailability();
-  }, [selectedDate, toast]);
+    if (weekDays.length > 0) {
+      loadAllAvailability();
+    }
+  }, [weekDays, toast]);
 
   const handlePreviousWeek = () => {
     setWeekStart(addDays(weekStart, -7));
@@ -73,9 +84,17 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
     setWeekStart(addDays(weekStart, 7));
   };
 
+  const handleDaySelect = (day: Date) => {
+    setSelectedDate(day);
+  };
+
+  const handleTimeSelect = (day: Date, time: string) => {
+    onSelectSlot(day, time);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <Button
           variant="outline"
           size="icon"
@@ -95,43 +114,65 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
         </Button>
       </div>
 
-      <div className="grid grid-cols-8 gap-2">
-        <div className="col-span-1"></div>
-        {weekDays.map((day) => (
-          <div
-            key={day.toISOString()}
-            className="text-center"
-          >
-            <div className="font-medium">
-              {format(day, "EEE", { locale: ptBR })}
+      <div className="grid grid-cols-7 gap-4 mb-6">
+        {weekDays.map((day) => {
+          const formattedDate = format(day, 'yyyy-MM-dd');
+          const hasAvailableSlots = availableSlotsByDay[formattedDate]?.length > 0;
+          
+          return (
+            <div
+              key={day.toISOString()}
+              onClick={() => hasAvailableSlots && handleDaySelect(day)}
+              className={cn(
+                "text-center p-2 rounded-lg cursor-pointer transition-colors",
+                selectedDate && isSameDay(selectedDate, day) 
+                  ? "bg-primary text-white" 
+                  : hasAvailableSlots 
+                    ? "hover:bg-primary/10"
+                    : "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <div className="text-xs font-medium">
+                {format(day, "EEE", { locale: ptBR })}
+              </div>
+              <div className={cn(
+                "text-xl font-semibold mt-1",
+                isSameDay(day, new Date()) && !selectedDate && "text-primary"
+              )}>
+                {format(day, "d")}
+              </div>
+              {hasAvailableSlots && (
+                <div className="mt-1 text-xs flex items-center justify-center">
+                  <Clock className="h-3 w-3 mr-1" />
+                  {availableSlotsByDay[formattedDate].length} horários
+                </div>
+              )}
             </div>
-            <div className={cn(
-              "text-sm",
-              isSameDay(day, new Date()) && "text-blue-600 font-bold"
-            )}>
-              {format(day, "d")}
-            </div>
-          </div>
-        ))}
-
-        {availableSlots.map((slot) => (
-          <React.Fragment key={`time-${slot.time}`}>
-            <div className="text-right pr-2 text-sm text-gray-600">
-              {slot.time}
-            </div>
-            {weekDays.map((day) => (
-              <Button
-                key={`${day.toISOString()}-${slot.time}`}
-                variant="outline"
-                className="h-8 text-xs hover:bg-blue-50 hover:text-blue-600"
-                onClick={() => onSelectSlot(day, slot.time)}
-              >
-                Disponível
-              </Button>
-            ))}
-          </React.Fragment>
-        ))}
+          );
+        })}
       </div>
+
+      {selectedDate && (
+        <Card className="mt-4">
+          <CardContent className="p-4">
+            <h3 className="text-md font-medium mb-4">
+              Horários disponíveis para {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              {availableSlotsByDay[format(selectedDate, 'yyyy-MM-dd')]?.map((slot) => (
+                <Button
+                  key={`${selectedDate.toISOString()}-${slot.time}`}
+                  variant="outline"
+                  className="h-10 text-sm hover:bg-primary hover:text-white"
+                  onClick={() => handleTimeSelect(selectedDate, slot.time)}
+                >
+                  {slot.time}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
