@@ -92,6 +92,24 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
     onSelectSlot(day, time);
   };
 
+  // Filtra apenas os dias que têm horários disponíveis
+  const availableDays = weekDays.filter(day => {
+    const formattedDate = format(day, 'yyyy-MM-dd');
+    return availableSlotsByDay[formattedDate]?.length > 0;
+  });
+
+  // Organiza os slots em colunas para exibição
+  const organizeAvailableSlotsInColumns = (slots: {time: string; available: boolean}[]) => {
+    const columns = [[], [], []]; // 3 colunas
+    
+    slots.forEach((slot, index) => {
+      const columnIndex = index % 3;
+      columns[columnIndex].push(slot);
+    });
+    
+    return columns;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex justify-between items-center mb-6">
@@ -152,7 +170,7 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
         })}
       </div>
 
-      {selectedDate && (
+      {selectedDate ? (
         <Card className="mt-4">
           <CardContent className="p-4">
             <h3 className="text-md font-medium mb-4">
@@ -172,6 +190,63 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <div className="mt-4">
+          <h3 className="text-md font-medium mb-4">Selecione um dia para ver os horários disponíveis</h3>
+          <div className="space-y-4">
+            {availableDays.length > 0 ? (
+              availableDays.map((day) => {
+                const formattedDate = format(day, 'yyyy-MM-dd');
+                const slots = availableSlotsByDay[formattedDate] || [];
+                const slotColumns = organizeAvailableSlotsInColumns(slots);
+                
+                return (
+                  <Card key={day.toISOString()} className="hover:border-primary">
+                    <CardContent className="p-4">
+                      <div 
+                        className="cursor-pointer" 
+                        onClick={() => handleDaySelect(day)}
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-medium">
+                            {format(day, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                          </h4>
+                          <span className="text-sm text-muted-foreground">
+                            {slots.length} horários
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {slotColumns.map((column, colIndex) => (
+                            <div key={colIndex} className="flex flex-col gap-1">
+                              {column.slice(0, 2).map((slot, index) => (
+                                <span 
+                                  key={index} 
+                                  className="text-xs bg-primary/10 text-primary px-2 py-1 rounded text-center"
+                                >
+                                  {slot.time}
+                                </span>
+                              ))}
+                              {column.length > 2 && (
+                                <span className="text-xs bg-gray-100 px-2 py-1 rounded text-center">
+                                  +{column.length - 2} mais
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Não há horários disponíveis para esta semana. 
+                Tente verificar a próxima semana.
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
