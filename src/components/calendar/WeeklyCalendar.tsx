@@ -142,9 +142,9 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
               Horários disponíveis para {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
             </h3>
             <div className="grid grid-cols-3 gap-2">
-              {availableSlotsByDay[format(selectedDate, 'yyyy-MM-dd')]?.map((slot) => (
+              {availableSlotsByDay[format(selectedDate, 'yyyy-MM-dd')]?.map((slot, index) => (
                 <Button
-                  key={`${selectedDate.toISOString()}-${slot.time}`}
+                  key={`${format(selectedDate, 'yyyy-MM-dd')}-${slot.time}-${index}`}
                   variant="outline"
                   className="h-10 text-sm hover:bg-primary hover:text-white"
                   onClick={() => handleTimeSelect(selectedDate, slot.time)}
@@ -169,7 +169,7 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
                 
                 return (
                   <div 
-                    key={day.toISOString()}
+                    key={formattedDate}
                     className={cn(
                       "rounded-lg border transition-colors",
                       hasAvailableSlots 
@@ -201,7 +201,7 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
                           <div className="space-y-1">
                             {slots.slice(0, 3).map((slot, idx) => (
                               <div 
-                                key={idx} 
+                                key={`${formattedDate}-preview-${idx}`} 
                                 className="text-xs bg-primary/10 text-primary px-2 py-1 rounded text-center"
                               >
                                 {slot.time}
