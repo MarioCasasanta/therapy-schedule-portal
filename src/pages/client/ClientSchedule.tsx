@@ -16,7 +16,9 @@ const ClientSchedule = () => {
   const { toast } = useToast();
 
   const handleSelectSlot = (date: Date, time: string) => {
-    const dateTime = new Date(`${date.toDateString()} ${time}`);
+    const [hours, minutes] = time.split(":").map(Number);
+    const dateTime = new Date(date);
+    dateTime.setHours(hours, minutes, 0, 0);
     setSelectedDateTime(dateTime);
     setConfirmStep(true);
   };
@@ -38,7 +40,7 @@ const ClientSchedule = () => {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-8 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Agendar Sessão</h1>
       
       {!confirmStep ? (

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { addDays, format, startOfWeek, isSameDay, parseISO } from "date-fns";
+import { addDays, format, startOfWeek, isSameDay, parseISO, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
 
   useEffect(() => {
     const days = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 5; i++) {
       days.push(addDays(weekStart, i));
     }
     setWeekDays(days);
@@ -98,18 +98,6 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
     return availableSlotsByDay[formattedDate]?.length > 0;
   });
 
-  // Organiza os slots em colunas para exibição
-  const organizeAvailableSlotsInColumns = (slots: {time: string; available: boolean}[]) => {
-    const columns = [[], [], []]; // 3 colunas
-    
-    slots.forEach((slot, index) => {
-      const columnIndex = index % 3;
-      columns[columnIndex].push(slot);
-    });
-    
-    return columns;
-  };
-
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex justify-between items-center mb-6">
@@ -130,44 +118,6 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
-      </div>
-
-      <div className="grid grid-cols-7 gap-4 mb-6">
-        {weekDays.map((day) => {
-          const formattedDate = format(day, 'yyyy-MM-dd');
-          const hasAvailableSlots = availableSlotsByDay[formattedDate]?.length > 0;
-          
-          return (
-            <div
-              key={day.toISOString()}
-              onClick={() => hasAvailableSlots && handleDaySelect(day)}
-              className={cn(
-                "text-center p-2 rounded-lg cursor-pointer transition-colors",
-                selectedDate && isSameDay(selectedDate, day) 
-                  ? "bg-primary text-white" 
-                  : hasAvailableSlots 
-                    ? "hover:bg-primary/10"
-                    : "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <div className="text-xs font-medium">
-                {format(day, "EEE", { locale: ptBR })}
-              </div>
-              <div className={cn(
-                "text-xl font-semibold mt-1",
-                isSameDay(day, new Date()) && !selectedDate && "text-primary"
-              )}>
-                {format(day, "d")}
-              </div>
-              {hasAvailableSlots && (
-                <div className="mt-1 text-xs flex items-center justify-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {availableSlotsByDay[formattedDate].length} horários
-                </div>
-              )}
-            </div>
-          );
-        })}
       </div>
 
       {selectedDate ? (
@@ -192,59 +142,71 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
         </Card>
       ) : (
         <div className="mt-4">
-          <h3 className="text-md font-medium mb-4">Selecione um dia para ver os horários disponíveis</h3>
-          <div className="space-y-4">
-            {availableDays.length > 0 ? (
-              availableDays.map((day) => {
-                const formattedDate = format(day, 'yyyy-MM-dd');
-                const slots = availableSlotsByDay[formattedDate] || [];
-                const slotColumns = organizeAvailableSlotsInColumns(slots);
-                
-                return (
-                  <Card key={day.toISOString()} className="hover:border-primary">
-                    <CardContent className="p-4">
-                      <div 
-                        className="cursor-pointer" 
-                        onClick={() => handleDaySelect(day)}
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-medium">
-                            {format(day, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-                          </h4>
-                          <span className="text-sm text-muted-foreground">
-                            {slots.length} horários
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          {slotColumns.map((column, colIndex) => (
-                            <div key={colIndex} className="flex flex-col gap-1">
-                              {column.slice(0, 2).map((slot, index) => (
-                                <span 
-                                  key={index} 
-                                  className="text-xs bg-primary/10 text-primary px-2 py-1 rounded text-center"
-                                >
-                                  {slot.time}
-                                </span>
-                              ))}
-                              {column.length > 2 && (
-                                <span className="text-xs bg-gray-100 px-2 py-1 rounded text-center">
-                                  +{column.length - 2} mais
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+          <div className="grid grid-cols-5 gap-4">
+            {weekDays.map((day) => {
+              const formattedDate = format(day, 'yyyy-MM-dd');
+              const daySlots = availableSlotsByDay[formattedDate] || [];
+              const hasAvailableSlots = daySlots.length > 0;
+              
+              return (
+                <Card 
+                  key={day.toISOString()} 
+                  className={cn(
+                    "hover:border-primary transition-colors",
+                    !hasAvailableSlots && "opacity-50"
+                  )}
+                >
+                  <CardContent className="p-4">
+                    <div 
+                      className={cn(
+                        "text-center p-2 rounded-lg",
+                        isToday(day) ? "bg-primary/10" : ""
+                      )}
+                    >
+                      <div className="text-xs font-medium">
+                        {format(day, "EEE", { locale: ptBR })}
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                Não há horários disponíveis para esta semana. 
-                Tente verificar a próxima semana.
-              </div>
-            )}
+                      <div className={cn(
+                        "text-xl font-semibold",
+                        isToday(day) && "text-primary"
+                      )}>
+                        {format(day, "d")}
+                      </div>
+                    </div>
+                    
+                    {hasAvailableSlots ? (
+                      <div className="mt-4 space-y-2">
+                        {daySlots.slice(0, 5).map((slot, index) => (
+                          <Button
+                            key={`${day.toISOString()}-${slot.time}-${index}`}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-sm hover:bg-primary hover:text-white"
+                            onClick={() => handleTimeSelect(day, slot.time)}
+                          >
+                            {slot.time}
+                          </Button>
+                        ))}
+                        {daySlots.length > 5 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full text-xs"
+                            onClick={() => handleDaySelect(day)}
+                          >
+                            +{daySlots.length - 5} mais
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="mt-4 text-center text-sm text-muted-foreground">
+                        Sem horários
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
