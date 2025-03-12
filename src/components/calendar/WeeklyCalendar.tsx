@@ -92,6 +92,12 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
     onSelectSlot(day, time);
   };
 
+  // Filtra apenas os dias que têm horários disponíveis
+  const availableDays = weekDays.filter(day => {
+    const formattedDate = format(day, 'yyyy-MM-dd');
+    return availableSlotsByDay[formattedDate]?.length > 0;
+  });
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex justify-between items-center mb-6">
@@ -152,7 +158,7 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
         })}
       </div>
 
-      {selectedDate && (
+      {selectedDate ? (
         <Card className="mt-4">
           <CardContent className="p-4">
             <h3 className="text-md font-medium mb-4">
@@ -172,6 +178,58 @@ export const WeeklyCalendar = ({ onSelectSlot, initialDate = new Date() }: Weekl
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <div className="mt-4">
+          <h3 className="text-md font-medium mb-4">Selecione um dia para ver os horários disponíveis</h3>
+          <div className="space-y-4">
+            {availableDays.length > 0 ? (
+              availableDays.map((day) => {
+                const formattedDate = format(day, 'yyyy-MM-dd');
+                const slots = availableSlotsByDay[formattedDate] || [];
+                
+                return (
+                  <Card key={day.toISOString()} className="hover:border-primary">
+                    <CardContent className="p-4">
+                      <div 
+                        className="cursor-pointer" 
+                        onClick={() => handleDaySelect(day)}
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-medium">
+                            {format(day, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                          </h4>
+                          <span className="text-sm text-muted-foreground">
+                            {slots.length} horários
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {slots.slice(0, 6).map((slot, index) => (
+                            <span 
+                              key={index} 
+                              className="text-xs bg-primary/10 text-primary px-2 py-1 rounded"
+                            >
+                              {slot.time}
+                            </span>
+                          ))}
+                          {slots.length > 6 && (
+                            <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              +{slots.length - 6} mais
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                Não há horários disponíveis para esta semana. 
+                Tente verificar a próxima semana.
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

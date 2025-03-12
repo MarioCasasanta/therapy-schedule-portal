@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Clock } from "lucide-react";
+import { CheckCircle, Clock, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ClientSchedule = () => {
@@ -79,6 +79,7 @@ const ClientSchedule = () => {
               
               <div className="flex gap-4 justify-end">
                 <Button variant="outline" onClick={handleBack}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
                   Voltar
                 </Button>
                 <Button onClick={handleConfirmSession}>
