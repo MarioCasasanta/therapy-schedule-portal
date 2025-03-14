@@ -33,7 +33,7 @@ const EspecialistasPage = () => {
         if (error) throw error;
 
         // Transformando os dados para o formato que precisamos
-        const especialistasData = data.map((profile) => ({
+        let especialistasData = data.map((profile) => ({
           id: profile.id,
           full_name: profile.full_name || "Especialista",
           avatar_url: profile.avatar_url || "",
@@ -42,6 +42,59 @@ const EspecialistasPage = () => {
           rating: 4.8, // Valor padrão, idealmente viria de avaliações
           specialty: "Psicanálise" // Exemplo, idealmente viria do banco
         }));
+
+        // Adicionar especialistas fictícios para visualização do layout
+        if (especialistasData.length < 6) {
+          const ficticios = [
+            {
+              id: "ficticio-1",
+              full_name: "Dra. Amanda Santos",
+              avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+              description: "Especialista em Terapia Cognitivo-Comportamental com foco em ansiedade e depressão.",
+              session_price: 180,
+              rating: 4.9,
+              specialty: "Psicologia Cognitivo-Comportamental"
+            },
+            {
+              id: "ficticio-2",
+              full_name: "Dr. Ricardo Oliveira",
+              avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+              description: "Psicoterapeuta com 15 anos de experiência em relacionamentos e traumas.",
+              session_price: 200,
+              rating: 4.7,
+              specialty: "Psicoterapia"
+            },
+            {
+              id: "ficticio-3",
+              full_name: "Dra. Carla Mendes",
+              avatar_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+              description: "Especialista em saúde mental com abordagem humanista e foco no autoconhecimento.",
+              session_price: 170,
+              rating: 4.8,
+              specialty: "Psicologia Humanista"
+            },
+            {
+              id: "ficticio-4",
+              full_name: "Dr. Paulo Fernandes",
+              avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+              description: "Psicanalista especializado em questões de identidade e desenvolvimento pessoal.",
+              session_price: 190,
+              rating: 4.6,
+              specialty: "Psicanálise"
+            },
+            {
+              id: "ficticio-5",
+              full_name: "Dra. Juliana Martins",
+              avatar_url: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+              description: "Terapeuta comportamental com experiência em transtornos alimentares e autoestima.",
+              session_price: 160,
+              rating: 4.9,
+              specialty: "Terapia Comportamental"
+            }
+          ];
+          
+          especialistasData = [...especialistasData, ...ficticios];
+        }
 
         setEspecialistas(especialistasData);
       } catch (error) {
