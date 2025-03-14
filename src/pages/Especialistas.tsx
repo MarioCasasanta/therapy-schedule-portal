@@ -1,13 +1,15 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Star, ArrowRight, Calendar, Clock, MapPin } from "lucide-react";
+import { Star, Heart, Youtube, ArrowLeft, ArrowRight, Calendar, Clock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { format, addDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface Especialista {
   id: string;
@@ -19,11 +21,14 @@ interface Especialista {
   specialty?: string;
   location?: string;
   experience?: number;
+  appointments_count?: number;
+  reviews_count?: number;
 }
 
 const EspecialistasPage = () => {
   const [especialistas, setEspecialistas] = useState<Especialista[]>([]);
   const [loading, setLoading] = useState(true);
+  const today = new Date();
 
   useEffect(() => {
     const fetchEspecialistas = async () => {
@@ -41,12 +46,14 @@ const EspecialistasPage = () => {
           id: profile.id,
           full_name: profile.full_name || "Especialista",
           avatar_url: profile.avatar_url || "",
-          description: profile.notes || "Especialista com vasta experiência em terapia e desenvolvimento pessoal. Oferece suporte para questões de ansiedade, autoconhecimento, relacionamentos e desenvolvimento profissional. Utiliza abordagem integrativa adaptada às necessidades individuais de cada cliente, criando um espaço seguro e acolhedor para o processo terapêutico.",
+          description: profile.notes || "Há +6 anos ajudo a superar ansiedade, estresse, medo, timidez, depressão, sabotagem, procrastinação, bloqueio, trauma, incerteza e a desenvolver autoestima, relacionamento, carreira comunicação, autoliderança, clareza e equilíbrio emocional para conquistar seus objetivos. Agende e nos vemos em breve.",
           session_price: 150, // Valor padrão, idealmente viria do banco
           rating: 4.8, // Valor padrão, idealmente viria de avaliações
-          specialty: "Psicanálise", // Exemplo, idealmente viria do banco
+          specialty: "Terapeuta", // Exemplo, idealmente viria do banco
           location: "Atendimento online",
-          experience: 5
+          experience: Math.floor(Math.random() * 20) + 3, // Entre 3 e 23 anos de experiência
+          appointments_count: Math.floor(Math.random() * 300) + 50, // Entre 50 e 350 atendimentos
+          reviews_count: Math.floor(Math.random() * 50) + 5 // Entre 5 e 55 comentários
         }));
 
         // Adicionar especialistas fictícios para visualização do layout
@@ -56,56 +63,66 @@ const EspecialistasPage = () => {
               id: "ficticio-1",
               full_name: "Amanda Santos",
               avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Psicóloga com abordagem cognitivo-comportamental, especialista em ansiedade e depressão. Utiliza técnicas baseadas em evidências para ajudar seus clientes a desenvolverem ferramentas práticas para lidar com desafios emocionais. Oferece um espaço acolhedor onde você pode explorar seus pensamentos e emoções com segurança, desenvolvendo estratégias personalizadas para seu bem-estar mental.",
+              description: "Especialista em psicologia clínica com abordagem humanista, focada no autoconhecimento e desenvolvimento pessoal. Atendo questões relacionadas à ansiedade, autoestima, relacionamentos e transições de vida. Meu objetivo é criar um espaço seguro onde você possa explorar suas emoções e desenvolver recursos internos para uma vida mais plena e consciente.",
               session_price: 180,
               rating: 4.9,
-              specialty: "Psicologia Cognitivo-Comportamental",
+              specialty: "Psicóloga",
               location: "Atendimento online",
-              experience: 8
+              experience: 8,
+              appointments_count: 156,
+              reviews_count: 23
             },
             {
               id: "ficticio-2",
               full_name: "Ricardo Oliveira",
               avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Psicoterapeuta com 15 anos de experiência em relacionamentos e traumas. Especializado em terapia de casal e familiar, ajudando pessoas a reconstruírem vínculos e superarem dificuldades de comunicação. Trabalha com abordagem sistêmica, considerando os diversos fatores que influenciam os relacionamentos e oferecendo ferramentas práticas para transformação positiva.",
+              description: "Há +15 anos ajudo pessoas a superarem traumas emocionais e construírem relacionamentos saudáveis. Especialista em terapia de casal e familiar, trabalho com comunicação, resolução de conflitos e reconexão afetiva. Minha abordagem é prática e baseada em evidências, com foco em resultados concretos e duradouros.",
               session_price: 200,
               rating: 4.7,
-              specialty: "Psicoterapia",
+              specialty: "Terapeuta",
               location: "Atendimento online",
-              experience: 15
+              experience: 15,
+              appointments_count: 275,
+              reviews_count: 41
             },
             {
               id: "ficticio-3",
               full_name: "Carla Mendes",
               avatar_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Especialista em saúde mental com abordagem humanista e foco no autoconhecimento. Dedicada a ajudar pessoas a encontrarem seu potencial pleno e autenticidade. Cria um ambiente terapêutico de aceitação incondicional onde você pode explorar seus valores e sentimentos mais profundos, redescobrindo sua capacidade inata de crescimento pessoal e bem-estar emocional.",
+              description: "Psicóloga especializada em terapia cognitivo-comportamental para ansiedade e depressão. Ajudo pessoas a identificarem padrões de pensamento negativos e desenvolverem habilidades práticas para lidar com desafios emocionais. Meu trabalho é focado em resultados, com ferramentas que você pode aplicar no dia a dia para melhorar sua qualidade de vida.",
               session_price: 170,
               rating: 4.8,
-              specialty: "Psicologia Humanista",
+              specialty: "Psicóloga",
               location: "Atendimento online",
-              experience: 7
+              experience: 7,
+              appointments_count: 132,
+              reviews_count: 18
             },
             {
               id: "ficticio-4",
-              full_name: "Paulo Fernandes",
+              full_name: "Thiago Luz",
               avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Psicanalista especializado em questões de identidade e desenvolvimento pessoal. Com formação em psicanálise contemporânea, oferece um espaço seguro para exploração do inconsciente e ressignificação de experiências. Trabalha com sonhos, memórias e associações livres para ajudar seus clientes a compreenderem padrões comportamentais e emocionais que influenciam suas vidas.",
+              description: "Há +6 anos ajudo a superar ansiedade, estresse, medo, timidez, depressão, sabotagem, procrastinação, bloqueio, trauma, incerteza e a desenvolver autoestima, relacionamento, carreira comunicação, autoliderança, clareza e equilíbrio emocional para conquistar seus objetivos. Agende e nos vemos em breve.",
               session_price: 190,
-              rating: 4.6,
-              specialty: "Psicanálise",
+              rating: 5.0,
+              specialty: "Terapeuta",
               location: "Atendimento online",
-              experience: 10
+              experience: 21,
+              appointments_count: 181,
+              reviews_count: 19
             },
             {
               id: "ficticio-5",
               full_name: "Juliana Martins",
               avatar_url: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Terapeuta comportamental com experiência em transtornos alimentares e autoestima. Utiliza técnicas baseadas em evidências para promover mudanças positivas e duradouras. Especializada em ajudar pessoas a desenvolverem uma relação saudável com o corpo e a alimentação, trabalhando questões de imagem corporal, comportamentos compulsivos e crenças limitantes sobre si mesmas.",
+              description: "Psicóloga especialista em desenvolvimento pessoal e profissional. Trabalho com questões relacionadas a carreira, propósito de vida e equilíbrio entre vida pessoal e trabalho. Minha abordagem integra técnicas de coaching e psicologia positiva para ajudar você a identificar seus talentos e alcançar seu potencial máximo.",
               session_price: 160,
               rating: 4.9,
-              specialty: "Terapia Comportamental",
+              specialty: "Psicóloga",
               location: "Atendimento online",
-              experience: 6
+              experience: 6,
+              appointments_count: 98,
+              reviews_count: 15
             }
           ];
           
@@ -123,6 +140,24 @@ const EspecialistasPage = () => {
     fetchEspecialistas();
   }, []);
 
+  // Gerar dias da semana para o calendário
+  const weekDays = Array.from({ length: 5 }, (_, i) => addDays(today, i));
+  
+  // Função para retornar o nome abreviado do dia da semana
+  const getDayName = (date: Date) => {
+    return format(date, 'EEE', { locale: ptBR }).toUpperCase();
+  }
+
+  // Função para retornar o dia do mês
+  const getDayNumber = (date: Date) => {
+    return format(date, 'd');
+  }
+
+  // Função para retornar o mês abreviado
+  const getMonthName = (date: Date) => {
+    return format(date, 'MMM', { locale: ptBR }).toUpperCase();
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -130,7 +165,7 @@ const EspecialistasPage = () => {
       <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Nossos Especialistas</h1>
-          <p className="text-gray-600">Encontre o profissional ideal para sua jornada de autocuidado</p>
+          <p className="text-gray-600">Encontramos {especialistas.length} especialistas disponíveis para você</p>
         </div>
         
         {loading ? (
@@ -150,83 +185,104 @@ const EspecialistasPage = () => {
                   className="overflow-hidden hover:shadow-md transition-all duration-300"
                 >
                   <CardContent className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                      {/* Foto e informações básicas */}
-                      <div className="md:col-span-3">
-                        <div className="flex flex-col items-center md:items-start">
-                          <Avatar className="h-20 w-20 mb-3">
-                            <AvatarImage src={especialista.avatar_url} alt={especialista.full_name} />
-                            <AvatarFallback className="bg-primary/10 text-primary">
+                    <div className="flex flex-col md:flex-row gap-6">
+                      {/* Informações do especialista */}
+                      <div className="md:w-2/5 flex flex-col">
+                        <div className="flex gap-4">
+                          <Avatar className="h-24 w-24 rounded-md">
+                            <AvatarImage src={especialista.avatar_url} alt={especialista.full_name} className="object-cover" />
+                            <AvatarFallback className="bg-primary/10 text-primary rounded-md">
                               {especialista.full_name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           
-                          <h3 className="font-semibold text-xl text-gray-900 mb-1">{especialista.full_name}</h3>
-                          <p className="text-primary mb-2">{especialista.specialty}</p>
-                          
-                          <div className="flex items-center mb-3">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className={`h-4 w-4 ${i < Math.floor(especialista.rating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
-                            ))}
-                            <span className="text-sm text-gray-500 ml-1">({especialista.rating})</span>
-                          </div>
-                          
-                          <div className="flex flex-col gap-2 text-sm">
-                            <div className="flex items-center text-gray-600">
-                              <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-                              {especialista.location}
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-bold text-xl text-gray-900">{especialista.full_name}</h3>
+                                <p className="text-gray-600">{especialista.specialty} • {especialista.experience} anos de experiência</p>
+                              </div>
+                              <Button variant="ghost" size="sm" className="rounded-full p-2">
+                                <Heart className="h-5 w-5 text-gray-400" />
+                              </Button>
                             </div>
-                            <div className="flex items-center text-gray-600">
-                              <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                              {especialista.experience} anos de experiência
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Descrição */}
-                      <div className="md:col-span-5">
-                        <h4 className="font-medium text-gray-900 mb-2 md:hidden">Sobre</h4>
-                        <p className="text-gray-600 text-sm md:text-base line-clamp-6">
-                          {especialista.description}
-                        </p>
-                      </div>
-                      
-                      {/* Agenda e Preço */}
-                      <div className="md:col-span-4">
-                        <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                          <div className="flex items-center mb-3">
-                            <Calendar className="h-5 w-5 text-primary mr-2" />
-                            <h4 className="font-medium text-gray-900">Próximas disponibilidades</h4>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 mb-4">
-                            <Button variant="outline" size="sm" className="justify-start">
-                              Hoje, 14:00
-                            </Button>
-                            <Button variant="outline" size="sm" className="justify-start">
-                              Hoje, 16:30
-                            </Button>
-                            <Button variant="outline" size="sm" className="justify-start">
-                              Amanhã, 10:00
-                            </Button>
-                            <Button variant="outline" size="sm" className="justify-start">
-                              Amanhã, 15:30
+                            
+                            <Button variant="outline" size="sm" className="mt-2 rounded-full bg-red-50 text-red-600 border-red-200 hover:bg-red-100">
+                              <Youtube className="h-4 w-4 mr-1" />
+                              Meu vídeo de apresentação
                             </Button>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between items-end">
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <Badge variant="secondary" className="rounded-full">Ansiedade</Badge>
+                          <Badge variant="secondary" className="rounded-full">Autoestima</Badge>
+                          <Badge variant="secondary" className="rounded-full">Avaliação de Perfil Profissional</Badge>
+                        </div>
+                        
+                        <p className="mt-4 text-gray-700 line-clamp-4">
+                          {especialista.description}
+                        </p>
+                        
+                        <div className="mt-4 flex items-center gap-4">
+                          <div className="flex items-center">
+                            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                            <span className="ml-1 font-semibold">{especialista.rating}</span>
+                            <span className="text-gray-500 ml-1">({especialista.reviews_count} comentários)</span>
+                          </div>
+                          <div className="flex items-center text-gray-500">
+                            <User className="h-4 w-4 mr-1" />
+                            <span>{especialista.appointments_count} atendimentos</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Agenda do especialista */}
+                      <div className="md:w-3/5 border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6 mt-4 md:mt-0">
+                        <div className="flex justify-between items-center mb-4">
+                          <Button variant="ghost" size="sm" className="rounded-full p-2">
+                            <ArrowLeft className="h-5 w-5" />
+                          </Button>
+                          
+                          <div className="grid grid-cols-5 gap-2 flex-1">
+                            {weekDays.map((day, index) => (
+                              <div 
+                                key={index} 
+                                className={`text-center p-2 rounded-md ${index === 3 ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                              >
+                                <div className="text-xs uppercase">{getDayName(day)}</div>
+                                <div className="text-xl font-semibold">{getDayNumber(day)}</div>
+                                <div className="text-xs uppercase">{getMonthName(day)}</div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <Button variant="ghost" size="sm" className="rounded-full p-2">
+                            <ArrowRight className="h-5 w-5" />
+                          </Button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {['07:00', '07:30', '08:00', '08:30', '09:00'].map((time) => (
+                            <Button 
+                              key={time} 
+                              variant="outline" 
+                              className="w-full justify-start text-left border border-gray-200"
+                            >
+                              {time}
+                            </Button>
+                          ))}
+                        </div>
+                        
+                        <div className="mt-6 flex justify-between items-center">
                           <div>
-                            <p className="text-sm text-gray-500">Preço da sessão</p>
-                            <p className="text-xl font-semibold text-primary">
-                              R$ {especialista.session_price?.toFixed(2).replace('.', ',')}
-                            </p>
+                            <p className="text-gray-500 text-sm">Sessão 50 min</p>
+                            <p className="text-2xl font-bold text-green-600">R$ {especialista.session_price?.toFixed(2).replace('.', ',')}</p>
                           </div>
                           
                           <Link to={`/especialistas/${especialista.id}`}>
-                            <Button>
-                              Ver perfil
-                              <ArrowRight className="ml-1 h-4 w-4" />
+                            <Button className="bg-primary hover:bg-primary/90 text-white px-8">
+                              Agendar
                             </Button>
                           </Link>
                         </div>
