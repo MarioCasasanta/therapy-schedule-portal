@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Star, ArrowRight, Calendar } from "lucide-react";
+import { Star, ArrowRight, Calendar, Clock, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Especialista {
   id: string;
@@ -16,6 +17,8 @@ interface Especialista {
   session_price?: number;
   rating?: number;
   specialty?: string;
+  location?: string;
+  experience?: number;
 }
 
 const EspecialistasPage = () => {
@@ -41,7 +44,9 @@ const EspecialistasPage = () => {
           description: profile.notes || "Especialista em terapia e desenvolvimento pessoal.",
           session_price: 150, // Valor padrão, idealmente viria do banco
           rating: 4.8, // Valor padrão, idealmente viria de avaliações
-          specialty: "Psicanálise" // Exemplo, idealmente viria do banco
+          specialty: "Psicanálise", // Exemplo, idealmente viria do banco
+          location: "Atendimento online",
+          experience: 5
         }));
 
         // Adicionar especialistas fictícios para visualização do layout
@@ -49,48 +54,58 @@ const EspecialistasPage = () => {
           const ficticios = [
             {
               id: "ficticio-1",
-              full_name: "Dra. Amanda Santos",
+              full_name: "Amanda Santos",
               avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Especialista em Terapia Cognitivo-Comportamental com foco em ansiedade e depressão.",
+              description: "Psicóloga com abordagem cognitivo-comportamental, especialista em ansiedade e depressão.",
               session_price: 180,
               rating: 4.9,
-              specialty: "Psicologia Cognitivo-Comportamental"
+              specialty: "Psicologia Cognitivo-Comportamental",
+              location: "Atendimento online",
+              experience: 8
             },
             {
               id: "ficticio-2",
-              full_name: "Dr. Ricardo Oliveira",
+              full_name: "Ricardo Oliveira",
               avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
               description: "Psicoterapeuta com 15 anos de experiência em relacionamentos e traumas.",
               session_price: 200,
               rating: 4.7,
-              specialty: "Psicoterapia"
+              specialty: "Psicoterapia",
+              location: "Atendimento online",
+              experience: 15
             },
             {
               id: "ficticio-3",
-              full_name: "Dra. Carla Mendes",
+              full_name: "Carla Mendes",
               avatar_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
               description: "Especialista em saúde mental com abordagem humanista e foco no autoconhecimento.",
               session_price: 170,
               rating: 4.8,
-              specialty: "Psicologia Humanista"
+              specialty: "Psicologia Humanista",
+              location: "Atendimento online",
+              experience: 7
             },
             {
               id: "ficticio-4",
-              full_name: "Dr. Paulo Fernandes",
+              full_name: "Paulo Fernandes",
               avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
               description: "Psicanalista especializado em questões de identidade e desenvolvimento pessoal.",
               session_price: 190,
               rating: 4.6,
-              specialty: "Psicanálise"
+              specialty: "Psicanálise",
+              location: "Atendimento online",
+              experience: 10
             },
             {
               id: "ficticio-5",
-              full_name: "Dra. Juliana Martins",
+              full_name: "Juliana Martins",
               avatar_url: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
               description: "Terapeuta comportamental com experiência em transtornos alimentares e autoestima.",
               session_price: 160,
               rating: 4.9,
-              specialty: "Terapia Comportamental"
+              specialty: "Terapia Comportamental",
+              location: "Atendimento online",
+              experience: 6
             }
           ];
           
@@ -108,70 +123,6 @@ const EspecialistasPage = () => {
     fetchEspecialistas();
   }, []);
 
-  const renderEspecialistasCards = () => {
-    if (especialistas.length === 0) {
-      return (
-        <div className="col-span-full text-center py-10">
-          <p className="text-gray-500">Nenhum especialista encontrado</p>
-        </div>
-      );
-    }
-
-    // Usando apenas o estilo 2
-    return especialistas.map((especialista) => (
-      <div 
-        key={especialista.id} 
-        className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-primary/20"
-      >
-        <div className="bg-gradient-to-r from-primary/90 to-primary h-20 relative">
-          <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
-            <Avatar className="h-20 w-20 border-4 border-white shadow-sm">
-              <AvatarImage src={especialista.avatar_url} alt={especialista.full_name} />
-              <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                {especialista.full_name.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-        
-        <div className="pt-12 px-4 pb-4 text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">{especialista.full_name}</h2>
-          <p className="text-primary text-sm font-medium mb-2">{especialista.specialty}</p>
-          
-          <div className="flex items-center justify-center mb-3">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className={`h-4 w-4 ${i < Math.floor(especialista.rating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
-              ))}
-            </div>
-            <span className="text-sm ml-2 text-gray-600">({especialista.rating})</span>
-          </div>
-          
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {especialista.description}
-          </p>
-          
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center">
-              <Calendar className="h-4 w-4 text-gray-500 mr-1" />
-              <span className="text-xs text-gray-500">Disponível hoje</span>
-            </div>
-            <div className="text-gray-800 font-semibold">
-              R$ {especialista.session_price?.toFixed(2).replace('.', ',')}
-            </div>
-          </div>
-          
-          <Link to={`/especialistas/${especialista.id}`}>
-            <Button variant="outline" className="w-full bg-white hover:bg-primary hover:text-white border-primary/30 text-primary">
-              Agendar agora
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-      </div>
-    ));
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -188,7 +139,77 @@ const EspecialistasPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {renderEspecialistasCards()}
+            {especialistas.length === 0 ? (
+              <div className="col-span-full text-center py-10">
+                <p className="text-gray-500">Nenhum especialista encontrado</p>
+              </div>
+            ) : (
+              especialistas.map((especialista) => (
+                <Card 
+                  key={especialista.id} 
+                  className="overflow-hidden hover:shadow-md transition-all duration-300"
+                >
+                  <CardContent className="p-0">
+                    <div className="flex flex-col">
+                      <div className="p-4 flex items-center gap-4">
+                        <Avatar className="h-16 w-16 rounded-md border border-gray-100">
+                          <AvatarImage src={especialista.avatar_url} alt={especialista.full_name} />
+                          <AvatarFallback className="rounded-md bg-primary/10 text-primary">
+                            {especialista.full_name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">{especialista.full_name}</h3>
+                          <p className="text-sm text-primary">{especialista.specialty}</p>
+                          <div className="flex items-center mt-1">
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={`h-3 w-3 ${i < Math.floor(especialista.rating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
+                              ))}
+                            </div>
+                            <span className="text-xs text-gray-500 ml-1">({especialista.rating})</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="px-4 pb-2">
+                        <p className="text-xs text-gray-600 line-clamp-2 mb-3">
+                          {especialista.description}
+                        </p>
+                        
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <div className="flex items-center text-xs text-gray-500">
+                            <MapPin className="h-3 w-3 mr-1" />
+                            {especialista.location}
+                          </div>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {especialista.experience} anos de experiência
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-gray-100 px-4 py-3 flex justify-between items-center mt-auto">
+                        <div className="font-medium">
+                          <div className="text-sm text-gray-400">Sessão</div>
+                          <div className="text-primary font-semibold">
+                            R$ {especialista.session_price?.toFixed(2).replace('.', ',')}
+                          </div>
+                        </div>
+                        
+                        <Link to={`/especialistas/${especialista.id}`}>
+                          <Button variant="default" size="sm" className="text-sm">
+                            Ver perfil
+                            <ArrowRight className="ml-1 h-3 w-3" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         )}
       </div>
