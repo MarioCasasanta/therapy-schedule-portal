@@ -29,6 +29,9 @@ const EspecialistasPage = () => {
   const [especialistas, setEspecialistas] = useState<Especialista[]>([]);
   const [loading, setLoading] = useState(true);
   const today = new Date();
+  
+  // Array de horários disponíveis para exibição na agenda
+  const availableTimeSlots = ['07:00', '07:30', '08:00', '08:30', '09:00'];
 
   useEffect(() => {
     const fetchEspecialistas = async () => {
@@ -262,15 +265,24 @@ const EspecialistasPage = () => {
                           </Button>
                         </div>
                         
-                        <div className="space-y-2">
-                          {['07:00', '07:30', '08:00', '08:30', '09:00'].map((time) => (
-                            <Button 
-                              key={time} 
-                              variant="outline" 
-                              className="w-full justify-start text-left border border-gray-200"
-                            >
-                              {time}
-                            </Button>
+                        {/* Grid de horários para cada dia */}
+                        <div className="grid grid-cols-5 gap-2">
+                          {/* Colunas para cada dia da semana */}
+                          {weekDays.map((day, dayIndex) => (
+                            <div key={dayIndex} className="space-y-2">
+                              {availableTimeSlots.map((time) => (
+                                <Button 
+                                  key={`${dayIndex}-${time}`} 
+                                  variant="outline" 
+                                  className={`w-full justify-center text-center border border-gray-200 ${
+                                    Math.random() > 0.7 ? 'opacity-50 cursor-not-allowed' : ''
+                                  }`}
+                                  disabled={Math.random() > 0.7}
+                                >
+                                  {time}
+                                </Button>
+                              ))}
+                            </div>
                           ))}
                         </div>
                         
