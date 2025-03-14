@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { AvailabilityController } from "@/controllers/AvailabilityController";
+import { Availability } from "@/types/availability";
 
 interface Especialista {
   id: string;
@@ -25,14 +27,24 @@ interface Especialista {
   reviews_count?: number;
 }
 
+interface AvailableTimeSlot {
+  time: string;
+  available: boolean;
+}
+
+interface DailyAvailability {
+  [date: string]: AvailableTimeSlot[];
+}
+
 const EspecialistasPage = () => {
   const [especialistas, setEspecialistas] = useState<Especialista[]>([]);
   const [loading, setLoading] = useState(true);
+  const [availabilityByEspecialista, setAvailabilityByEspecialista] = useState<{[id: string]: DailyAvailability}>({});
   const today = new Date();
   
-  // Array de horários disponíveis para exibição na agenda
-  const availableTimeSlots = ['07:00', '07:30', '08:00', '08:30', '09:00'];
-
+  // Gerar dias da semana para o calendário
+  const weekDays = Array.from({ length: 5 }, (_, i) => addDays(today, i));
+  
   useEffect(() => {
     const fetchEspecialistas = async () => {
       try {
@@ -133,6 +145,9 @@ const EspecialistasPage = () => {
         }
 
         setEspecialistas(especialistasData);
+        
+        // Após carregar os especialistas, vamos buscar a disponibilidade para cada um
+        await fetchAvailabilityForAll(especialistasData);
       } catch (error) {
         console.error("Erro ao buscar especialistas:", error);
       } finally {
@@ -143,9 +158,74 @@ const EspecialistasPage = () => {
     fetchEspecialistas();
   }, []);
 
-  // Gerar dias da semana para o calendário
-  const weekDays = Array.from({ length: 5 }, (_, i) => addDays(today, i));
+  // Função para buscar disponibilidade para todos os especialistas
+  const fetchAvailabilityForAll = async (especialistas: Especialista[]) => {
+    const availabilityMap: {[id: string]: DailyAvailability} = {};
+    
+    // Para cada especialista, buscar disponibilidade para os dias da semana
+    for (const especialista of especialistas) {
+      const dailyAvailability: DailyAvailability = {};
+      
+      // Para cada dia, buscar os horários disponíveis
+      for (const day of weekDays) {
+        const dayOfWeek = day.getDay();
+        const formattedDate = format(day, 'yyyy-MM-dd');
+        
+        try {
+          // Aqui estamos simulando a busca de disponibilidade
+          // Em uma aplicação real, isso viria do backend baseado no especialista.id
+          const availability = await simulateAvailabilityForDay(dayOfWeek);
+          dailyAvailability[formattedDate] = availability;
+        } catch (error) {
+          console.error(`Erro ao buscar disponibilidade para ${especialista.full_name} no dia ${formattedDate}:`, error);
+          dailyAvailability[formattedDate] = [];
+        }
+      }
+      
+      availabilityMap[especialista.id] = dailyAvailability;
+    }
+    
+    setAvailabilityByEspecialista(availabilityMap);
+  };
   
+  // Função para simular disponibilidade para um dia da semana
+  const simulateAvailabilityForDay = async (dayOfWeek: number): Promise<AvailableTimeSlot[]> => {
+    // Simular alguns horários disponíveis baseados no dia da semana
+    const possibleTimes = [
+      '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', 
+      '10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
+      '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+      '16:00', '16:30', '17:00', '17:30', '18:00', '18:30',
+      '19:00', '19:30', '20:00'
+    ];
+    
+    // Vamos selecionar alguns horários aleatórios para simular disponibilidade
+    // Em uma aplicação real, isso viria do banco de dados
+    const availableSlots: AvailableTimeSlot[] = [];
+    
+    // Em fins de semana (0 = domingo, 6 = sábado) menos horários disponíveis
+    const numSlots = (dayOfWeek === 0 || dayOfWeek === 6) 
+      ? Math.floor(Math.random() * 3) + 1  // 1 a 3 slots nos fins de semana
+      : Math.floor(Math.random() * 6) + 3; // 3 a 8 slots nos dias de semana
+    
+    // Selecionar horários aleatórios
+    const selectedIndices = new Set<number>();
+    while (selectedIndices.size < numSlots) {
+      const index = Math.floor(Math.random() * possibleTimes.length);
+      selectedIndices.add(index);
+    }
+    
+    // Criar slots disponíveis a partir dos índices selecionados
+    Array.from(selectedIndices).sort((a, b) => a - b).forEach(index => {
+      availableSlots.push({
+        time: possibleTimes[index],
+        available: true
+      });
+    });
+    
+    return availableSlots;
+  };
+
   // Função para retornar o nome abreviado do dia da semana
   const getDayName = (date: Date) => {
     return format(date, 'EEE', { locale: ptBR }).toUpperCase();
@@ -251,7 +331,7 @@ const EspecialistasPage = () => {
                             {weekDays.map((day, index) => (
                               <div 
                                 key={index} 
-                                className={`text-center p-2 rounded-md ${index === 3 ? 'bg-primary/10 text-primary font-medium' : ''}`}
+                                className={`text-center p-2 rounded-md ${index === 0 ? 'bg-primary/10 text-primary font-medium' : ''}`}
                               >
                                 <div className="text-xs uppercase">{getDayName(day)}</div>
                                 <div className="text-xl font-semibold">{getDayNumber(day)}</div>
@@ -268,22 +348,28 @@ const EspecialistasPage = () => {
                         {/* Grid de horários para cada dia */}
                         <div className="grid grid-cols-5 gap-2">
                           {/* Colunas para cada dia da semana */}
-                          {weekDays.map((day, dayIndex) => (
-                            <div key={dayIndex} className="space-y-2">
-                              {availableTimeSlots.map((time) => (
-                                <Button 
-                                  key={`${dayIndex}-${time}`} 
-                                  variant="outline" 
-                                  className={`w-full justify-center text-center border border-gray-200 ${
-                                    Math.random() > 0.7 ? 'opacity-50 cursor-not-allowed' : ''
-                                  }`}
-                                  disabled={Math.random() > 0.7}
-                                >
-                                  {time}
-                                </Button>
-                              ))}
-                            </div>
-                          ))}
+                          {weekDays.map((day, dayIndex) => {
+                            const formattedDate = format(day, 'yyyy-MM-dd');
+                            const dailySlots = availabilityByEspecialista[especialista.id]?.[formattedDate] || [];
+                            
+                            return (
+                              <div key={dayIndex} className="space-y-2">
+                                {dailySlots.length === 0 ? (
+                                  <p className="text-center text-sm text-gray-400 py-2">Sem horários</p>
+                                ) : (
+                                  dailySlots.map((slot) => (
+                                    <Button 
+                                      key={`${dayIndex}-${slot.time}`} 
+                                      variant="outline" 
+                                      className="w-full justify-center text-center border border-gray-200"
+                                    >
+                                      {slot.time}
+                                    </Button>
+                                  ))
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                         
                         <div className="mt-6 flex justify-between items-center">
