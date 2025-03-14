@@ -1,5 +1,6 @@
 
 import { Link } from "react-router-dom";
+import { Calendar } from "lucide-react";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -12,6 +13,13 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
   return (
     <div className="md:hidden bg-white border-b border-gray-100">
       <div className="px-2 pt-2 pb-3 space-y-1">
+        <Link
+          to="/especialistas"
+          className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+          onClick={() => setIsOpen(false)}
+        >
+          Especialistas
+        </Link>
         <a
           href="#services"
           className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
@@ -42,10 +50,18 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
         </a>
         <Link
           to="/auth"
-          className="block text-center bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+          className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
           onClick={() => setIsOpen(false)}
         >
           Entrar
+        </Link>
+        <Link
+          to="/especialistas"
+          className="block text-center bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 flex items-center justify-center gap-2 transition-colors"
+          onClick={() => setIsOpen(false)}
+        >
+          <Calendar className="h-4 w-4" />
+          Agendar Consulta
         </Link>
       </div>
     </div>

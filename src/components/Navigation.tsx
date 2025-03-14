@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
@@ -19,6 +19,9 @@ const Navigation = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
+            <Link to="/especialistas" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Especialistas
+            </Link>
             <a href="#services" className="text-sage-600 hover:text-sage-800 transition-colors">
               Serviços
             </a>
@@ -33,9 +36,16 @@ const Navigation = () => {
             </a>
             <Link 
               to="/auth" 
-              className="bg-sage-500 text-white px-6 py-2 rounded-md hover:bg-sage-600 transition-colors"
+              className="text-sage-600 hover:text-sage-800 transition-colors"
             >
               Entrar
+            </Link>
+            <Link 
+              to="/especialistas" 
+              className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 flex items-center gap-2 transition-colors"
+            >
+              <Calendar className="h-4 w-4" />
+              Agendar Consulta
             </Link>
           </div>
 
