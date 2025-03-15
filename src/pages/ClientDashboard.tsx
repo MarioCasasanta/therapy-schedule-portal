@@ -9,6 +9,7 @@ import { InvoiceViewer } from "@/components/invoices/InvoiceViewer";
 import { Calendar, Receipt } from "lucide-react";
 import { ClientSidebar } from "@/components/client/ClientSidebar";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -46,10 +47,10 @@ const ClientDashboard = () => {
   }, [navigate, toast]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex h-screen">
-        <ClientSidebar className="w-64 hidden md:block" />
-        <main className="flex-1 overflow-y-auto">
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-50">
+        <ClientSidebar className="hidden md:block" />
+        <SidebarInset className="overflow-auto">
           <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div className="px-4 py-6 sm:px-0">
               <div className="flex justify-between items-center mb-8">
@@ -79,9 +80,9 @@ const ClientDashboard = () => {
               </Tabs>
             </div>
           </div>
-        </main>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

@@ -1,6 +1,5 @@
 
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   Users,
@@ -11,11 +10,23 @@ import {
   Settings,
   UserCircle,
   ArrowLeft,
-  LogOut
+  LogOut,
+  ChevronLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar
+} from "@/components/ui/sidebar";
 
 interface AdminSidebarProps {
   currentPath: string;
@@ -24,6 +35,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({ currentPath }: AdminSidebarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { state } = useSidebar();
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
@@ -58,43 +70,50 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
   };
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col h-full">
-      <div className="space-y-4 flex-grow">
-        <Button
-          variant="ghost"
-          className="w-full justify-start"
-          onClick={handleGoToHome}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Voltar ao Site
-        </Button>
-        
-        <div className="space-y-1">
-          {menuItems.map((item) => (
-            <Button
-              key={item.path}
-              variant="ghost"
-              className={cn(
-                "w-full justify-start",
-                currentPath === item.path && "bg-sage-50 text-sage-900"
-              )}
-              onClick={() => navigate(item.path)}
-            >
-              <item.icon className="mr-2 h-4 w-4" />
-              {item.label}
-            </Button>
-          ))}
+    <Sidebar>
+      <SidebarHeader className="relative">
+        <div className="absolute right-2 top-2 md:hidden">
+          <SidebarTrigger />
         </div>
-      </div>
-
-      <Button
-        variant="ghost"
-        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-        onClick={handleLogout}
-      >
-        <LogOut className="mr-2 h-4 w-4" />
-        Sair
-      </Button>
-    </div>
+        <div className="p-2">
+          <SidebarMenuButton
+            variant="outline"
+            className="w-full justify-start"
+            onClick={handleGoToHome}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span>Voltar ao Site</span>
+          </SidebarMenuButton>
+        </div>
+      </SidebarHeader>
+      
+      <SidebarContent>
+        <SidebarMenu>
+          {menuItems.map((item) => (
+            <SidebarMenuItem key={item.path}>
+              <SidebarMenuButton
+                isActive={currentPath === item.path}
+                tooltip={state === "collapsed" ? item.label : undefined}
+                onClick={() => navigate(item.path)}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+      
+      <SidebarFooter>
+        <SidebarMenuButton
+          variant="outline"
+          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Sair</span>
+        </SidebarMenuButton>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

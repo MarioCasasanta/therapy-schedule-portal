@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
 import { useLocation } from "react-router-dom";
@@ -6,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvailabilityController } from "@/controllers/AvailabilityController";
 import { Availability } from "@/types/availability";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 const NewSession = () => {
   const location = useLocation();
@@ -64,27 +66,29 @@ const NewSession = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex h-screen">
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
         <AdminSidebar currentPath={location.pathname} />
-        <main className="flex-1 p-8">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Nova Sessão</h1>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Selecione um horário disponível</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WeeklyCalendar
-                  onSelectSlot={handleSlotSelect}
-                />
-              </CardContent>
-            </Card>
+        <SidebarInset className="overflow-auto">
+          <div className="p-8">
+            <div className="max-w-7xl mx-auto">
+              <h1 className="text-3xl font-bold text-gray-900 mb-8">Nova Sessão</h1>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Selecione um horário disponível</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <WeeklyCalendar
+                    onSelectSlot={handleSlotSelect}
+                  />
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </main>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

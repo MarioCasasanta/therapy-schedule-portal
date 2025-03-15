@@ -9,6 +9,8 @@ import { Plus, Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SessionController } from "@/controllers/SessionController";
 import { Session } from "@/types/session";
+import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 const Sessions = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -73,51 +75,58 @@ const Sessions = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Sessões</h1>
-        <div className="space-x-2">
-          <Button onClick={() => navigate("/dashboard/availability")}>
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            Gerenciar Disponibilidade
-          </Button>
-          <Button onClick={() => navigate("/dashboard/sessions/new")}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Sessão
-          </Button>
-        </div>
-      </div>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
+        <AdminSidebar currentPath="/dashboard/sessions" />
+        <SidebarInset className="overflow-auto">
+          <div className="p-6 space-y-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold">Sessões</h1>
+              <div className="space-x-2">
+                <Button onClick={() => navigate("/dashboard/availability")}>
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  Gerenciar Disponibilidade
+                </Button>
+                <Button onClick={() => navigate("/dashboard/sessions/new")}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nova Sessão
+                </Button>
+              </div>
+            </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Lista de Sessões</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SessionList
-              sessions={sessions}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onSendInvite={handleSendInvite}
-            />
-          </CardContent>
-        </Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Lista de Sessões</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SessionList
+                    sessions={sessions}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onSendInvite={handleSendInvite}
+                  />
+                </CardContent>
+              </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Calendário</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={(date) => date && setDate(date)}
-              className="rounded-md border"
-            />
-          </CardContent>
-        </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Calendário</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(date) => date && setDate(date)}
+                    className="rounded-md border"
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

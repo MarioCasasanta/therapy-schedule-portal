@@ -10,6 +10,7 @@ import { AvailabilityController } from "@/controllers/AvailabilityController";
 import { Availability } from "@/types/availability";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
 import { useLocation } from "react-router-dom";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 const DAYS_OF_WEEK = [
   "Domingo",
@@ -76,83 +77,85 @@ const AvailabilityPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex h-screen">
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
         <AdminSidebar currentPath={location.pathname} />
-        <main className="flex-1 p-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gerenciar Disponibilidade</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {availabilities.map((availability) => (
-                  <div key={availability.id} className="flex items-center space-x-4">
-                    <div className="w-32">
-                      <Label>{DAYS_OF_WEEK[availability.day_of_week]}</Label>
+        <SidebarInset className="overflow-auto">
+          <div className="p-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Gerenciar Disponibilidade</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {availabilities.map((availability) => (
+                    <div key={availability.id} className="flex items-center space-x-4">
+                      <div className="w-32">
+                        <Label>{DAYS_OF_WEEK[availability.day_of_week]}</Label>
+                      </div>
+                      <Switch
+                        checked={availability.is_available}
+                        onCheckedChange={(checked) => {
+                          const updated = {
+                            ...availability,
+                            is_available: checked
+                          };
+                          setAvailabilities(availabilities.map(a => 
+                            a.id === availability.id ? updated : a
+                          ));
+                          handleSave(updated);
+                        }}
+                      />
+                      {availability.is_available && (
+                        <>
+                          <div className="flex items-center space-x-2">
+                            <Label>Início</Label>
+                            <Input
+                              type="time"
+                              value={availability.start_time}
+                              onChange={(e) => {
+                                const updated = {
+                                  ...availability,
+                                  start_time: e.target.value
+                                };
+                                setAvailabilities(availabilities.map(a => 
+                                  a.id === availability.id ? updated : a
+                                ));
+                              }}
+                            />
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Label>Fim</Label>
+                            <Input
+                              type="time"
+                              value={availability.end_time}
+                              onChange={(e) => {
+                                const updated = {
+                                  ...availability,
+                                  end_time: e.target.value
+                                };
+                                setAvailabilities(availabilities.map(a => 
+                                  a.id === availability.id ? updated : a
+                                ));
+                              }}
+                            />
+                          </div>
+                          <Button
+                            onClick={() => handleSave(availability)}
+                          >
+                            Salvar
+                          </Button>
+                        </>
+                      )}
                     </div>
-                    <Switch
-                      checked={availability.is_available}
-                      onCheckedChange={(checked) => {
-                        const updated = {
-                          ...availability,
-                          is_available: checked
-                        };
-                        setAvailabilities(availabilities.map(a => 
-                          a.id === availability.id ? updated : a
-                        ));
-                        handleSave(updated);
-                      }}
-                    />
-                    {availability.is_available && (
-                      <>
-                        <div className="flex items-center space-x-2">
-                          <Label>Início</Label>
-                          <Input
-                            type="time"
-                            value={availability.start_time}
-                            onChange={(e) => {
-                              const updated = {
-                                ...availability,
-                                start_time: e.target.value
-                              };
-                              setAvailabilities(availabilities.map(a => 
-                                a.id === availability.id ? updated : a
-                              ));
-                            }}
-                          />
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Label>Fim</Label>
-                          <Input
-                            type="time"
-                            value={availability.end_time}
-                            onChange={(e) => {
-                              const updated = {
-                                ...availability,
-                                end_time: e.target.value
-                              };
-                              setAvailabilities(availabilities.map(a => 
-                                a.id === availability.id ? updated : a
-                              ));
-                            }}
-                          />
-                        </div>
-                        <Button
-                          onClick={() => handleSave(availability)}
-                        >
-                          Salvar
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </main>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

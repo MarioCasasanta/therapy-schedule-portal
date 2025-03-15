@@ -14,6 +14,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
+import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 const Payments = () => {
   const [payments, setPayments] = useState<any[]>([]);
@@ -75,58 +77,65 @@ const Payments = () => {
   };
 
   return (
-    <div className="p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Gestão de Pagamentos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Sessão</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Método</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell>
-                    {format(new Date(payment.created_at), "dd/MM/yyyy")}
-                  </TableCell>
-                  <TableCell>{payment.profiles?.full_name}</TableCell>
-                  <TableCell>
-                    {format(new Date(payment.sessoes?.data_hora), "dd/MM/yyyy HH:mm")}
-                  </TableCell>
-                  <TableCell>R$ {payment.valor.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Badge variant={payment.status === "pendente" ? "secondary" : "default"}>
-                      {payment.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{payment.metodo_pagamento || "-"}</TableCell>
-                  <TableCell>
-                    {payment.status === "pendente" && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleProcessPayment(payment.id)}
-                      >
-                        Processar
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
+        <AdminSidebar currentPath="/dashboard/payments" />
+        <SidebarInset className="overflow-auto">
+          <div className="p-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Gestão de Pagamentos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Cliente</TableHead>
+                      <TableHead>Sessão</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Método</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {payments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell>
+                          {format(new Date(payment.created_at), "dd/MM/yyyy")}
+                        </TableCell>
+                        <TableCell>{payment.profiles?.full_name}</TableCell>
+                        <TableCell>
+                          {format(new Date(payment.sessoes?.data_hora), "dd/MM/yyyy HH:mm")}
+                        </TableCell>
+                        <TableCell>R$ {payment.valor.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Badge variant={payment.status === "pendente" ? "secondary" : "default"}>
+                            {payment.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{payment.metodo_pagamento || "-"}</TableCell>
+                        <TableCell>
+                          {payment.status === "pendente" && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleProcessPayment(payment.id)}
+                            >
+                              Processar
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 

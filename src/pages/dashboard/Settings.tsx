@@ -8,6 +8,8 @@ import { PaymentMethodsSection } from "@/components/settings/PaymentMethodsSecti
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { CalendarSection } from "@/components/settings/CalendarSection";
 import { AvailabilitySection } from "@/components/settings/AvailabilitySection";
+import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -55,25 +57,32 @@ export default function Settings() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Configurações</h1>
-      
-      <PaymentMethodsSection
-        initialMethods={paymentMethods}
-        onUpdate={setPaymentMethods}
-      />
-      
-      <NotificationsSection
-        initialPreferences={notificationPreferences}
-        onUpdate={setNotificationPreferences}
-      />
-      
-      <CalendarSection
-        initialConfig={calendarSync}
-        onUpdate={setCalendarSync}
-      />
-      
-      <AvailabilitySection />
-    </div>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
+        <AdminSidebar currentPath="/dashboard/settings" />
+        <SidebarInset className="overflow-auto">
+          <div className="p-6 space-y-6">
+            <h1 className="text-2xl font-semibold">Configurações</h1>
+            
+            <PaymentMethodsSection
+              initialMethods={paymentMethods}
+              onUpdate={setPaymentMethods}
+            />
+            
+            <NotificationsSection
+              initialPreferences={notificationPreferences}
+              onUpdate={setNotificationPreferences}
+            />
+            
+            <CalendarSection
+              initialConfig={calendarSync}
+              onUpdate={setCalendarSync}
+            />
+            
+            <AvailabilitySection />
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }

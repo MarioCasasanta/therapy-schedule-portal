@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -77,13 +78,17 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <AdminSidebar currentPath="/dashboard" />
-      <div className="flex-1 overflow-auto p-6">
-        <h1 className="text-2xl font-semibold">Dashboard Administrativo</h1>
-        <p className="text-gray-700">Bem-vindo ao painel administrativo.</p>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-100">
+        <AdminSidebar currentPath="/dashboard" />
+        <SidebarInset className="overflow-auto">
+          <div className="p-6">
+            <h1 className="text-2xl font-semibold">Dashboard Administrativo</h1>
+            <p className="text-gray-700">Bem-vindo ao painel administrativo.</p>
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
