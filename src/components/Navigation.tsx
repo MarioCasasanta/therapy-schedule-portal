@@ -19,6 +19,9 @@ const Navigation = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
+            <Link to="/para-voce" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Para Você
+            </Link>
             <Link to="/para-especialistas" className="text-sage-600 hover:text-sage-800 transition-colors">
               Para Especialistas
             </Link>
