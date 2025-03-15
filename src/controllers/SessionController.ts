@@ -3,17 +3,40 @@ import { supabase } from "@/integrations/supabase/client";
 import { Session, SessionFormData } from "@/types/session";
 
 export class SessionController {
-  static async list() {
-    const { data, error } = await supabase
+  static async list(userId?: string, role?: string) {
+    let query = supabase
       .from("sessoes")
       .select(`
         *,
         profiles:cliente_id (*)
       `)
       .order("data_hora", { ascending: true });
+    
+    // If user is a specialist, only return their sessions
+    if (role === 'especialista' && userId) {
+      query = query.eq("especialista_id", userId);
+    }
+    
+    const { data, error } = await query;
 
     if (error) throw error;
     return data as Session[];
+  }
+
+  static async listClients(especialistaId: string) {
+    // Only fetch clients that have sessions with this specialist
+    const { data, error } = await supabase
+      .from("sessoes")
+      .select(`
+        distinct(cliente_id),
+        profiles:cliente_id (*)
+      `)
+      .eq("especialista_id", especialistaId);
+
+    if (error) throw error;
+    
+    // Transform the data to return only the client profiles
+    return data.map(item => item.profiles) as any[];
   }
 
   static async get(id: string) {

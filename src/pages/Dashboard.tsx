@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string>("admin");
 
   const logAccess = useCallback(async (userId: string) => {
     try {
@@ -52,8 +53,10 @@ const Dashboard = () => {
           return;
         }
 
-        if (profile.role !== 'admin') {
-          console.warn("⚠️ Usuário não é admin. Redirecionando...");
+        setUserRole(profile.role);
+
+        if (profile.role !== 'admin' && profile.role !== 'especialista') {
+          console.warn("⚠️ Usuário não é admin ou especialista. Redirecionando...");
           navigate("/client-dashboard", { replace: true });
           return;
         }
@@ -80,11 +83,11 @@ const Dashboard = () => {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-gray-100">
-        <AdminSidebar currentPath="/dashboard" />
+        <AdminSidebar currentPath="/dashboard" userRole={userRole} />
         <SidebarInset className="overflow-auto">
           <div className="p-6">
-            <h1 className="text-2xl font-semibold">Dashboard Administrativo</h1>
-            <p className="text-gray-700">Bem-vindo ao painel administrativo.</p>
+            <h1 className="text-2xl font-semibold">Dashboard {userRole === 'admin' ? 'Administrativo' : 'do Especialista'}</h1>
+            <p className="text-gray-700">Bem-vindo ao seu painel de controle.</p>
           </div>
         </SidebarInset>
       </div>
