@@ -13,6 +13,14 @@ export const DesktopNav = ({ user, profile, handleLogout }: DesktopNavProps) => 
 
   return (
     <div className="hidden md:flex items-center space-x-8">
+      <Link to="/especialistas" className="text-sage-600 hover:text-sage-800 transition-colors">
+        Especialistas
+      </Link>
+      
+      <Link to="/blog" className="text-sage-600 hover:text-sage-800 transition-colors">
+        Blog
+      </Link>
+      
       {user && isAdmin && (
         <Link to="/dashboard" className="text-sage-600 hover:text-sage-800 transition-colors">
           Dashboard

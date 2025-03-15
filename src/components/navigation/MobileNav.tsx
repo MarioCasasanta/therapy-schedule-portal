@@ -21,6 +21,13 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
           Especialistas
         </Link>
         <Link
+          to="/blog"
+          className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
+          onClick={() => setIsOpen(false)}
+        >
+          Blog
+        </Link>
+        <Link
           to="/auth"
           className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
           onClick={() => setIsOpen(false)}

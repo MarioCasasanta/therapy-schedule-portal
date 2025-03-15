@@ -23,6 +23,15 @@ import ChatGPTIntegration from "@/pages/Documentation/ChatGPTIntegration";
 import NotFound from "@/pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
+// Admin Dashboard Routes
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import BlogPosts from "@/pages/admin/BlogPosts";
+import BlogPostEditor from "@/pages/admin/BlogPostEditor";
+
+// Blog Public Routes
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
+
 function App() {
   return (
     <Router>
@@ -32,6 +41,10 @@ function App() {
         <Route path="/docs/chatgpt-integration" element={<ChatGPTIntegration />} />
         <Route path="/especialistas" element={<Especialistas />} />
         <Route path="/especialistas/:id" element={<EspecialistaDetalhe />} />
+        
+        {/* Blog Routes */}
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         
         {/* Admin Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
@@ -44,6 +57,12 @@ function App() {
         <Route path="/dashboard/availability" element={<Availability />} />
         <Route path="/dashboard/notifications" element={<Notifications />} />
         <Route path="/dashboard/profile" element={<Profile />} />
+        
+        {/* Admin Dashboard Routes */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/blog-posts" element={<BlogPosts />} />
+        <Route path="/admin/blog-posts/new" element={<BlogPostEditor />} />
+        <Route path="/admin/blog-posts/edit/:id" element={<BlogPostEditor />} />
         
         {/* Client Routes */}
         <Route path="/client-dashboard" element={<ClientDashboard />} />

@@ -11,7 +11,10 @@ import {
   UserCircle,
   ArrowLeft,
   LogOut,
-  ChevronLeft
+  FileText,
+  UserCog,
+  TestTube,
+  PencilRuler
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,8 +43,12 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
   const menuItems = [
     { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
     { icon: Users, label: "Clientes", path: "/dashboard/clients" },
+    { icon: UserCog, label: "Especialistas", path: "/dashboard/specialists" },
     { icon: Calendar, label: "Sessões", path: "/dashboard/sessions" },
     { icon: CreditCard, label: "Financeiro", path: "/dashboard/payments" },
+    { icon: FileText, label: "Blog", path: "/admin/blog-posts" },
+    { icon: TestTube, label: "Testes", path: "/dashboard/tests" },
+    { icon: PencilRuler, label: "Editor de Site", path: "/dashboard/site-editor" },
     { icon: BarChart, label: "Relatórios", path: "/dashboard/reports" },
     { icon: Bell, label: "Notificações", path: "/dashboard/notifications" },
     { icon: Settings, label: "Configurações", path: "/dashboard/settings" },
