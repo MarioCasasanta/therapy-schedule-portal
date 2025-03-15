@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { UserMenu } from "./UserMenu";
+import { Heart } from "lucide-react";
 
 interface DesktopNavProps {
   user: any;

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Menu, X, Calendar } from "lucide-react";
+import { Menu, X, Calendar, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
@@ -13,7 +13,8 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-xl font-playfair font-semibold text-sage-600">
+            <Link to="/" className="text-xl font-playfair font-semibold text-sage-600 flex items-center">
+              <Heart className="h-6 w-6 text-pink-500 mr-2 fill-pink-500" />
               Além do Apego
             </Link>
           </div>
