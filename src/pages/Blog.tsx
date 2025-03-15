@@ -16,7 +16,6 @@ interface BlogPost {
   author_id: string;
   created_at: string;
   updated_at: string;
-  author_name?: string;
 }
 
 const Blog = () => {
@@ -28,10 +27,7 @@ const Blog = () => {
       try {
         const { data, error } = await supabase
           .from('blog_posts')
-          .select(`
-            *,
-            profiles:author_id (name)
-          `)
+          .select('*')
           .eq('published', true)
           .order('created_at', { ascending: false });
 
@@ -39,13 +35,7 @@ const Blog = () => {
           throw error;
         }
 
-        // Transform data to match the BlogPost interface with author name
-        const postsWithAuthorName = data.map((post: any) => ({
-          ...post,
-          author_name: post.profiles?.name || 'Autor Desconhecido'
-        }));
-
-        setPosts(postsWithAuthorName);
+        setPosts(data || []);
       } catch (error) {
         console.error("Erro ao buscar posts do blog:", error);
       } finally {
@@ -87,7 +77,7 @@ const Blog = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-gray-500 mb-2">
-                      Por {post.author_name} • {format(new Date(post.created_at), 'dd/MM/yyyy')}
+                      {format(new Date(post.created_at), 'dd/MM/yyyy')}
                     </p>
                     <p className="line-clamp-4 text-gray-700">{post.excerpt}</p>
                   </CardContent>

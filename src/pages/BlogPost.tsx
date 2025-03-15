@@ -13,7 +13,6 @@ interface BlogPostDetail {
   content: string;
   created_at: string;
   updated_at: string;
-  author_name?: string;
 }
 
 const BlogPost = () => {
@@ -32,10 +31,7 @@ const BlogPost = () => {
 
         const { data, error } = await supabase
           .from('blog_posts')
-          .select(`
-            *,
-            profiles:author_id (name)
-          `)
+          .select('*')
           .eq('slug', slug)
           .eq('published', true)
           .single();
@@ -48,10 +44,7 @@ const BlogPost = () => {
           throw new Error("Artigo não encontrado");
         }
 
-        setPost({
-          ...data,
-          author_name: data.profiles?.name || 'Autor Desconhecido'
-        });
+        setPost(data);
       } catch (error: any) {
         console.error("Erro ao buscar post do blog:", error);
         setError(error.message || "Não foi possível carregar o artigo.");
@@ -111,8 +104,6 @@ const BlogPost = () => {
           <header className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
             <div className="text-gray-600">
-              <span>Por {post.author_name}</span>
-              <span className="mx-2">•</span>
               <time dateTime={post.created_at}>
                 {format(new Date(post.created_at), 'dd MMMM, yyyy')}
               </time>
