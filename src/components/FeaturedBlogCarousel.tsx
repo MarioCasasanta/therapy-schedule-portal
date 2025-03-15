@@ -67,18 +67,65 @@ const FeaturedBlogCarousel = () => {
     return null;
   }
 
+  // Extract the first post as the featured post
+  const featuredPost = posts[0];
+  const smallerPosts = posts.slice(1);
+
   return (
-    <div className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="py-16 relative overflow-hidden" style={{ background: "linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)" }}>
+      {/* Watercolor-like background effect */}
+      <div className="absolute inset-0 opacity-30" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeBlend mode='multiply' in2='SourceGraphic' result='monoNoise'/%3E%3CfeBlend mode='soft-light' in='SourceGraphic' in2='monoNoise' result='softNoise'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+             backgroundBlendMode: 'soft-light',
+             mixBlendMode: 'overlay'
+           }}>
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        {/* Large featured article */}
+        {featuredPost && (
+          <div className="mb-12">
+            <Link to={`/blog/${featuredPost.slug}`}>
+              <Card className="overflow-hidden border-0 shadow-lg bg-white/80 backdrop-blur-sm transition-all hover:shadow-xl">
+                <div className="md:flex">
+                  <div className="md:w-1/2 lg:w-3/5">
+                    <div className="aspect-[16/9] h-full">
+                      <img 
+                        src={getBlogImage(0)} 
+                        alt={featuredPost.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="md:w-1/2 lg:w-2/5 p-6 md:p-8 flex flex-col justify-center">
+                    <CardTitle className="text-2xl md:text-3xl mb-4">{featuredPost.title}</CardTitle>
+                    <p className="text-sm text-gray-500 mb-4">
+                      {format(new Date(featuredPost.created_at), 'dd/MM/yyyy')}
+                    </p>
+                    <p className="text-gray-700 mb-6 line-clamp-4">{featuredPost.excerpt}</p>
+                    <div className="mt-auto">
+                      <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                        Leia o artigo completo
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          </div>
+        )}
+        
+        {/* Carousel of smaller articles */}
         <Carousel className="w-full max-w-5xl mx-auto">
           <CarouselContent>
-            {posts.map((post, index) => (
+            {smallerPosts.map((post, index) => (
               <CarouselItem key={post.id} className="md:basis-1/2 lg:basis-1/3">
                 <Link to={`/blog/${post.slug}`}>
-                  <Card className="h-full border overflow-hidden hover:shadow-md transition-shadow">
+                  <Card className="h-full border overflow-hidden hover:shadow-md transition-shadow bg-white/80 backdrop-blur-sm">
                     <div className="aspect-[16/9] w-full overflow-hidden">
                       <img 
-                        src={getBlogImage(index)} 
+                        src={getBlogImage(index + 1)} 
                         alt={post.title}
                         className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
                       />
