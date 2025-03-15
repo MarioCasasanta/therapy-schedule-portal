@@ -72,9 +72,12 @@ const FeaturedBlogCarousel = () => {
   const smallerPosts = posts.slice(1);
 
   return (
-    <div className="py-16 relative overflow-hidden" style={{ background: "linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)" }}>
-      {/* Watercolor-like background effect */}
-      <div className="absolute inset-0 opacity-30" 
+    <div className="py-16 relative overflow-hidden" 
+         style={{ 
+           background: "linear-gradient(102.3deg, rgba(147,39,143,1) 5.9%, rgba(234,172,232,1) 64%, rgba(246,219,245,1) 89%)"
+         }}>
+      {/* Colorful watercolor-like background effect */}
+      <div className="absolute inset-0 opacity-20" 
            style={{ 
              backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeBlend mode='multiply' in2='SourceGraphic' result='monoNoise'/%3E%3CfeBlend mode='soft-light' in='SourceGraphic' in2='monoNoise' result='softNoise'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
              backgroundBlendMode: 'soft-light',
@@ -83,11 +86,17 @@ const FeaturedBlogCarousel = () => {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        {/* Title with light text for better contrast */}
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-white mb-2">Blog</h2>
+          <p className="text-white/90">Artigos, dicas e insights para sua jornada de autoconhecimento</p>
+        </div>
+        
         {/* Large featured article */}
         {featuredPost && (
           <div className="mb-12">
             <Link to={`/blog/${featuredPost.slug}`}>
-              <Card className="overflow-hidden border-0 shadow-lg bg-white/80 backdrop-blur-sm transition-all hover:shadow-xl">
+              <Card className="overflow-hidden border-0 shadow-lg bg-white/90 backdrop-blur-sm transition-all hover:shadow-xl">
                 <div className="md:flex">
                   <div className="md:w-1/2 lg:w-3/5">
                     <div className="aspect-[16/9] h-full">
@@ -122,7 +131,7 @@ const FeaturedBlogCarousel = () => {
             {smallerPosts.map((post, index) => (
               <CarouselItem key={post.id} className="md:basis-1/2 lg:basis-1/3">
                 <Link to={`/blog/${post.slug}`}>
-                  <Card className="h-full border overflow-hidden hover:shadow-md transition-shadow bg-white/80 backdrop-blur-sm">
+                  <Card className="h-full border overflow-hidden hover:shadow-md transition-shadow bg-white/90 backdrop-blur-sm">
                     <div className="aspect-[16/9] w-full overflow-hidden">
                       <img 
                         src={getBlogImage(index + 1)} 
@@ -143,8 +152,8 @@ const FeaturedBlogCarousel = () => {
             ))}
           </CarouselContent>
           <div className="flex justify-center mt-8">
-            <CarouselPrevious className="static mr-4 translate-y-0" />
-            <CarouselNext className="static ml-4 translate-y-0" />
+            <CarouselPrevious className="static mr-4 translate-y-0 bg-white/90 hover:bg-white" />
+            <CarouselNext className="static ml-4 translate-y-0 bg-white/90 hover:bg-white" />
           </div>
         </Carousel>
       </div>
