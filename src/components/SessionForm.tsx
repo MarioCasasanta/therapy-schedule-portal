@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,14 +23,36 @@ interface SessionFormProps {
 
 export const SessionForm = ({ initialData, onSubmit, onCancel }: SessionFormProps) => {
   const [formData, setFormData] = useState({
-    data_hora: initialData?.data_hora || "",
-    tipo_sessao: initialData?.tipo_sessao || "",
-    guest_email: initialData?.guest_email || "",
-    notas: initialData?.notas || "",
-    valor: initialData?.valor?.toString() || "0",
-    status_pagamento: initialData?.status_pagamento || "pendente",
-    data_pagamento: initialData?.data_pagamento || "",
+    data_hora: "",
+    tipo_sessao: "",
+    guest_email: "",
+    notas: "",
+    valor: "0",
+    status_pagamento: "pendente",
+    data_pagamento: "",
   });
+
+  // Format date for datetime-local input
+  const formatDateForInput = (dateString?: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().slice(0, 16);
+  };
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        data_hora: formatDateForInput(initialData.data_hora),
+        tipo_sessao: initialData.tipo_sessao || "",
+        guest_email: initialData.guest_email || "",
+        notas: initialData.notas || "",
+        valor: initialData.valor?.toString() || "0",
+        status_pagamento: initialData.status_pagamento || "pendente",
+        data_pagamento: formatDateForInput(initialData.data_pagamento),
+      });
+    }
+  }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
