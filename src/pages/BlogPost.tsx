@@ -15,6 +15,18 @@ interface BlogPostDetail {
   updated_at: string;
 }
 
+const getBlogDetailImage = (slug: string) => {
+  // Map slugs to specific images or use a default
+  const imageMap: Record<string, string> = {
+    "como-lidar-com-ansiedade-dia-a-dia": "photo-1488590528505-98d2b5aba04b",
+    "beneficios-terapia-saude-mental": "photo-1581091226825-a6a2a5aee158",
+    "alimentacao-saude-mental-relacao": "photo-1649972904349-6e44c42644a7"
+  };
+  
+  const imageId = imageMap[slug] || "photo-1488590528505-98d2b5aba04b";
+  return `https://images.unsplash.com/${imageId}?auto=format&fit=crop&w=1200&h=600&q=80`;
+};
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -102,6 +114,13 @@ const BlogPost = () => {
         
         <article>
           <header className="mb-8">
+            <div className="rounded-lg overflow-hidden mb-6">
+              <img 
+                src={getBlogDetailImage(slug || '')} 
+                alt={post.title}
+                className="w-full h-auto object-cover"
+              />
+            </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
             <div className="text-gray-600">
               <time dateTime={post.created_at}>

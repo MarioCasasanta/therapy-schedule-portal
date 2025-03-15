@@ -18,6 +18,16 @@ interface BlogPost {
   updated_at: string;
 }
 
+// Helper function to get image based on post index
+const getBlogImage = (index: number) => {
+  const images = [
+    "photo-1488590528505-98d2b5aba04b",
+    "photo-1581091226825-a6a2a5aee158", 
+    "photo-1649972904349-6e44c42644a7"
+  ];
+  return `https://images.unsplash.com/${images[index % images.length]}?auto=format&fit=crop&w=800&h=400&q=80`;
+};
+
 const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,9 +79,16 @@ const Blog = () => {
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
+            {posts.map((post, index) => (
               <Link to={`/blog/${post.slug}`} key={post.id} className="h-full">
-                <Card className="h-full transition-shadow hover:shadow-md">
+                <Card className="h-full transition-shadow hover:shadow-md overflow-hidden">
+                  <div className="aspect-[16/9] w-full overflow-hidden">
+                    <img 
+                      src={getBlogImage(index)} 
+                      alt={post.title}
+                      className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+                    />
+                  </div>
                   <CardHeader className="pb-2">
                     <CardTitle className="line-clamp-2 text-xl">{post.title}</CardTitle>
                   </CardHeader>

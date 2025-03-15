@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
+import FeaturedBlogCarousel from "@/components/FeaturedBlogCarousel";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ContactSection from "@/components/ContactSection";
 
@@ -51,6 +52,7 @@ const Index = () => {
       <Navigation />
       <HeroSection />
       <ServicesSection />
+      <FeaturedBlogCarousel />
       <TestimonialsSection />
       <ContactSection />
     </div>
