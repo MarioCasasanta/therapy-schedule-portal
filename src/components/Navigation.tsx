@@ -22,9 +22,6 @@ const Navigation = () => {
             <Link to="/especialistas" className="text-sage-600 hover:text-sage-800 transition-colors">
               Especialistas
             </Link>
-            <a href="#about" className="text-sage-600 hover:text-sage-800 transition-colors">
-              Sobre
-            </a>
             <Link 
               to="/auth" 
               className="text-sage-600 hover:text-sage-800 transition-colors"
