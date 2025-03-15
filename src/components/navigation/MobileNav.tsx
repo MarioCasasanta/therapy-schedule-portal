@@ -14,11 +14,11 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
     <div className="md:hidden bg-white border-b border-gray-100">
       <div className="px-2 pt-2 pb-3 space-y-1">
         <Link
-          to="/especialistas"
+          to="/para-especialistas"
           className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
           onClick={() => setIsOpen(false)}
         >
-          Especialistas
+          Para Especialistas
         </Link>
         <Link
           to="/blog"

@@ -19,6 +19,7 @@ import ClientProfile from "@/pages/client/Profile";
 import SessionFeedback from "@/pages/client/sessions/SessionFeedback";
 import Especialistas from "@/pages/Especialistas";
 import EspecialistaDetalhe from "@/pages/EspecialistaDetalhe";
+import ParaEspecialistas from "@/pages/ParaEspecialistas";
 import ChatGPTIntegration from "@/pages/Documentation/ChatGPTIntegration";
 import NotFound from "@/pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
@@ -41,6 +42,7 @@ function App() {
         <Route path="/docs/chatgpt-integration" element={<ChatGPTIntegration />} />
         <Route path="/especialistas" element={<Especialistas />} />
         <Route path="/especialistas/:id" element={<EspecialistaDetalhe />} />
+        <Route path="/para-especialistas" element={<ParaEspecialistas />} />
         
         {/* Blog Routes */}
         <Route path="/blog" element={<Blog />} />

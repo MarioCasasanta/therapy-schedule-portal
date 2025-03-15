@@ -19,8 +19,8 @@ const Navigation = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/especialistas" className="text-sage-600 hover:text-sage-800 transition-colors">
-              Especialistas
+            <Link to="/para-especialistas" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Para Especialistas
             </Link>
             <Link to="/blog" className="text-sage-600 hover:text-sage-800 transition-colors">
               Blog

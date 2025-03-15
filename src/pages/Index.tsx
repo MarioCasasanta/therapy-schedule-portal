@@ -6,8 +6,8 @@ import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import FeaturedBlogCarousel from "@/components/FeaturedBlogCarousel";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import ContactSection from "@/components/ContactSection";
+import FAQSection from "@/components/FAQSection";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -53,8 +53,8 @@ const Index = () => {
       <HeroSection />
       <ServicesSection />
       <FeaturedBlogCarousel />
-      <TestimonialsSection />
-      <ContactSection />
+      <FAQSection />
+      <Footer />
     </div>
   );
 };
