@@ -23,7 +23,9 @@ const getBlogImage = (index: number) => {
   const images = [
     "photo-1488590528505-98d2b5aba04b",
     "photo-1581091226825-a6a2a5aee158", 
-    "photo-1649972904349-6e44c42644a7"
+    "photo-1649972904349-6e44c42644a7",
+    "photo-1497316730643-415fac54a2af",
+    "photo-1507842217343-583bb7270b66"
   ];
   return `https://images.unsplash.com/${images[index % images.length]}?auto=format&fit=crop&w=800&h=400&q=80`;
 };

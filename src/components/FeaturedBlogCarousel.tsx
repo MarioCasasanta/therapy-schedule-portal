@@ -19,7 +19,9 @@ const getBlogImage = (index: number) => {
   const images = [
     "photo-1488590528505-98d2b5aba04b",
     "photo-1581091226825-a6a2a5aee158", 
-    "photo-1649972904349-6e44c42644a7"
+    "photo-1649972904349-6e44c42644a7",
+    "photo-1497316730643-415fac54a2af",
+    "photo-1507842217343-583bb7270b66"
   ];
   return `https://images.unsplash.com/${images[index % images.length]}?auto=format&fit=crop&w=800&h=500&q=80`;
 };
@@ -36,7 +38,7 @@ const FeaturedBlogCarousel = () => {
           .select('id, title, slug, excerpt, created_at')
           .eq('published', true)
           .order('created_at', { ascending: false })
-          .limit(3);
+          .limit(5);
 
         if (error) {
           throw error;
@@ -68,13 +70,6 @@ const FeaturedBlogCarousel = () => {
   return (
     <div className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Artigos em Destaque</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Conteúdo selecionado para ajudar na sua jornada terapêutica
-          </p>
-        </div>
-        
         <Carousel className="w-full max-w-5xl mx-auto">
           <CarouselContent>
             {posts.map((post, index) => (
