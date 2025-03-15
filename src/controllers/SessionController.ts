@@ -28,7 +28,7 @@ export class SessionController {
     const { data, error } = await supabase
       .from("sessoes")
       .select(`
-        distinct(cliente_id),
+        cliente_id,
         profiles:cliente_id (*)
       `)
       .eq("especialista_id", especialistaId);
@@ -36,7 +36,15 @@ export class SessionController {
     if (error) throw error;
     
     // Transform the data to return only the client profiles
-    return data.map(item => item.profiles) as any[];
+    // Using a Map to ensure unique clients
+    const uniqueClients = new Map();
+    data.forEach(item => {
+      if (item.profiles) {
+        uniqueClients.set(item.profiles.id, item.profiles);
+      }
+    });
+    
+    return Array.from(uniqueClients.values());
   }
 
   static async get(id: string) {

@@ -35,6 +35,13 @@ interface AdminSidebarProps {
   userRole?: string;
 }
 
+interface MenuItem {
+  icon: any;
+  label: string;
+  path: string;
+  position?: number;
+}
+
 export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,7 +50,7 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
   // Define menu items based on role
   const getMenuItems = () => {
     // Base items for all users
-    const baseItems = [
+    const baseItems: MenuItem[] = [
       { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
       { icon: Calendar, label: "Sessões", path: "/dashboard/sessions" },
       { icon: Bell, label: "Notificações", path: "/dashboard/notifications" },
@@ -52,7 +59,7 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
     ];
     
     // Admin-specific items
-    const adminItems = [
+    const adminItems: MenuItem[] = [
       { icon: Users, label: "Clientes", path: "/dashboard/clients", position: 1 },
       { icon: UserCog, label: "Especialistas", path: "/dashboard/specialists", position: 2 },
       { icon: CreditCard, label: "Financeiro", path: "/dashboard/payments", position: 4 },
@@ -63,7 +70,7 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
     ];
     
     // Specialist-specific items
-    const specialistItems = [
+    const specialistItems: MenuItem[] = [
       { icon: Users, label: "Meus Clientes", path: "/dashboard/clients", position: 1 },
     ];
 
