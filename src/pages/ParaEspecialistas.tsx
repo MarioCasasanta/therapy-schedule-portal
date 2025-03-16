@@ -1,5 +1,5 @@
 
-import { Check, Calendar, Users, Clock, BarChart } from "lucide-react";
+import { Check, Calendar, Users, Clock, BarChart, Star, Award, Phone } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ const plans = [
     features: [
       "Perfil completo na plataforma",
       "Até 5 agendamentos por mês",
+      "Integração com Google Calendar",
       "Suporte por email",
       "Pagamentos via plataforma"
     ],
@@ -27,6 +28,8 @@ const plans = [
     features: [
       "Tudo do plano Básico",
       "Agendamentos ilimitados",
+      "Calendário na página do perfil",
+      "Botão de WhatsApp no perfil",
       "Prioridade nos resultados de busca",
       "Suporte prioritário",
       "Relatórios mensais de desempenho"
@@ -41,6 +44,11 @@ const plans = [
     description: "Para práticas avançadas",
     features: [
       "Tudo do plano Profissional",
+      "Perfil destacado na plataforma",
+      "Selo 'Além do Apego' após certificação",
+      "Exibição em campanhas de dependência emocional",
+      "Calendário na página do perfil",
+      "Botão de WhatsApp no perfil",
       "Ferramentas de análise avançadas",
       "Lembretes automáticos para clientes",
       "Integração com calendário",
@@ -153,12 +161,27 @@ const ParaEspecialistas = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-start">
-                        <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
+                    {plan.features.map((feature, i) => {
+                      // Add special icons for highlight features
+                      let icon = <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />;
+                      
+                      if (feature.includes("Selo 'Além do Apego'")) {
+                        icon = <Award className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" />;
+                      } else if (feature.includes("Perfil destacado")) {
+                        icon = <Star className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />;
+                      } else if (feature.includes("WhatsApp")) {
+                        icon = <Phone className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />;
+                      } else if (feature.includes("Integração com Google Calendar") || feature.includes("Calendário na página")) {
+                        icon = <Calendar className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />;
+                      }
+                      
+                      return (
+                        <li key={i} className="flex items-start">
+                          {icon}
+                          <span className="text-gray-700">{feature}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </CardContent>
                 <CardFooter>
