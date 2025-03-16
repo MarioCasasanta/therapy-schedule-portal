@@ -71,7 +71,7 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
     
     // Specialist-specific items
     const specialistItems: MenuItem[] = [
-      { icon: Users, label: "Meus Clientes", path: "/dashboard/clients", position: 1 },
+      { icon: Users, label: "Meus Clientes", path: "/dashboard/specialist-clients", position: 1 },
     ];
 
     if (userRole === "admin") {
