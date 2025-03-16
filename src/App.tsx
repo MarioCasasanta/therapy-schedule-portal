@@ -23,6 +23,7 @@ import ParaEspecialistas from "@/pages/ParaEspecialistas";
 import ChatGPTIntegration from "@/pages/Documentation/ChatGPTIntegration";
 import NotFound from "@/pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
+import DashboardClients from "@/pages/dashboard/Clients";
 
 // Admin Dashboard Routes
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -59,6 +60,7 @@ function App() {
         <Route path="/dashboard/availability" element={<Availability />} />
         <Route path="/dashboard/notifications" element={<Notifications />} />
         <Route path="/dashboard/profile" element={<Profile />} />
+        <Route path="/dashboard/clients" element={<DashboardClients />} />
         
         {/* Admin Dashboard Routes */}
         <Route path="/admin" element={<AdminDashboard />} />

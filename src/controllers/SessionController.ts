@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Session, SessionFormData } from "@/types/session";
 
@@ -29,7 +30,7 @@ export class SessionController {
       .from("sessoes")
       .select(`
         cliente_id,
-        profiles:cliente_id (*)
+        profiles:cliente_id (id, name, full_name, email, tipo_usuario, created_at)
       `);
       
     if (especialistaId) {
