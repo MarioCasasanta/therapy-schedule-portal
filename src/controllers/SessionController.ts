@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Session, SessionFormData } from "@/types/session";
 
@@ -36,19 +35,17 @@ export class SessionController {
     if (error) throw error;
     
     // Transform the data to return only unique client profiles
-    const clientProfiles: any[] = [];
-    const clientIds = new Set();
+    const clientProfiles: Record<string, any> = {};
     
     if (data && data.length > 0) {
       data.forEach(item => {
-        if (item.profiles && !clientIds.has(item.profiles.id)) {
-          clientIds.add(item.profiles.id);
-          clientProfiles.push(item.profiles);
+        if (item.profiles && !clientProfiles[item.profiles.id]) {
+          clientProfiles[item.profiles.id] = item.profiles;
         }
       });
     }
     
-    return clientProfiles;
+    return Object.values(clientProfiles);
   }
 
   static async get(id: string) {

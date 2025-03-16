@@ -1,12 +1,10 @@
-
-import { Check, Calendar, Users, Clock, BarChart, Star, Award, Phone, X } from "lucide-react";
+import { Check, Calendar, Users, Clock, BarChart, Star, Award, Phone, X, Video, Book } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
-// Complete list of all possible features across all plans
 const allFeatures = [
   { 
     name: "Perfil completo na plataforma", 
@@ -19,6 +17,11 @@ const allFeatures = [
     icon: "calendar"
   },
   { 
+    name: "Pagamentos via plataforma", 
+    available: { basic: true, professional: true, premium: true },
+    icon: "payment"
+  },
+  { 
     name: "Calendário na página do perfil", 
     available: { basic: false, professional: true, premium: true },
     icon: "calendar"
@@ -29,14 +32,29 @@ const allFeatures = [
     icon: "whatsapp"
   },
   { 
-    name: "Agendamentos por mês", 
-    available: { basic: "5", professional: "Ilimitados", premium: "Ilimitados" },
-    icon: "schedule"
-  },
-  { 
     name: "Prioridade nos resultados de busca", 
     available: { basic: false, professional: true, premium: true },
     icon: "search"
+  },
+  { 
+    name: "Lembretes automáticos para clientes", 
+    available: { basic: false, professional: true, premium: true },
+    icon: "reminder"
+  },
+  { 
+    name: "Vídeo de apresentação", 
+    available: { basic: false, professional: true, premium: true },
+    icon: "video"
+  },
+  { 
+    name: "Ferramentas e testes da comunidade", 
+    available: { basic: false, professional: true, premium: true },
+    icon: "community"
+  },
+  { 
+    name: "Agendamentos por mês", 
+    available: { basic: "5", professional: "Ilimitados", premium: "Ilimitados" },
+    icon: "schedule"
   },
   { 
     name: "Perfil destacado na plataforma", 
@@ -59,14 +77,14 @@ const allFeatures = [
     icon: "analytics"
   },
   { 
-    name: "Lembretes automáticos para clientes", 
-    available: { basic: false, professional: true, premium: true },
-    icon: "reminder"
-  },
-  { 
     name: "Artigos destacados no blog", 
     available: { basic: false, professional: false, premium: true },
     icon: "blog"
+  },
+  { 
+    name: "Acesso à biblioteca de vídeos", 
+    available: { basic: false, professional: false, premium: true },
+    icon: "video-library"
   },
   { 
     name: "Suporte", 
@@ -74,16 +92,24 @@ const allFeatures = [
     icon: "support"
   },
   { 
-    name: "Pagamentos via plataforma", 
-    available: { basic: true, professional: true, premium: true },
-    icon: "payment"
-  },
-  { 
     name: "Relatórios de desempenho", 
     available: { basic: false, professional: "Mensais", premium: "Semanais" },
     icon: "reports"
   }
 ];
+
+const getSortedFeatures = (planType: string) => {
+  return [...allFeatures].sort((a, b) => {
+    const aAvailable = a.available[planType as keyof typeof a.available];
+    const bAvailable = b.available[planType as keyof typeof b.available];
+    
+    if (!!aAvailable === !!bAvailable) {
+      return 0;
+    }
+    
+    return !!aAvailable ? -1 : 1;
+  });
+};
 
 const plans = [
   {
@@ -141,7 +167,6 @@ const ParaEspecialistas = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      {/* Hero Section */}
       <div className="pt-24 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
           <div className="text-center">
@@ -158,7 +183,6 @@ const ParaEspecialistas = () => {
         </div>
       </div>
       
-      {/* How it Works Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -184,7 +208,6 @@ const ParaEspecialistas = () => {
         </div>
       </section>
       
-      {/* Pricing Plans Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -214,17 +237,14 @@ const ParaEspecialistas = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3">
-                    {allFeatures.map((feature, i) => {
+                    {getSortedFeatures(plan.planType).map((feature, i) => {
                       const available = feature.available[plan.planType as keyof typeof feature.available];
                       
-                      // Handle different icon types
                       let icon;
                       
                       if (available === false) {
-                        // Red X for unavailable features
                         icon = <X className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />;
                       } else {
-                        // Feature-specific icons for available features
                         if (feature.icon === "award" || feature.name.includes("Selo")) {
                           icon = <Award className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" />;
                         } else if (feature.icon === "highlight" || feature.name.includes("destacado")) {
@@ -233,15 +253,19 @@ const ParaEspecialistas = () => {
                           icon = <Phone className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />;
                         } else if (feature.icon === "calendar" || feature.name.includes("Calendar") || feature.name.includes("Calendário")) {
                           icon = <Calendar className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />;
+                        } else if (feature.icon === "video" || feature.name.includes("Vídeo")) {
+                          icon = <Video className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />;
+                        } else if (feature.icon === "blog" || feature.name.includes("blog") || feature.icon === "video-library" || feature.name.includes("biblioteca")) {
+                          icon = <Book className="h-5 w-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" />;
+                        } else if (feature.icon === "community" || feature.name.includes("comunidade")) {
+                          icon = <Users className="h-5 w-5 text-teal-500 mr-2 flex-shrink-0 mt-0.5" />;
                         } else {
                           icon = <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />;
                         }
                       }
                       
-                      // Display text with any qualifiers (like "5" for basic agendamentos)
                       let displayText = feature.name;
                       if (typeof available === 'string') {
-                        // For features with qualifiers (like limited number or support type)
                         if (feature.name === "Agendamentos por mês") {
                           displayText = `${feature.name}: ${available}`;
                         } else if (feature.name === "Suporte" || feature.name === "Relatórios de desempenho") {
@@ -271,7 +295,6 @@ const ParaEspecialistas = () => {
         </div>
       </section>
       
-      {/* Testimonials - For specialists section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -330,7 +353,6 @@ const ParaEspecialistas = () => {
         </div>
       </section>
       
-      {/* CTA Section */}
       <section className="py-16 bg-primary/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-6">
