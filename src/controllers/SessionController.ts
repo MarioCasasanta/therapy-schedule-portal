@@ -22,15 +22,21 @@ export class SessionController {
     return data as Session[];
   }
 
-  static async listClients(especialistaId: string) {
-    // Only fetch clients that have sessions with this specialist
-    const { data, error } = await supabase
+  static async listClients(especialistaId?: string) {
+    // If especialistaId is provided, only fetch clients that have sessions with this specialist
+    // Otherwise fetch all clients
+    let query = supabase
       .from("sessoes")
       .select(`
         cliente_id,
         profiles:cliente_id (*)
-      `)
-      .eq("especialista_id", especialistaId);
+      `);
+      
+    if (especialistaId) {
+      query = query.eq("especialista_id", especialistaId);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     
@@ -46,6 +52,38 @@ export class SessionController {
     }
     
     return Object.values(clientProfiles);
+  }
+
+  static async getAllClients() {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("tipo_usuario", "cliente")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async getAllSpecialists() {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("tipo_usuario", "especialista")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async getClientSessionCount(clientId: string) {
+    const { count, error } = await supabase
+      .from("sessoes")
+      .select("*", { count: 'exact', head: true })
+      .eq("cliente_id", clientId);
+
+    if (error) throw error;
+    return count || 0;
   }
 
   static async get(id: string) {
