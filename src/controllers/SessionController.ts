@@ -36,17 +36,19 @@ export class SessionController {
     if (error) throw error;
     
     // Transform the data to return only unique client profiles
-    const clientMap = new Map();
+    const clientProfiles: any[] = [];
+    const clientIds = new Set();
     
     if (data && data.length > 0) {
       data.forEach(item => {
-        if (item.profiles) {
-          clientMap.set(item.profiles.id, item.profiles);
+        if (item.profiles && !clientIds.has(item.profiles.id)) {
+          clientIds.add(item.profiles.id);
+          clientProfiles.push(item.profiles);
         }
       });
     }
     
-    return Array.from(clientMap.values());
+    return clientProfiles;
   }
 
   static async get(id: string) {

@@ -1,23 +1,96 @@
 
-import { Check, Calendar, Users, Clock, BarChart, Star, Award, Phone } from "lucide-react";
+import { Check, Calendar, Users, Clock, BarChart, Star, Award, Phone, X } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
+// Complete list of all possible features across all plans
+const allFeatures = [
+  { 
+    name: "Perfil completo na plataforma", 
+    available: { basic: true, professional: true, premium: true },
+    icon: "profile"
+  },
+  { 
+    name: "Integração com Google Calendar", 
+    available: { basic: true, professional: true, premium: true },
+    icon: "calendar"
+  },
+  { 
+    name: "Calendário na página do perfil", 
+    available: { basic: false, professional: true, premium: true },
+    icon: "calendar"
+  },
+  { 
+    name: "Botão de WhatsApp no perfil", 
+    available: { basic: false, professional: true, premium: true },
+    icon: "whatsapp"
+  },
+  { 
+    name: "Agendamentos por mês", 
+    available: { basic: "5", professional: "Ilimitados", premium: "Ilimitados" },
+    icon: "schedule"
+  },
+  { 
+    name: "Prioridade nos resultados de busca", 
+    available: { basic: false, professional: true, premium: true },
+    icon: "search"
+  },
+  { 
+    name: "Perfil destacado na plataforma", 
+    available: { basic: false, professional: false, premium: true },
+    icon: "highlight"
+  },
+  { 
+    name: "Selo 'Além do Apego' após certificação", 
+    available: { basic: false, professional: false, premium: true },
+    icon: "award"
+  },
+  { 
+    name: "Exibição em campanhas de dependência emocional", 
+    available: { basic: false, professional: false, premium: true },
+    icon: "campaign"
+  },
+  { 
+    name: "Ferramentas de análise avançadas", 
+    available: { basic: false, professional: false, premium: true },
+    icon: "analytics"
+  },
+  { 
+    name: "Lembretes automáticos para clientes", 
+    available: { basic: false, professional: true, premium: true },
+    icon: "reminder"
+  },
+  { 
+    name: "Artigos destacados no blog", 
+    available: { basic: false, professional: false, premium: true },
+    icon: "blog"
+  },
+  { 
+    name: "Suporte", 
+    available: { basic: "Email", professional: "Prioritário", premium: "24/7" },
+    icon: "support"
+  },
+  { 
+    name: "Pagamentos via plataforma", 
+    available: { basic: true, professional: true, premium: true },
+    icon: "payment"
+  },
+  { 
+    name: "Relatórios de desempenho", 
+    available: { basic: false, professional: "Mensais", premium: "Semanais" },
+    icon: "reports"
+  }
+];
+
 const plans = [
   {
     name: "Básico",
     price: "R$ 49,90",
     description: "Ideal para terapeutas iniciantes",
-    features: [
-      "Perfil completo na plataforma",
-      "Até 5 agendamentos por mês",
-      "Integração com Google Calendar",
-      "Suporte por email",
-      "Pagamentos via plataforma"
-    ],
+    planType: "basic",
     color: "bg-white",
     buttonColor: "bg-primary hover:bg-primary/90"
   },
@@ -25,15 +98,7 @@ const plans = [
     name: "Profissional",
     price: "R$ 99,90",
     description: "Para terapeutas estabelecidos",
-    features: [
-      "Tudo do plano Básico",
-      "Agendamentos ilimitados",
-      "Calendário na página do perfil",
-      "Botão de WhatsApp no perfil",
-      "Prioridade nos resultados de busca",
-      "Suporte prioritário",
-      "Relatórios mensais de desempenho"
-    ],
+    planType: "professional",
     color: "bg-primary/5",
     buttonColor: "bg-primary hover:bg-primary/90",
     highlighted: true
@@ -42,19 +107,7 @@ const plans = [
     name: "Premium",
     price: "R$ 149,90",
     description: "Para práticas avançadas",
-    features: [
-      "Tudo do plano Profissional",
-      "Perfil destacado na plataforma",
-      "Selo 'Além do Apego' após certificação",
-      "Exibição em campanhas de dependência emocional",
-      "Calendário na página do perfil",
-      "Botão de WhatsApp no perfil",
-      "Ferramentas de análise avançadas",
-      "Lembretes automáticos para clientes",
-      "Integração com calendário",
-      "Artigos destacados no blog",
-      "Suporte 24/7"
-    ],
+    planType: "premium",
     color: "bg-white",
     buttonColor: "bg-primary hover:bg-primary/90"
   }
@@ -161,24 +214,47 @@ const ParaEspecialistas = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3">
-                    {plan.features.map((feature, i) => {
-                      // Add special icons for highlight features
-                      let icon = <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />;
+                    {allFeatures.map((feature, i) => {
+                      const available = feature.available[plan.planType as keyof typeof feature.available];
                       
-                      if (feature.includes("Selo 'Além do Apego'")) {
-                        icon = <Award className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" />;
-                      } else if (feature.includes("Perfil destacado")) {
-                        icon = <Star className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />;
-                      } else if (feature.includes("WhatsApp")) {
-                        icon = <Phone className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />;
-                      } else if (feature.includes("Integração com Google Calendar") || feature.includes("Calendário na página")) {
-                        icon = <Calendar className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />;
+                      // Handle different icon types
+                      let icon;
+                      
+                      if (available === false) {
+                        // Red X for unavailable features
+                        icon = <X className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />;
+                      } else {
+                        // Feature-specific icons for available features
+                        if (feature.icon === "award" || feature.name.includes("Selo")) {
+                          icon = <Award className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" />;
+                        } else if (feature.icon === "highlight" || feature.name.includes("destacado")) {
+                          icon = <Star className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />;
+                        } else if (feature.icon === "whatsapp" || feature.name.includes("WhatsApp")) {
+                          icon = <Phone className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />;
+                        } else if (feature.icon === "calendar" || feature.name.includes("Calendar") || feature.name.includes("Calendário")) {
+                          icon = <Calendar className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />;
+                        } else {
+                          icon = <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />;
+                        }
+                      }
+                      
+                      // Display text with any qualifiers (like "5" for basic agendamentos)
+                      let displayText = feature.name;
+                      if (typeof available === 'string') {
+                        // For features with qualifiers (like limited number or support type)
+                        if (feature.name === "Agendamentos por mês") {
+                          displayText = `${feature.name}: ${available}`;
+                        } else if (feature.name === "Suporte" || feature.name === "Relatórios de desempenho") {
+                          displayText = `${feature.name}: ${available}`;
+                        }
                       }
                       
                       return (
                         <li key={i} className="flex items-start">
                           {icon}
-                          <span className="text-gray-700">{feature}</span>
+                          <span className={`${available === false ? 'text-gray-400' : 'text-gray-700'}`}>
+                            {displayText}
+                          </span>
                         </li>
                       );
                     })}
