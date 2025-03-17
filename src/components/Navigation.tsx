@@ -29,6 +29,9 @@ const Navigation = () => {
             <Link to="/blog" className="text-sage-600 hover:text-sage-800 transition-colors">
               Blog
             </Link>
+            <Link to="/trabalhe-conosco" className="text-sage-600 hover:text-sage-800 transition-colors">
+              Trabalhe Conosco
+            </Link>
             <Link 
               to="/auth" 
               className="text-sage-600 hover:text-sage-800 transition-colors"

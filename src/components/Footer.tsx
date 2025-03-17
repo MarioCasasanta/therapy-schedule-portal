@@ -24,6 +24,7 @@ export const Footer = () => {
               <li><Link to="/especialistas" className="text-sage-300 hover:text-white">Especialistas</Link></li>
               <li><Link to="/para-especialistas" className="text-sage-300 hover:text-white">Para Especialistas</Link></li>
               <li><Link to="/blog" className="text-sage-300 hover:text-white">Blog</Link></li>
+              <li><Link to="/trabalhe-conosco" className="text-sage-300 hover:text-white">Trabalhe Conosco</Link></li>
             </ul>
           </div>
           
@@ -32,7 +33,7 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li><Link to="/auth" className="text-sage-300 hover:text-white">Área do Cliente</Link></li>
               <li><Link to="/auth" className="text-sage-300 hover:text-white">Área do Especialista</Link></li>
-              <li><Link to="/admin-login" className="text-sage-300 hover:text-white">Admin</Link></li>
+              <li><Link to="/admin-login" className="text-sage-300 hover:text-white">Área do Funcionário</Link></li>
             </ul>
           </div>
           
