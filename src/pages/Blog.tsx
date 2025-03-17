@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { BlogController } from "@/controllers/BlogController";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ interface BlogPost {
   author_id: string;
   created_at: string;
   updated_at: string;
+  author_name?: string;
 }
 
 // Helper function to get image based on post index
@@ -37,17 +38,8 @@ const Blog = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const { data, error } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .eq('published', true)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          throw error;
-        }
-
-        setPosts(data || []);
+        const postsData = await BlogController.getPublishedPosts();
+        setPosts(postsData);
       } catch (error) {
         console.error("Erro ao buscar posts do blog:", error);
       } finally {

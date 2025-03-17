@@ -34,6 +34,7 @@ import HR from "@/pages/HR";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import BlogPosts from "@/pages/admin/BlogPosts";
 import BlogPostEditor from "@/pages/admin/BlogPostEditor";
+import AdminBlogOverview from "@/pages/admin/AdminBlogOverview";
 
 // Blog Public Routes
 import Blog from "@/pages/Blog";
@@ -74,6 +75,7 @@ function App() {
         <Route path="/admin/notifications" element={<Notifications />} />
         <Route path="/admin/profile" element={<Profile />} />
         <Route path="/admin/blog-posts" element={<BlogPosts />} />
+        <Route path="/admin/blog-overview" element={<AdminBlogOverview />} />
         <Route path="/admin/blog-posts/new" element={<BlogPostEditor />} />
         <Route path="/admin/blog-posts/edit/:id" element={<BlogPostEditor />} />
         
