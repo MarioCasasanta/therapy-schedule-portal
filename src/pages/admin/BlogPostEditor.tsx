@@ -13,7 +13,7 @@ import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import * as z from "zod"; // Alterando a importação para import completo
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const blogPostSchema = z.object({
