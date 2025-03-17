@@ -6,25 +6,28 @@ import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
-const blogPostSchema = z.object({
-  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
-  slug: z.string().min(3, "O slug deve ter pelo menos 3 caracteres").regex(/^[a-z0-9-]+$/, "Slug deve conter apenas letras minúsculas, números e hífens"),
-  excerpt: z.string().min(10, "O resumo deve ter pelo menos 10 caracteres"),
-  content: z.string().min(50, "O conteúdo deve ter pelo menos 50 caracteres"),
-  published: z.boolean().default(false)
+// Schema com yup em vez de zod
+const blogPostSchema = yup.object({
+  title: yup.string().min(3, "O título deve ter pelo menos 3 caracteres").required("Título é obrigatório"),
+  slug: yup.string()
+    .min(3, "O slug deve ter pelo menos 3 caracteres")
+    .matches(/^[a-z0-9-]+$/, "Slug deve conter apenas letras minúsculas, números e hífens")
+    .required("Slug é obrigatório"),
+  excerpt: yup.string().min(10, "O resumo deve ter pelo menos 10 caracteres").required("Resumo é obrigatório"),
+  content: yup.string().min(50, "O conteúdo deve ter pelo menos 50 caracteres").required("Conteúdo é obrigatório"),
+  published: yup.boolean().default(false)
 });
 
-type BlogPostFormValues = z.infer<typeof blogPostSchema>;
+type BlogPostFormValues = yup.InferType<typeof blogPostSchema>;
 
 const BlogPostEditor = () => {
   const { id } = useParams();
@@ -35,7 +38,7 @@ const BlogPostEditor = () => {
   const isEditMode = !!id;
 
   const form = useForm<BlogPostFormValues>({
-    resolver: zodResolver(blogPostSchema),
+    resolver: yupResolver(blogPostSchema),
     defaultValues: {
       title: "",
       slug: "",
