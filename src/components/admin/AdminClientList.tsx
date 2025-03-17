@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { UserSearch, Calendar, CheckCircle2, Search } from "lucide-react";
+import { UserSearch, Calendar, CheckCircle2, Search, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Client {
@@ -56,59 +56,59 @@ export function AdminClientList() {
   const [totalClients, setTotalClients] = useState<number>(0);
   const { toast } = useToast();
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      
+      // Load specialists
+      const { data: specialistsData, error: specialistsError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .eq('role', 'especialista');
         
-        // Load specialists
-        const { data: specialistsData, error: specialistsError } = await supabase
-          .from('profiles')
-          .select('id, full_name, email')
-          .eq('role', 'especialista');
-          
-        if (specialistsError) throw specialistsError;
-        setSpecialists(specialistsData || []);
+      if (specialistsError) throw specialistsError;
+      setSpecialists(specialistsData || []);
+      
+      // Buscar todos os clientes com role = 'cliente'
+      const { data: clientsData, error: clientsError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'cliente');
         
-        // Modificação principal: alterar 'client' para 'cliente' ou buscar por ambos
-        const { data: clientsData, error: clientsError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('role', 'cliente');
-          
-        if (clientsError) throw clientsError;
-        
-        console.log("Fetched clients:", clientsData);
-        
-        // Add session count to each client (simplified for now)
-        const clientsWithSessionCount = await Promise.all(
-          (clientsData || []).map(async (client) => {
-            const { count } = await supabase
-              .from('sessoes')
-              .select('*', { count: 'exact' })
-              .eq('cliente_id', client.id);
-              
-            return {
-              ...client,
-              sessionCount: count || 0
-            };
-          })
-        );
-        
-        setClients(clientsWithSessionCount);
-        setTotalClients(clientsWithSessionCount.length);
-      } catch (error: any) {
-        console.error("Error loading clients:", error);
-        toast({
-          variant: "destructive",
-          title: "Erro ao carregar clientes",
-          description: error.message,
-        });
-      } finally {
-        setLoading(false);
-      }
+      if (clientsError) throw clientsError;
+      
+      console.log("Fetched clients:", clientsData);
+      
+      // Add session count to each client (simplified for now)
+      const clientsWithSessionCount = await Promise.all(
+        (clientsData || []).map(async (client) => {
+          const { count } = await supabase
+            .from('sessoes')
+            .select('*', { count: 'exact' })
+            .eq('cliente_id', client.id);
+            
+          return {
+            ...client,
+            sessionCount: count || 0
+          };
+        })
+      );
+      
+      setClients(clientsWithSessionCount);
+      setTotalClients(clientsWithSessionCount.length);
+    } catch (error: any) {
+      console.error("Error loading clients:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar clientes",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     loadData();
   }, [toast]);
 
@@ -161,10 +161,16 @@ export function AdminClientList() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline">
-            <UserSearch className="mr-2 h-4 w-4" />
-            Adicionar Cliente
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={loadData}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Atualizar Lista
+            </Button>
+            <Button variant="outline">
+              <UserSearch className="mr-2 h-4 w-4" />
+              Adicionar Cliente
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
