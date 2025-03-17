@@ -1,67 +1,52 @@
-
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 
 export class SessionController {
   static async getSessions() {
     try {
-      const { data, error } = await supabase
-        .from('sessoes')
-        .select('*');
-
-      if (error) throw error;
-
-      return data || [];
+      const { data, error } = await supabase.from("sessions").select("*");
+      if (error) {
+        console.error("Error fetching sessions:", error);
+        return [];
+      }
+      return data;
     } catch (error) {
-      console.error('Error fetching sessions:', error);
+      console.error("Error fetching sessions:", error);
       return [];
     }
   }
 
-  static async getSessionsByClient(clientId: string) {
+  static async getSessionById(id: string) {
     try {
       const { data, error } = await supabase
-        .from('sessoes')
-        .select('*')
-        .eq('cliente_id', clientId);
-
-      if (error) throw error;
-
-      return data || [];
+        .from("sessions")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (error) {
+        console.error("Error fetching session:", error);
+        return null;
+      }
+      return data;
     } catch (error) {
-      console.error('Error fetching client sessions:', error);
-      return [];
-    }
-  }
-
-  static async getSessionsBySpecialist(specialistId: string) {
-    try {
-      const { data, error } = await supabase
-        .from('sessoes')
-        .select('*')
-        .eq('especialista_id', specialistId);
-
-      if (error) throw error;
-
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching specialist sessions:', error);
-      return [];
+      console.error("Error fetching session:", error);
+      return null;
     }
   }
 
   static async createSession(sessionData: any) {
     try {
       const { data, error } = await supabase
-        .from('sessoes')
+        .from("sessions")
         .insert([sessionData])
         .select()
         .single();
-
-      if (error) throw error;
-
+      if (error) {
+        console.error("Error creating session:", error);
+        return null;
+      }
       return data;
     } catch (error) {
-      console.error('Error creating session:', error);
+      console.error("Error creating session:", error);
       return null;
     }
   }
@@ -69,135 +54,78 @@ export class SessionController {
   static async updateSession(id: string, sessionData: any) {
     try {
       const { data, error } = await supabase
-        .from('sessoes')
+        .from("sessions")
         .update(sessionData)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
-
-      if (error) throw error;
-
+      if (error) {
+        console.error("Error updating session:", error);
+        return null;
+      }
       return data;
     } catch (error) {
-      console.error('Error updating session:', error);
+      console.error("Error updating session:", error);
       return null;
     }
   }
 
   static async deleteSession(id: string) {
     try {
-      const { error } = await supabase
-        .from('sessoes')
+      const { data, error } = await supabase
+        .from("sessions")
         .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
+        .eq("id", id);
+      if (error) {
+        console.error("Error deleting session:", error);
+        return false;
+      }
       return true;
     } catch (error) {
-      console.error('Error deleting session:', error);
+      console.error("Error deleting session:", error);
       return false;
     }
   }
 
-  // Additional methods needed for components
-  static async getAllSpecialists() {
+  static async getSpecialistDetails(id: string) {
     try {
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'especialista');
-
-      if (error) throw error;
-
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching specialists:', error);
-      return [];
-    }
-  }
-
-  static async getAllClients() {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'cliente');
-
-      if (error) throw error;
-
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-      return [];
-    }
-  }
-  
-  static async listClients() {
-    return this.getAllClients();
-  }
-
-  static async listSessions() {
-    return this.getSessions();
-  }
-
-  static async getClientSessionCount(clientId: string) {
-    try {
-      const { count, error } = await supabase
-        .from('sessoes')
-        .select('*', { count: 'exact', head: true })
-        .eq('cliente_id', clientId);
-
-      if (error) throw error;
-
-      return count || 0;
-    } catch (error) {
-      console.error('Error counting client sessions:', error);
-      return 0;
-    }
-  }
-
-  static async getSpecialistSessionCount(specialistId: string) {
-    try {
-      const { count, error } = await supabase
-        .from('sessoes')
-        .select('*', { count: 'exact', head: true })
-        .eq('especialista_id', specialistId);
-
-      if (error) throw error;
-
-      return count || 0;
-    } catch (error) {
-      console.error('Error counting specialist sessions:', error);
-      return 0;
-    }
-  }
-
-  static async getSpecialistDetails(specialistId: string) {
-    try {
-      const { data, error } = await supabase
-        .from('specialist_details')
-        .select('*, specialists(*)')
-        .eq('specialist_id', specialistId)
+        .from("specialist_profiles")
+        .select(`
+        *,
+        profiles:user_id (*)
+      `)
+        .eq("id", id)
         .single();
 
       if (error) throw error;
 
-      return data;
-    } catch (error) {
-      console.error('Error fetching specialist details:', error);
-      return null;
-    }
-  }
+      // Transform the data to match the expected structure
+      const result = {
+        id: data.id,
+        full_name: data.profiles?.full_name,
+        specialty: data.specialty,
+        bio: data.bio,
+        email: data.profiles?.email,
+        phone: data.phone,
+        rating: data.rating || 4.8,
+        experience_years: data.experience_years || 5,
+        details: {
+          thumbnail_url: data.thumbnail_url,
+          short_description: data.short_description,
+          long_description: data.long_description,
+          education: data.education,
+          areas_of_expertise: data.areas_of_expertise,
+          languages: data.languages,
+          certifications: data.certifications,
+          sessions_completed: data.sessions_completed,
+        },
+      };
 
-  static async sendSessionInvite(sessionId: string) {
-    try {
-      // Placeholder for sending session invite
-      console.log(`Sending invite for session ${sessionId}`);
-      return true;
+      return result;
     } catch (error) {
-      console.error('Error sending session invite:', error);
-      return false;
+      console.error("Error fetching specialist details:", error);
+      throw error;
     }
   }
 }

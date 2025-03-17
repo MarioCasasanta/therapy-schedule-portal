@@ -7,7 +7,7 @@ import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import FeaturedBlogCarousel from "@/components/FeaturedBlogCarousel";
 import FAQSection from "@/components/FAQSection";
-import Footer from "@/components/Footer";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   const navigate = useNavigate();

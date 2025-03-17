@@ -1,9 +1,6 @@
-import { Check, Calendar, Users, Clock, BarChart, Star, Award, Phone, X, Video, Book } from "lucide-react";
+import React from "react";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Footer } from "@/components/Footer";
 
 const allFeatures = [
   { 

@@ -54,14 +54,14 @@ const EspecialistaDetalhe = () => {
 
         setEspecialista({
           id: data.id,
-          full_name: data.full_name || "Especialista",
+          full_name: data.full_name,
           avatar_url: data.details?.thumbnail_url, 
-          description: data.details?.short_description || data.bio || "Especialista em terapia e desenvolvimento pessoal.",
+          description: data.details?.short_description || data.bio,
           bio: data.bio,
-          specialty: data.specialty || "Psicanálise",
+          specialty: data.specialty,
           session_price: 150, // Valor padrão, idealmente viria do banco
-          rating: data.rating || 4.8,
-          experience_years: data.experience_years || 5,
+          rating: data.rating,
+          experience_years: data.experience_years,
           email: data.email,
           phone: data.phone,
           details: data.details
@@ -312,3 +312,4 @@ const EspecialistaDetalhe = () => {
 };
 
 export default EspecialistaDetalhe;
+
