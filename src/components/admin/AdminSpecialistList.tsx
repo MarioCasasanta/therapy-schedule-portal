@@ -54,9 +54,11 @@ export default function AdminSpecialistList() {
     async function loadData() {
       try {
         setLoading(true);
+        console.log("Carregando especialistas...");
         
         // Load all specialists
         const specialistsData = await SessionController.getAllSpecialists();
+        console.log("Dados de especialistas recebidos:", specialistsData);
         
         // Add session count to each specialist
         const specialistsWithSessionCount = await Promise.all(
@@ -69,9 +71,11 @@ export default function AdminSpecialistList() {
           })
         );
         
+        console.log("Especialistas processados:", specialistsWithSessionCount);
         setSpecialists(specialistsWithSessionCount);
         setFilteredSpecialists(specialistsWithSessionCount);
       } catch (error: any) {
+        console.error("Erro ao carregar especialistas:", error);
         toast({
           variant: "destructive",
           title: "Erro ao carregar especialistas",
