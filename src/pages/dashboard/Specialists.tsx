@@ -1,7 +1,7 @@
 
 import { useLocation } from "react-router-dom";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
-import { AdminSpecialistList } from "@/components/admin/AdminSpecialistList";
+import AdminSpecialistList from "@/components/admin/AdminSpecialistList";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export default function DashboardSpecialists() {

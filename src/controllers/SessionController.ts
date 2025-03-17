@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@/types/session";
+import { Session, SessionFormData } from "@/types/session";
 
 export const SessionController = {
   getSession: async (sessionId: string): Promise<Session> => {
@@ -31,7 +31,7 @@ export const SessionController = {
     return data as Session[];
   },
 
-  createSession: async (sessionData: any): Promise<Session> => {
+  createSession: async (sessionData: SessionFormData): Promise<Session> => {
     // Make sure data_hora is provided as required by the database
     if (!sessionData.data_hora) {
       throw new Error("data_hora is required");
