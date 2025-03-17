@@ -36,7 +36,6 @@ interface Specialist {
   created_at: string;
   full_name?: string;
   email?: string;
-  bio?: string;
   specialty?: string;
   sessionCount?: number;
 }

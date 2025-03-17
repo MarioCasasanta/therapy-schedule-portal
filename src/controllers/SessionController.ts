@@ -157,10 +157,10 @@ export const SessionController = {
     return SessionController.sendSessionInvite(sessionId);
   },
 
-  getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string, created_at: string, bio?: string, specialty?: string}[]> => {
+  getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string, created_at: string, specialty?: string}[]> => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, full_name, email, created_at, bio, specialty")
+      .select("id, full_name, email, created_at, specialty")
       .eq("role", "especialista")
       .order("created_at", { ascending: false });
 
@@ -168,10 +168,10 @@ export const SessionController = {
     return data || [];
   },
   
-  searchSpecialists: async (searchTerm: string): Promise<{id: string, full_name: string, email: string, created_at: string, bio?: string, specialty?: string}[]> => {
+  searchSpecialists: async (searchTerm: string): Promise<{id: string, full_name: string, email: string, created_at: string, specialty?: string}[]> => {
     let query = supabase
       .from("profiles")
-      .select("id, full_name, email, created_at, bio, specialty")
+      .select("id, full_name, email, created_at, specialty")
       .eq("role", "especialista");
       
     if (searchTerm) {

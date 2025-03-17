@@ -26,6 +26,7 @@ import { Toaster } from "@/components/ui/toaster";
 import DashboardClients from "@/pages/dashboard/Clients";
 import SpecialistClients from "@/pages/dashboard/SpecialistClients";
 import ClientDetail from "@/pages/dashboard/ClientDetail";
+import DashboardSpecialists from "@/pages/dashboard/Specialists";
 
 // Admin Dashboard Routes
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -58,6 +59,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/clients" element={<DashboardClients />} />
         <Route path="/admin/clients/:id" element={<ClientDetail />} />
+        <Route path="/admin/specialists" element={<DashboardSpecialists />} />
         <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/sessions" element={<Sessions />} />
         <Route path="/admin/sessions/new" element={<NewSession />} />
