@@ -1,27 +1,41 @@
 
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Star, ArrowLeft, CalendarDays, Clock, MapPin, User, Mail, Phone } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Star, ArrowLeft, CalendarDays, Clock, MapPin, User, Mail, Phone, GraduationCap, Languages } from "lucide-react";
+import { SessionController } from "@/controllers/SessionController";
 import Navigation from "@/components/Navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WeeklyCalendar } from "@/components/calendar/WeeklyCalendar";
+import { Badge } from "@/components/ui/badge";
+
+interface SpecialistDetail {
+  short_description?: string;
+  long_description?: string;
+  education?: string;
+  thumbnail_url?: string;
+  sessions_completed?: number;
+  areas_of_expertise?: string[];
+  languages?: string[];
+  certifications?: string[];
+}
 
 interface Especialista {
   id: string;
-  full_name: string;
-  avatar_url: string;
+  full_name?: string;
+  avatar_url?: string;
   description?: string;
   notes?: string;
   specialty?: string;
+  bio?: string;
   session_price?: number;
   rating?: number;
   experience_years?: number;
   email?: string;
   phone?: string;
+  details?: SpecialistDetail;
 }
 
 const EspecialistaDetalhe = () => {
@@ -36,27 +50,23 @@ const EspecialistaDetalhe = () => {
       if (!id) return;
       
       try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", id)
-          .single();
+        setLoading(true);
+        // Usando o novo método do SessionController para buscar detalhes do especialista
+        const data = await SessionController.getSpecialistDetails(id);
 
-        if (error) throw error;
-
-        // Transformando os dados para o formato que precisamos
         setEspecialista({
           id: data.id,
           full_name: data.full_name || "Especialista",
-          avatar_url: data.avatar_url || "",
-          description: data.notes || "Especialista em terapia e desenvolvimento pessoal.",
-          notes: data.notes,
-          specialty: "Psicanálise", // Exemplo, idealmente viria do banco
+          avatar_url: data.details?.thumbnail_url, 
+          description: data.details?.short_description || data.bio || "Especialista em terapia e desenvolvimento pessoal.",
+          bio: data.bio,
+          specialty: data.specialty || "Psicanálise",
           session_price: 150, // Valor padrão, idealmente viria do banco
-          rating: 4.8, // Valor padrão, idealmente viria de avaliações
-          experience_years: 5, // Exemplo, idealmente viria do banco
+          rating: data.rating || 4.8,
+          experience_years: data.experience_years || 5,
           email: data.email,
-          phone: data.telefone || data.phone,
+          phone: data.phone,
+          details: data.details
         });
       } catch (error) {
         console.error("Erro ao buscar dados do especialista:", error);
@@ -129,9 +139,9 @@ const EspecialistaDetalhe = () => {
                 <div className="flex flex-col items-center text-center mb-6">
                   <div className="mb-4">
                     <Avatar className="h-32 w-32 border-4 border-white shadow-md">
-                      <AvatarImage src={especialista.avatar_url} alt={especialista.full_name} />
+                      <AvatarImage src={especialista.avatar_url} alt={especialista.full_name || ""} />
                       <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-                        {especialista.full_name.split(' ').map(n => n[0]).join('')}
+                        {especialista.full_name ? especialista.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ES'}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -153,6 +163,14 @@ const EspecialistaDetalhe = () => {
                 </div>
                 
                 <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <GraduationCap className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">Formação</h3>
+                      <p className="text-gray-600 text-sm">{especialista.details?.education || "Não informada"}</p>
+                    </div>
+                  </div>
+                
                   <div className="flex items-start gap-3">
                     <CalendarDays className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                     <div>
@@ -176,6 +194,16 @@ const EspecialistaDetalhe = () => {
                       <p className="text-gray-600 text-sm">Online via videoconferência</p>
                     </div>
                   </div>
+                  
+                  {especialista.details?.languages && especialista.details.languages.length > 0 && (
+                    <div className="flex items-start gap-3">
+                      <Languages className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h3 className="font-medium text-gray-900">Idiomas</h3>
+                        <p className="text-gray-600 text-sm">{especialista.details.languages.join(", ")}</p>
+                      </div>
+                    </div>
+                  )}
                   
                   {especialista.email && (
                     <div className="flex items-start gap-3">
@@ -214,35 +242,57 @@ const EspecialistaDetalhe = () => {
                   <CardContent className="p-6">
                     <h2 className="text-xl font-semibold mb-4">Sobre o profissional</h2>
                     <div className="prose max-w-none text-gray-700">
-                      <p>{especialista.description}</p>
-                      <p className="mt-4">
-                        Com {especialista.experience_years} anos de experiência, {especialista.full_name} é 
-                        especialista em atender pessoas que buscam desenvolvimento pessoal, 
-                        autoconhecimento e bem-estar emocional.
-                      </p>
-                      <p className="mt-4">
-                        Cada sessão é personalizada de acordo com as necessidades individuais, 
-                        utilizando técnicas baseadas em evidências para ajudar no processo terapêutico.
-                      </p>
+                      <p>{especialista.details?.short_description || especialista.description}</p>
+                      
+                      {especialista.details?.long_description && (
+                        <p className="mt-4">{especialista.details.long_description}</p>
+                      )}
+                      
+                      {!especialista.details?.long_description && (
+                        <>
+                          <p className="mt-4">
+                            Com {especialista.experience_years} anos de experiência, {especialista.full_name} é 
+                            especialista em atender pessoas que buscam desenvolvimento pessoal, 
+                            autoconhecimento e bem-estar emocional.
+                          </p>
+                          <p className="mt-4">
+                            Cada sessão é personalizada de acordo com as necessidades individuais, 
+                            utilizando técnicas baseadas em evidências para ajudar no processo terapêutico.
+                          </p>
+                        </>
+                      )}
                     </div>
                     
                     <div className="mt-8">
-                      <h3 className="text-lg font-semibold mb-3">Especialidades</h3>
+                      <h3 className="text-lg font-semibold mb-3">Especializações</h3>
                       <div className="flex flex-wrap gap-2">
-                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                          Ansiedade
-                        </span>
-                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                          Depressão
-                        </span>
-                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                          Autoconhecimento
-                        </span>
-                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                          Relacionamentos
-                        </span>
+                        {especialista.details?.areas_of_expertise && especialista.details.areas_of_expertise.length > 0 ? (
+                          especialista.details.areas_of_expertise.map((area, index) => (
+                            <Badge key={index} variant="secondary" className="rounded-full">
+                              {area}
+                            </Badge>
+                          ))
+                        ) : (
+                          <>
+                            <Badge variant="secondary" className="rounded-full">Ansiedade</Badge>
+                            <Badge variant="secondary" className="rounded-full">Depressão</Badge>
+                            <Badge variant="secondary" className="rounded-full">Autoconhecimento</Badge>
+                            <Badge variant="secondary" className="rounded-full">Relacionamentos</Badge>
+                          </>
+                        )}
                       </div>
                     </div>
+                    
+                    {especialista.details?.certifications && especialista.details.certifications.length > 0 && (
+                      <div className="mt-8">
+                        <h3 className="text-lg font-semibold mb-3">Certificações</h3>
+                        <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                          {especialista.details.certifications.map((cert, index) => (
+                            <li key={index}>{cert}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

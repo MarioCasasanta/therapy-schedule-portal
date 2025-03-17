@@ -157,11 +157,29 @@ export const SessionController = {
     return SessionController.sendSessionInvite(sessionId);
   },
 
-  getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string, created_at: string, specialty?: string}[]> => {
-    // Primeiro, obter dados da tabela de especialistas
+  getAllSpecialists: async (): Promise<{
+    id: string, 
+    full_name: string, 
+    email: string, 
+    created_at: string, 
+    specialty?: string,
+    bio?: string,
+    experience_years?: number,
+    rating?: number,
+    details?: {
+      short_description?: string,
+      long_description?: string,
+      education?: string,
+      thumbnail_url?: string,
+      sessions_completed?: number,
+      areas_of_expertise?: string[],
+      languages?: string[]
+    }
+  }[]> => {
+    // Buscar dados da tabela de especialistas
     const { data: specialistsData, error: specialistsError } = await supabase
       .from("specialists")
-      .select("id, specialty")
+      .select("id, specialty, bio, experience_years, rating, created_at")
       .order("created_at", { ascending: false });
     
     if (specialistsError) throw specialistsError;
@@ -170,6 +188,7 @@ export const SessionController = {
     if (specialistsData && specialistsData.length > 0) {
       const specialistIds = specialistsData.map(spec => spec.id);
       
+      // Buscar perfis relacionados
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
         .select("id, full_name, email, created_at")
@@ -178,19 +197,47 @@ export const SessionController = {
       
       if (profilesError) throw profilesError;
       
-      // Combinar os dados das duas tabelas
+      // Buscar detalhes adicionais dos especialistas
+      const { data: detailsData, error: detailsError } = await supabase
+        .from("specialist_details")
+        .select("*")
+        .in("specialist_id", specialistIds);
+        
+      if (detailsError) throw detailsError;
+      
+      // Mapear detalhes para um objeto indexado por specialist_id para fácil acesso
+      const detailsMap = (detailsData || []).reduce((map, detail) => {
+        map[detail.specialist_id] = detail;
+        return map;
+      }, {} as Record<string, any>);
+      
+      // Combinar os dados das três tabelas
       const combinedData = profilesData?.map(profile => {
         const specialist = specialistsData.find(s => s.id === profile.id);
+        const details = detailsMap[profile.id];
+        
         return {
           ...profile,
-          specialty: specialist?.specialty || "Não especificada"
+          specialty: specialist?.specialty || "Não especificada",
+          bio: specialist?.bio || "",
+          experience_years: specialist?.experience_years || 0,
+          rating: specialist?.rating || 0,
+          details: details ? {
+            short_description: details.short_description,
+            long_description: details.long_description,
+            education: details.education,
+            thumbnail_url: details.thumbnail_url,
+            sessions_completed: details.sessions_completed,
+            areas_of_expertise: details.areas_of_expertise,
+            languages: details.languages
+          } : undefined
         };
       }) || [];
       
       return combinedData;
     }
     
-    // Caso não encontre especialistas na nova tabela, busca da tabela de profiles como fallback
+    // Caso não encontre especialistas na tabela specialists, busca da tabela de profiles como fallback
     const { data, error } = await supabase
       .from("profiles")
       .select("id, full_name, email, created_at")
@@ -201,17 +248,49 @@ export const SessionController = {
     return data || [];
   },
   
-  searchSpecialists: async (searchTerm: string): Promise<{id: string, full_name: string, email: string, created_at: string, specialty?: string}[]> => {
-    // Primeiro, buscar todos os especialistas da nova tabela
+  searchSpecialists: async (searchTerm: string): Promise<{
+    id: string, 
+    full_name: string, 
+    email: string, 
+    created_at: string, 
+    specialty?: string, 
+    bio?: string,
+    experience_years?: number,
+    rating?: number,
+    details?: {
+      short_description?: string,
+      long_description?: string,
+      education?: string,
+      thumbnail_url?: string,
+      sessions_completed?: number,
+      areas_of_expertise?: string[],
+      languages?: string[]
+    }
+  }[]> => {
+    // Primeiro, buscar todos os especialistas da tabela specialists
     const { data: allSpecialistsData, error: specialistsError } = await supabase
       .from("specialists")
-      .select("id, specialty");
+      .select("id, specialty, bio, experience_years, rating");
     
     if (specialistsError) throw specialistsError;
     
-    // Se temos especialistas na nova tabela
+    // Se temos especialistas na tabela specialists
     if (allSpecialistsData && allSpecialistsData.length > 0) {
       const specialistIds = allSpecialistsData.map(s => s.id);
+      
+      // Buscar detalhes dos especialistas
+      const { data: detailsData, error: detailsError } = await supabase
+        .from("specialist_details")
+        .select("*")
+        .in("specialist_id", specialistIds);
+        
+      if (detailsError) throw detailsError;
+      
+      // Mapear detalhes para um objeto indexado por specialist_id
+      const detailsMap = (detailsData || []).reduce((map, detail) => {
+        map[detail.specialist_id] = detail;
+        return map;
+      }, {} as Record<string, any>);
       
       // Buscar profiles correspondentes, filtrando pela busca
       let query = supabase
@@ -228,20 +307,54 @@ export const SessionController = {
       if (profilesError) throw profilesError;
       
       // Combinar os dados
-      const combinedData = profilesData?.map(profile => {
+      let combinedData = profilesData?.map(profile => {
         const specialist = allSpecialistsData.find(s => s.id === profile.id);
+        const details = detailsMap[profile.id];
+        
         return {
           ...profile,
-          specialty: specialist?.specialty || "Não especificada"
+          specialty: specialist?.specialty || "Não especificada",
+          bio: specialist?.bio || "",
+          experience_years: specialist?.experience_years || 0,
+          rating: specialist?.rating || 0,
+          details: details ? {
+            short_description: details.short_description,
+            long_description: details.long_description,
+            education: details.education,
+            thumbnail_url: details.thumbnail_url,
+            sessions_completed: details.sessions_completed,
+            areas_of_expertise: details.areas_of_expertise,
+            languages: details.languages
+          } : undefined
         };
       }) || [];
       
-      // Filtrar também por especialidade
+      // Filtrar também por especialidade e detalhes
       if (searchTerm) {
+        // Converter para minúsculas para comparação insensível a maiúsculas/minúsculas
+        const searchTermLower = searchTerm.toLowerCase();
+        
         return combinedData.filter(specialist => 
-          specialist.specialty?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          specialist.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          specialist.email?.toLowerCase().includes(searchTerm.toLowerCase())
+          // Busca em campos básicos
+          specialist.specialty?.toLowerCase().includes(searchTermLower) ||
+          specialist.full_name?.toLowerCase().includes(searchTermLower) ||
+          specialist.email?.toLowerCase().includes(searchTermLower) ||
+          specialist.bio?.toLowerCase().includes(searchTermLower) ||
+          
+          // Busca em campos de detalhes
+          specialist.details?.short_description?.toLowerCase().includes(searchTermLower) ||
+          specialist.details?.long_description?.toLowerCase().includes(searchTermLower) ||
+          specialist.details?.education?.toLowerCase().includes(searchTermLower) ||
+          
+          // Busca em áreas de especialização
+          specialist.details?.areas_of_expertise?.some(area => 
+            area.toLowerCase().includes(searchTermLower)
+          ) ||
+          
+          // Busca em idiomas
+          specialist.details?.languages?.some(language => 
+            language.toLowerCase().includes(searchTermLower)
+          )
         );
       }
       
@@ -275,7 +388,24 @@ export const SessionController = {
   },
   
   // Método para cadastrar um especialista
-  registerSpecialist: async (userId: string, specialistData: { specialty?: string, bio?: string, experience_years?: number }): Promise<void> => {
+  registerSpecialist: async (
+    userId: string, 
+    specialistData: { 
+      specialty?: string, 
+      bio?: string, 
+      experience_years?: number
+    }, 
+    detailsData?: {
+      short_description?: string,
+      long_description?: string,
+      education?: string,
+      thumbnail_url?: string,
+      sessions_completed?: number,
+      areas_of_expertise?: string[],
+      languages?: string[],
+      certifications?: string[]
+    }
+  ): Promise<void> => {
     // Primeiro, verificar se o usuário já existe na tabela de especialistas
     const { data: existingSpecialist, error: checkError } = await supabase
       .from("specialists")
@@ -312,6 +442,38 @@ export const SessionController = {
       
       if (profileUpdateError) throw profileUpdateError;
     }
+
+    // Atualizar ou inserir detalhes do especialista
+    if (detailsData) {
+      // Verificar se já existem detalhes para este especialista
+      const { data: existingDetails, error: detailsCheckError } = await supabase
+        .from("specialist_details")
+        .select("id")
+        .eq("specialist_id", userId)
+        .maybeSingle();
+
+      if (detailsCheckError) throw detailsCheckError;
+
+      if (existingDetails) {
+        // Atualizar detalhes existentes
+        const { error: updateDetailsError } = await supabase
+          .from("specialist_details")
+          .update(detailsData)
+          .eq("specialist_id", userId);
+
+        if (updateDetailsError) throw updateDetailsError;
+      } else {
+        // Inserir novos detalhes
+        const { error: insertDetailsError } = await supabase
+          .from("specialist_details")
+          .insert({
+            specialist_id: userId,
+            ...detailsData
+          });
+
+        if (insertDetailsError) throw insertDetailsError;
+      }
+    }
   },
   
   // Método para obter detalhes de um especialista
@@ -323,7 +485,17 @@ export const SessionController = {
     specialty?: string,
     bio?: string,
     experience_years?: number,
-    rating?: number
+    rating?: number,
+    details?: {
+      short_description?: string,
+      long_description?: string,
+      education?: string,
+      thumbnail_url?: string,
+      sessions_completed?: number,
+      areas_of_expertise?: string[],
+      languages?: string[],
+      certifications?: string[]
+    }
   }> => {
     // Buscar dados da tabela specialists
     const { data: specialistData, error: specialistError } = await supabase
@@ -343,6 +515,15 @@ export const SessionController = {
     
     if (profileError) throw profileError;
     
+    // Buscar detalhes adicionais
+    const { data: detailsData, error: detailsError } = await supabase
+      .from("specialist_details")
+      .select("*")
+      .eq("specialist_id", specialistId)
+      .maybeSingle();
+      
+    if (detailsError) throw detailsError;
+    
     // Combinar os dados
     if (specialistData && profileData) {
       return {
@@ -350,13 +531,77 @@ export const SessionController = {
         specialty: specialistData.specialty,
         bio: specialistData.bio,
         experience_years: specialistData.experience_years,
-        rating: specialistData.rating
+        rating: specialistData.rating,
+        details: detailsData ? {
+          short_description: detailsData.short_description,
+          long_description: detailsData.long_description,
+          education: detailsData.education,
+          thumbnail_url: detailsData.thumbnail_url,
+          sessions_completed: detailsData.sessions_completed,
+          areas_of_expertise: detailsData.areas_of_expertise,
+          languages: detailsData.languages,
+          certifications: detailsData.certifications
+        } : undefined
       };
     } else if (profileData) {
       // Caso não tenha dados na tabela specialists
       return profileData;
     } else {
       throw new Error("Especialista não encontrado");
+    }
+  },
+  
+  // Método para atualizar os detalhes de um especialista
+  updateSpecialistDetails: async (
+    specialistId: string,
+    detailsData: {
+      short_description?: string,
+      long_description?: string,
+      education?: string,
+      thumbnail_url?: string,
+      sessions_completed?: number,
+      areas_of_expertise?: string[],
+      languages?: string[],
+      certifications?: string[]
+    }
+  ): Promise<void> => {
+    // Verificar se o especialista existe
+    const { data: existingSpecialist, error: checkError } = await supabase
+      .from("specialists")
+      .select("id")
+      .eq("id", specialistId)
+      .maybeSingle();
+    
+    if (checkError) throw checkError;
+    if (!existingSpecialist) throw new Error("Especialista não encontrado");
+    
+    // Verificar se já existem detalhes para este especialista
+    const { data: existingDetails, error: detailsCheckError } = await supabase
+      .from("specialist_details")
+      .select("id")
+      .eq("specialist_id", specialistId)
+      .maybeSingle();
+      
+    if (detailsCheckError) throw detailsCheckError;
+    
+    if (existingDetails) {
+      // Atualizar detalhes existentes
+      const { error: updateError } = await supabase
+        .from("specialist_details")
+        .update(detailsData)
+        .eq("specialist_id", specialistId);
+        
+      if (updateError) throw updateError;
+    } else {
+      // Inserir novos detalhes
+      const { error: insertError } = await supabase
+        .from("specialist_details")
+        .insert({
+          specialist_id: specialistId,
+          ...detailsData
+        });
+        
+      if (insertError) throw insertError;
     }
   }
 };

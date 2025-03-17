@@ -891,6 +891,62 @@ export type Database = {
           },
         ]
       }
+      specialist_details: {
+        Row: {
+          areas_of_expertise: string[] | null
+          certifications: string[] | null
+          created_at: string | null
+          education: string | null
+          id: string
+          languages: string[] | null
+          long_description: string | null
+          rating: number | null
+          sessions_completed: number | null
+          short_description: string | null
+          specialist_id: string
+          thumbnail_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          areas_of_expertise?: string[] | null
+          certifications?: string[] | null
+          created_at?: string | null
+          education?: string | null
+          id?: string
+          languages?: string[] | null
+          long_description?: string | null
+          rating?: number | null
+          sessions_completed?: number | null
+          short_description?: string | null
+          specialist_id: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          areas_of_expertise?: string[] | null
+          certifications?: string[] | null
+          created_at?: string | null
+          education?: string | null
+          id?: string
+          languages?: string[] | null
+          long_description?: string | null
+          rating?: number | null
+          sessions_completed?: number | null
+          short_description?: string | null
+          specialist_id?: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialist_details_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: true
+            referencedRelation: "specialists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       specialists: {
         Row: {
           bio: string | null

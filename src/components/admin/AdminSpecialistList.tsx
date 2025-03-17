@@ -27,9 +27,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { UserSearch, Calendar, CheckCircle2, Search, Briefcase } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserSearch, Calendar, CheckCircle2, Search, Briefcase, GraduationCap, Languages, Award, Star } from "lucide-react";
+
+interface SpecialistDetail {
+  short_description?: string;
+  long_description?: string;
+  education?: string;
+  thumbnail_url?: string;
+  sessions_completed?: number;
+  areas_of_expertise?: string[];
+  languages?: string[];
+  certifications?: string[];
+}
 
 interface Specialist {
   id: string;
@@ -37,7 +57,11 @@ interface Specialist {
   full_name?: string;
   email?: string;
   specialty?: string;
+  bio?: string;
+  experience_years?: number;
+  rating?: number;
   sessionCount?: number;
+  details?: SpecialistDetail;
 }
 
 export function AdminSpecialistList() {
@@ -47,6 +71,8 @@ export function AdminSpecialistList() {
   const [totalSpecialists, setTotalSpecialists] = useState<number>(0);
   const [specialtyFilter, setSpecialtyFilter] = useState<string>("all");
   const [specialties, setSpecialties] = useState<string[]>([]);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedSpecialist, setSelectedSpecialist] = useState<Specialist | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -154,6 +180,11 @@ export function AdminSpecialistList() {
     return specialtyFilter === "all" || specialist.specialty === specialtyFilter;
   });
 
+  const handleViewDetails = (specialist: Specialist) => {
+    setSelectedSpecialist(specialist);
+    setDetailDialogOpen(true);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -205,6 +236,7 @@ export function AdminSpecialistList() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Especialidade</TableHead>
+                <TableHead>Qualificações</TableHead>
                 <TableHead>Data de Inscrição</TableHead>
                 <TableHead>Sessões Realizadas</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
@@ -213,7 +245,7 @@ export function AdminSpecialistList() {
             <TableBody>
               {filteredSpecialists.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     Nenhum especialista encontrado
                   </TableCell>
                 </TableRow>
@@ -221,7 +253,15 @@ export function AdminSpecialistList() {
                 filteredSpecialists.map((specialist) => (
                   <TableRow key={specialist.id}>
                     <TableCell className="font-medium">
-                      {specialist.full_name || "Especialista sem nome"}
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={specialist.details?.thumbnail_url || specialist.avatar_url} alt={specialist.full_name || ""} />
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {specialist.full_name ? specialist.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ES'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span>{specialist.full_name || "Especialista sem nome"}</span>
+                      </div>
                     </TableCell>
                     <TableCell>{specialist.email || "Sem email"}</TableCell>
                     <TableCell>
@@ -229,6 +269,24 @@ export function AdminSpecialistList() {
                         <Briefcase className="mr-2 h-4 w-4 text-muted-foreground" />
                         {specialist.specialty || "Não especificada"}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {specialist.details?.areas_of_expertise && specialist.details.areas_of_expertise.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {specialist.details.areas_of_expertise.slice(0, 2).map((area, index) => (
+                            <span key={index} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs">
+                              {area}
+                            </span>
+                          ))}
+                          {specialist.details.areas_of_expertise.length > 2 && (
+                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs">
+                              +{specialist.details.areas_of_expertise.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Não informadas</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
@@ -239,11 +297,11 @@ export function AdminSpecialistList() {
                     <TableCell>
                       <div className="flex items-center">
                         <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
-                        {specialist.sessionCount || 0} sessões
+                        {specialist.details?.sessions_completed || specialist.sessionCount || 0} sessões
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleViewDetails(specialist)}>
                         Ver detalhes
                       </Button>
                     </TableCell>
@@ -259,6 +317,116 @@ export function AdminSpecialistList() {
           Mostrando {filteredSpecialists.length} de {totalSpecialists} especialistas
         </div>
       </CardFooter>
+
+      {/* Dialog para exibir detalhes do especialista */}
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Detalhes do Especialista</DialogTitle>
+            <DialogDescription>
+              Informações detalhadas sobre o especialista selecionado
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedSpecialist && (
+            <div className="grid gap-6 py-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={selectedSpecialist.details?.thumbnail_url || selectedSpecialist.avatar_url} alt={selectedSpecialist.full_name || ""} />
+                  <AvatarFallback className="text-lg bg-primary/10 text-primary">
+                    {selectedSpecialist.full_name ? selectedSpecialist.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ES'}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div>
+                  <h3 className="text-xl font-semibold">{selectedSpecialist.full_name}</h3>
+                  <p className="text-muted-foreground">{selectedSpecialist.email}</p>
+                  <div className="flex items-center mt-1">
+                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
+                    <span>{selectedSpecialist.rating || selectedSpecialist.details?.rating || 0}</span>
+                    <span className="mx-2">•</span>
+                    <Briefcase className="h-4 w-4 text-muted-foreground mr-1" />
+                    <span>{selectedSpecialist.specialty}</span>
+                    <span className="mx-2">•</span>
+                    <span>{selectedSpecialist.experience_years || 0} anos de experiência</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-medium mb-2 flex items-center">
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    Formação
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedSpecialist.details?.education || "Não informada"}
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-2 flex items-center">
+                    <Languages className="h-4 w-4 mr-2" />
+                    Idiomas
+                  </h4>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedSpecialist.details?.languages && selectedSpecialist.details.languages.length > 0 ? (
+                      selectedSpecialist.details.languages.map((language, index) => (
+                        <span key={index} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs">
+                          {language}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Não informados</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2 flex items-center">
+                  <Award className="h-4 w-4 mr-2" />
+                  Áreas de Especialização
+                </h4>
+                <div className="flex flex-wrap gap-1">
+                  {selectedSpecialist.details?.areas_of_expertise && selectedSpecialist.details.areas_of_expertise.length > 0 ? (
+                    selectedSpecialist.details.areas_of_expertise.map((area, index) => (
+                      <span key={index} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs">
+                        {area}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Não informadas</span>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Descrição Curta</h4>
+                <p className="text-sm text-muted-foreground">
+                  {selectedSpecialist.details?.short_description || selectedSpecialist.bio || "Não informada"}
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Descrição Completa</h4>
+                <p className="text-sm text-muted-foreground">
+                  {selectedSpecialist.details?.long_description || "Não informada"}
+                </p>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
+              Fechar
+            </Button>
+            <Button>
+              Editar Especialista
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
