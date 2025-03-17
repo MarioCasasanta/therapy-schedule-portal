@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
+import AdminLogin from "@/pages/AdminLogin";
 import Dashboard from "@/pages/Dashboard";
 import ClientDashboard from "@/pages/ClientDashboard";
 import Settings from "@/pages/dashboard/Settings";
@@ -43,6 +44,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/docs/chatgpt-integration" element={<ChatGPTIntegration />} />
         <Route path="/especialistas" element={<Especialistas />} />
         <Route path="/especialistas/:id" element={<EspecialistaDetalhe />} />
