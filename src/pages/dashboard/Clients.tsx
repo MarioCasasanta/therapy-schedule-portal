@@ -4,7 +4,7 @@ import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
 import { AdminClientList } from "@/components/admin/AdminClientList";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
-export default function DashboardClients() {
+export default function AdminClients() {
   const location = useLocation();
   
   return (
