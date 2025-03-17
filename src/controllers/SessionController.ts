@@ -113,7 +113,7 @@ export const SessionController = {
   },
 
   listClients: async (especialistaId?: string): Promise<{id: string, full_name: string, email: string, created_at: string}[]> => {
-    if (especialistaId) {
+    if (especialistaId && especialistaId !== 'all') {
       // Get clients assigned to this specialist
       const { data: sessionData, error: sessionError } = await supabase
         .from("sessoes")

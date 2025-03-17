@@ -30,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserSearch, Calendar, CheckCircle2, Search } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Client {
   id: string;
@@ -94,13 +95,13 @@ export function AdminClientList() {
     loadData();
   }, [toast]);
 
-  // Filter clients based on search term and selected specialist
+  // Filter clients based on search term
   const filteredClients = clients.filter(client => {
     const matchesSearch = searchTerm === "" || 
       (client.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
        client.email?.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    return selectedSpecialist === "all" ? matchesSearch : false; // For now we don't have specialist filtering
+    return matchesSearch;
   });
 
   return (
@@ -188,8 +189,10 @@ export function AdminClientList() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        Ver detalhes
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to={`/admin/clients/${client.id}`}>
+                          Ver detalhes
+                        </Link>
                       </Button>
                     </TableCell>
                   </TableRow>
