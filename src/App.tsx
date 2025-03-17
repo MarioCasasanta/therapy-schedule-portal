@@ -24,7 +24,7 @@ import ParaEspecialistas from "@/pages/ParaEspecialistas";
 import ChatGPTIntegration from "@/pages/Documentation/ChatGPTIntegration";
 import NotFound from "@/pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
-import DashboardClients from "@/pages/dashboard/Clients";
+import GerenciarClientes from "@/pages/dashboard/GerenciarClientes";
 import SpecialistClients from "@/pages/dashboard/SpecialistClients";
 import ClientDetail from "@/pages/dashboard/ClientDetail";
 import DashboardSpecialists from "@/pages/dashboard/Specialists";
@@ -61,7 +61,7 @@ function App() {
         
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/clients" element={<DashboardClients />} />
+        <Route path="/admin/clients" element={<GerenciarClientes />} />
         <Route path="/admin/clients/:id" element={<ClientDetail />} />
         <Route path="/admin/specialists" element={<DashboardSpecialists />} />
         <Route path="/admin/settings" element={<Settings />} />

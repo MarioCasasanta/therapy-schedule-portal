@@ -2,99 +2,99 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export class SessionController {
-  // Mock database functions for development
+  // Funções do banco de dados para desenvolvimento
   static async getSessions() {
     try {
-      // Using the 'sessoes' table which is available in Supabase
+      // Usando a tabela 'sessoes' que está disponível no Supabase
       const { data, error } = await supabase.from("sessoes").select("*");
       if (error) {
-        console.error("Error fetching sessions:", error);
+        console.error("Erro ao buscar sessões:", error);
         return [];
       }
       return data || [];
     } catch (error) {
-      console.error("Error fetching sessions:", error);
+      console.error("Erro ao buscar sessões:", error);
       return [];
     }
   }
 
   static async getSessionById(id: string) {
     try {
-      // Using the 'sessoes' table
+      // Usando a tabela 'sessoes'
       const { data, error } = await supabase
         .from("sessoes")
         .select("*")
         .eq("id", id)
         .single();
       if (error) {
-        console.error("Error fetching session:", error);
+        console.error("Erro ao buscar sessão:", error);
         return null;
       }
       return data;
     } catch (error) {
-      console.error("Error fetching session:", error);
+      console.error("Erro ao buscar sessão:", error);
       return null;
     }
   }
 
   static async createSession(sessionData: any) {
     try {
-      // Using the 'sessoes' table
+      // Usando a tabela 'sessoes'
       const { data, error } = await supabase
         .from("sessoes")
         .insert([sessionData])
         .select();
       if (error) {
-        console.error("Error creating session:", error);
+        console.error("Erro ao criar sessão:", error);
         return null;
       }
       return data ? data[0] : null;
     } catch (error) {
-      console.error("Error creating session:", error);
+      console.error("Erro ao criar sessão:", error);
       return null;
     }
   }
 
   static async updateSession(id: string, sessionData: any) {
     try {
-      // Using the 'sessoes' table
+      // Usando a tabela 'sessoes'
       const { data, error } = await supabase
         .from("sessoes")
         .update(sessionData)
         .eq("id", id)
         .select();
       if (error) {
-        console.error("Error updating session:", error);
+        console.error("Erro ao atualizar sessão:", error);
         return null;
       }
       return data ? data[0] : null;
     } catch (error) {
-      console.error("Error updating session:", error);
+      console.error("Erro ao atualizar sessão:", error);
       return null;
     }
   }
 
   static async deleteSession(id: string) {
     try {
-      // Using the 'sessoes' table
+      // Usando a tabela 'sessoes'
       const { error } = await supabase
         .from("sessoes")
         .delete()
         .eq("id", id);
       if (error) {
-        console.error("Error deleting session:", error);
+        console.error("Erro ao excluir sessão:", error);
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Error deleting session:", error);
+      console.error("Erro ao excluir sessão:", error);
       return false;
     }
   }
 
   static async getSpecialistDetails(id: string) {
     try {
-      // Using profiles table since specialist_profiles may not exist
+      // Usando a tabela profiles já que specialist_profiles pode não existir
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -104,10 +104,10 @@ export class SessionController {
 
       if (error) throw error;
 
-      // Transform the data to match the expected structure
+      // Transformar os dados para corresponder à estrutura esperada
       const result = {
         id: data.id,
-        full_name: data.full_name || "Unknown",
+        full_name: data.full_name || "Desconhecido",
         specialty: "Psicologia",
         bio: "Especialista em terapia",
         email: data.email || "email@example.com",
@@ -128,12 +128,12 @@ export class SessionController {
 
       return result;
     } catch (error) {
-      console.error("Error fetching specialist details:", error);
+      console.error("Erro ao buscar detalhes do especialista:", error);
       throw error;
     }
   }
 
-  // Additional functions needed by AdminClientList and AdminSpecialistList
+  // Funções adicionais necessárias para AdminClientList e AdminSpecialistList
   static async getAllClients() {
     try {
       const { data, error } = await supabase
@@ -142,13 +142,13 @@ export class SessionController {
         .or("role.eq.cliente,role.eq.client,tipo_usuario.eq.cliente");
       
       if (error) {
-        console.error("Error fetching clients:", error);
+        console.error("Erro ao buscar clientes:", error);
         return [];
       }
       
       return data || [];
     } catch (error) {
-      console.error("Error fetching clients:", error);
+      console.error("Erro ao buscar clientes:", error);
       return [];
     }
   }
@@ -161,13 +161,13 @@ export class SessionController {
         .eq("role", "specialist");
       
       if (error) {
-        console.error("Error fetching specialists:", error);
+        console.error("Erro ao buscar especialistas:", error);
         return [];
       }
       
       return data || [];
     } catch (error) {
-      console.error("Error fetching specialists:", error);
+      console.error("Erro ao buscar especialistas:", error);
       return [];
     }
   }
@@ -182,8 +182,8 @@ export class SessionController {
       if (error) throw error;
       return count || 0;
     } catch (error) {
-      console.error("Error fetching client session count:", error);
-      return Math.floor(Math.random() * 20); // Fallback to mock count
+      console.error("Erro ao contar sessões do cliente:", error);
+      return Math.floor(Math.random() * 20); // Fallback para contagem fictícia
     }
   }
 
@@ -197,8 +197,8 @@ export class SessionController {
       if (error) throw error;
       return count || 0;
     } catch (error) {
-      console.error("Error fetching specialist session count:", error);
-      return Math.floor(Math.random() * 50) + 5; // Fallback to mock count
+      console.error("Erro ao contar sessões do especialista:", error);
+      return Math.floor(Math.random() * 50) + 5; // Fallback para contagem fictícia
     }
   }
 
@@ -212,8 +212,8 @@ export class SessionController {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error("Error listing sessions:", error);
-      // Return mock session data for demonstration if database query fails
+      console.error("Erro ao listar sessões:", error);
+      // Retornar dados fictícios para demonstração se a consulta falhar
       return [
         {
           id: "1",
@@ -224,7 +224,7 @@ export class SessionController {
         },
         {
           id: "2",
-          data_hora: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+          data_hora: new Date(Date.now() + 86400000).toISOString(), // Amanhã
           tipo_sessao: "casal",
           clientName: "Maria e Pedro",
           status: "scheduled"
@@ -234,8 +234,8 @@ export class SessionController {
   }
 
   static async sendSessionInvite(sessionId: string) {
-    // Mock function that would normally send an invitation
-    console.log(`Invitation sent for session ${sessionId}`);
+    // Função fictícia que normalmente enviaria um convite
+    console.log(`Convite enviado para a sessão ${sessionId}`);
     return true;
   }
 }
