@@ -21,7 +21,7 @@ const Sessions = () => {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const data = await SessionController.list();
+        const data = await SessionController.listSessions();
         setSessions(data);
       } catch (error: any) {
         toast({
@@ -40,7 +40,7 @@ const Sessions = () => {
   };
 
   const handleDelete = (session: Session) => {
-    SessionController.delete(session.id)
+    SessionController.deleteSession(session.id)
       .then(() => {
         setSessions(sessions.filter(s => s.id !== session.id));
         toast({
@@ -58,7 +58,7 @@ const Sessions = () => {
   };
 
   const handleSendInvite = (session: Session) => {
-    SessionController.sendInvite(session.id)
+    SessionController.sendSessionInvite(session.id)
       .then(() => {
         toast({
           title: "Sucesso",
