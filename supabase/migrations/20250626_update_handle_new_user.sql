@@ -13,7 +13,8 @@ BEGIN
     new.email, 
     COALESCE(new.raw_user_meta_data->>'role', 'cliente')
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO 
+  UPDATE SET role = EXCLUDED.role;
   RETURN new;
 END;
 $$;

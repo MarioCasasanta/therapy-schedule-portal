@@ -73,7 +73,7 @@ const Auth = () => {
         if (loginError) throw loginError;
 
         if (session) {
-          // After login, we'll check the profile and redirect accordingly
+          // After login, update the user's role if they selected a different role
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("role")
@@ -82,8 +82,27 @@ const Auth = () => {
             
           if (profileError) throw profileError;
           
-          navigate(profile.role === "admin" ? "/dashboard" : 
-                 profile.role === "especialista" ? "/dashboard" : 
+          // If the user selected a different role than what's in their profile
+          if (profile.role !== userType) {
+            // Update their role in the profiles table
+            const { error: updateError } = await supabase
+              .from("profiles")
+              .update({ role: userType })
+              .eq("id", session.user.id);
+              
+            if (updateError) throw updateError;
+            
+            // Update their metadata
+            const { error: metadataError } = await supabase.auth.updateUser({
+              data: { role: userType }
+            });
+            
+            if (metadataError) throw metadataError;
+          }
+          
+          // Redirect based on the selected role
+          navigate(userType === "admin" ? "/dashboard" : 
+                 userType === "especialista" ? "/dashboard" : 
                  "/client-dashboard", { replace: true });
         }
       } else {
