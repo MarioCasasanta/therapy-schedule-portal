@@ -1,684 +1,432 @@
+
 import { useState, useEffect } from "react";
-import { SessionController } from "@/controllers/SessionController";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, X, Edit, User, Star, BookOpen, Award, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SessionController } from "@/controllers/SessionController";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserSearch, Calendar, CheckCircle2, Search, Briefcase, GraduationCap, Languages, Award, Star } from "lucide-react";
+
+interface SpecialistDetail {
+  short_description?: string;
+  long_description?: string;
+  education?: string;
+  thumbnail_url?: string;
+  sessions_completed?: number;
+  areas_of_expertise?: string[];
+  languages?: string[];
+  certifications?: string[];
+}
 
 interface Specialist {
   id: string;
+  created_at: string;
   full_name?: string;
   email?: string;
-  created_at: string;
   specialty?: string;
   bio?: string;
   experience_years?: number;
   rating?: number;
-  avatar_url?: string;
-  details?: {
-    short_description?: string;
-    long_description?: string;
-    education?: string;
-    thumbnail_url?: string;
-    rating?: number;
-    sessions_completed?: number;
-    areas_of_expertise?: string[];
-    languages?: string[];
-    certifications?: string[];
-  };
+  sessionCount?: number;
+  details?: SpecialistDetail;
 }
 
-export default function AdminSpecialistList() {
+export function AdminSpecialistList() {
   const [specialists, setSpecialists] = useState<Specialist[]>([]);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentSpecialist, setCurrentSpecialist] = useState<Specialist | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [totalSpecialists, setTotalSpecialists] = useState<number>(0);
+  const [specialtyFilter, setSpecialtyFilter] = useState<string>("all");
+  const [specialties, setSpecialties] = useState<string[]>([]);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedSpecialist, setSelectedSpecialist] = useState<Specialist | null>(null);
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    specialty: "",
-    bio: "",
-    experienceYears: "",
-    // Campos de detalhes
-    shortDescription: "",
-    longDescription: "",
-    education: "",
-    thumbnailUrl: "",
-    areasOfExpertise: "",
-    languages: "",
-    certifications: "",
-    sessionsCompleted: "0"
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        
+        // Load all specialists
+        const specialistsData = await SessionController.getAllSpecialists();
+        
+        // Add session count to each specialist
+        const specialistsWithSessionCount = await Promise.all(
+          specialistsData.map(async (specialist) => {
+            const sessionCount = await SessionController.getSpecialistSessionCount(specialist.id);
+            return {
+              ...specialist,
+              sessionCount
+            };
+          })
+        );
+        
+        // Extract unique specialties for the filter
+        const uniqueSpecialties = Array.from(
+          new Set(
+            specialistsData
+              .map(spec => spec.specialty)
+              .filter(specialty => specialty) as string[]
+          )
+        );
+        
+        setSpecialists(specialistsWithSessionCount);
+        setSpecialties(uniqueSpecialties);
+        setTotalSpecialists(specialistsWithSessionCount.length);
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar especialistas",
+          description: error.message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [toast]);
+
+  // Search specialists when search term changes
+  useEffect(() => {
+    async function searchSpecialists() {
+      try {
+        if (searchTerm.trim() === "") {
+          // If search is cleared, reload all specialists
+          const specialistsData = await SessionController.getAllSpecialists();
+          
+          const specialistsWithSessionCount = await Promise.all(
+            specialistsData.map(async (specialist) => {
+              const sessionCount = await SessionController.getSpecialistSessionCount(specialist.id);
+              return {
+                ...specialist,
+                sessionCount
+              };
+            })
+          );
+          
+          setSpecialists(specialistsWithSessionCount);
+          setTotalSpecialists(specialistsWithSessionCount.length);
+        } else {
+          // Search for specialists
+          const specialistsData = await SessionController.searchSpecialists(searchTerm);
+          
+          const specialistsWithSessionCount = await Promise.all(
+            specialistsData.map(async (specialist) => {
+              const sessionCount = await SessionController.getSpecialistSessionCount(specialist.id);
+              return {
+                ...specialist,
+                sessionCount
+              };
+            })
+          );
+          
+          setSpecialists(specialistsWithSessionCount);
+        }
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Erro na pesquisa",
+          description: error.message,
+        });
+      }
+    }
+
+    // Debounce search to avoid too many queries
+    const handler = setTimeout(() => {
+      searchSpecialists();
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm, toast]);
+
+  // Filter specialists based on specialty
+  const filteredSpecialists = specialists.filter(specialist => {
+    return specialtyFilter === "all" || specialist.specialty === specialtyFilter;
   });
 
-  useEffect(() => {
-    loadSpecialists();
-  }, []);
-
-  const loadSpecialists = async () => {
-    try {
-      const specialists = await SessionController.getSpecialists();
-      setSpecialists(specialists);
-    } catch (error) {
-      console.error("Error loading specialists:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao carregar especialistas",
-        description: "Ocorreu um erro ao buscar os especialistas. Por favor, tente novamente.",
-      });
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleAddSpecialist = async () => {
-    setIsSubmitting(true);
-    try {
-      // Criar um ID único para o novo especialista (pode ser substituído por um UUID gerado no backend)
-      const newSpecialistId = Math.random().toString(36).substring(2, 15);
-
-      // Preparar os dados do especialista
-      const specialistData = {
-        specialty: formData.specialty,
-        bio: formData.bio,
-        experience_years: parseInt(formData.experienceYears || "0", 10),
-        rating: 0 // Valor padrão
-      };
-
-      // Preparar os dados de detalhes do especialista
-      const detailsData = {
-        short_description: formData.shortDescription,
-        long_description: formData.longDescription,
-        education: formData.education,
-        thumbnail_url: formData.thumbnailUrl,
-        rating: 0, // Valor padrão
-        sessions_completed: parseInt(formData.sessionsCompleted || "0", 10),
-        areas_of_expertise: formData.areasOfExpertise.split(",").map(item => item.trim()),
-        languages: formData.languages.split(",").map(item => item.trim()),
-        certifications: formData.certifications.split(",").map(item => item.trim())
-      };
-
-      // Registrar o especialista
-      await SessionController.registerSpecialist(newSpecialistId, specialistData, detailsData);
-
-      // Atualizar a lista de especialistas
-      await loadSpecialists();
-
-      toast({
-        title: "Especialista adicionado",
-        description: "Especialista adicionado com sucesso!",
-      });
-      setIsAddDialogOpen(false);
-      setFormData({
-        fullName: "",
-        email: "",
-        specialty: "",
-        bio: "",
-        experienceYears: "",
-        // Campos de detalhes
-        shortDescription: "",
-        longDescription: "",
-        education: "",
-        thumbnailUrl: "",
-        areasOfExpertise: "",
-        languages: "",
-        certifications: "",
-        sessionsCompleted: "0"
-      });
-    } catch (error: any) {
-      console.error("Error adding specialist:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao adicionar especialista",
-        description: error.message || "Ocorreu um erro ao adicionar o especialista. Por favor, tente novamente.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleUpdateSpecialist = async () => {
-    if (!currentSpecialist) return;
-
-    setIsSubmitting(true);
-    try {
-      // Preparar os dados do especialista para atualização
-      const specialistData = {
-        specialty: formData.specialty,
-        bio: formData.bio,
-        experience_years: parseInt(formData.experienceYears || "0", 10),
-        rating: currentSpecialist.rating || 0 // Manter o rating existente
-      };
-
-      // Preparar os dados de detalhes do especialista para atualização
-      const detailsData = {
-        short_description: formData.shortDescription,
-        long_description: formData.longDescription,
-        education: formData.education,
-        thumbnail_url: formData.thumbnailUrl,
-        rating: currentSpecialist.details?.rating || 0, // Manter o rating existente
-        sessions_completed: parseInt(formData.sessionsCompleted || "0", 10),
-        areas_of_expertise: formData.areasOfExpertise.split(",").map(item => item.trim()),
-        languages: formData.languages.split(",").map(item => item.trim()),
-        certifications: formData.certifications.split(",").map(item => item.trim())
-      };
-
-      // Atualizar o especialista
-      await SessionController.registerSpecialist(currentSpecialist.id, specialistData, detailsData);
-
-      // Atualizar a lista de especialistas
-      await loadSpecialists();
-
-      toast({
-        title: "Especialista atualizado",
-        description: "Especialista atualizado com sucesso!",
-      });
-      setIsEditDialogOpen(false);
-      setFormData({
-        fullName: "",
-        email: "",
-        specialty: "",
-        bio: "",
-        experienceYears: "",
-        // Campos de detalhes
-        shortDescription: "",
-        longDescription: "",
-        education: "",
-        thumbnailUrl: "",
-        areasOfExpertise: "",
-        languages: "",
-        certifications: "",
-        sessionsCompleted: "0"
-      });
-    } catch (error: any) {
-      console.error("Error updating specialist:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao atualizar especialista",
-        description: error.message || "Ocorreu um erro ao atualizar o especialista. Por favor, tente novamente.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleViewDetails = (specialist: Specialist) => {
+    setSelectedSpecialist(specialist);
+    setDetailDialogOpen(true);
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Gerenciar Especialistas</h1>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Adicionar Especialista
-        </Button>
-      </div>
-
-      <Tabs defaultValue="active" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="active">Ativos</TabsTrigger>
-          <TabsTrigger value="pending">Pendentes</TabsTrigger>
-          <TabsTrigger value="inactive">Inativos</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {specialists
-              .filter((specialist) => true) // Substituir por filtro real de status
-              .map((specialist) => (
-                <SpecialistCard 
-                  key={specialist.id} 
-                  specialist={specialist} 
-                  onEdit={() => {
-                    setCurrentSpecialist(specialist);
-                    setFormData({
-                      fullName: specialist.full_name || "",
-                      email: specialist.email || "",
-                      specialty: specialist.specialty || "",
-                      bio: specialist.bio || "",
-                      experienceYears: specialist.experience_years?.toString() || "",
-                      // Valores de detalhes
-                      shortDescription: specialist.details?.short_description || "",
-                      longDescription: specialist.details?.long_description || "",
-                      education: specialist.details?.education || "",
-                      thumbnailUrl: specialist.details?.thumbnail_url || specialist.avatar_url || "",
-                      areasOfExpertise: specialist.details?.areas_of_expertise?.join(", ") || "",
-                      languages: specialist.details?.languages?.join(", ") || "",
-                      certifications: specialist.details?.certifications?.join(", ") || "",
-                      sessionsCompleted: specialist.details?.sessions_completed?.toString() || "0"
-                    });
-                    setIsEditDialogOpen(true);
-                  }}
-                />
-              ))}
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-2xl">Especialistas</CardTitle>
+        <CardDescription>
+          Gerencie os {totalSpecialists} especialistas cadastrados na plataforma
+        </CardDescription>
+        <div className="flex flex-col gap-4 mt-4 md:flex-row md:justify-between">
+          <div className="flex flex-1 gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome, email ou especialidade"
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Select
+              value={specialtyFilter}
+              onValueChange={setSpecialtyFilter}
+            >
+              <SelectTrigger className="w-[220px]">
+                <SelectValue placeholder="Filtrar por especialidade" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as especialidades</SelectItem>
+                {specialties.map((specialty) => (
+                  <SelectItem key={specialty} value={specialty}>
+                    {specialty}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </TabsContent>
-
-        <TabsContent value="pending" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {/* Versão filtrada da lista de especialistas, mostrando pendentes */}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="inactive" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {/* Versão filtrada da lista de especialistas, mostrando inativos */}
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Dialog para adicionar especialista */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Adicionar Novo Especialista</DialogTitle>
-            <DialogDescription>
-              Preencha os dados para cadastrar um novo especialista.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="fullName">Nome Completo</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="specialty">Especialidade</Label>
-              <Input
-                type="text"
-                id="specialty"
-                name="specialty"
-                value={formData.specialty}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="experienceYears">Anos de Experiência</Label>
-              <Input
-                type="number"
-                id="experienceYears"
-                name="experienceYears"
-                value={formData.experienceYears}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            {/* Campos de detalhes */}
-            <div>
-              <Label htmlFor="shortDescription">Descrição Curta</Label>
-              <Input
-                type="text"
-                id="shortDescription"
-                name="shortDescription"
-                value={formData.shortDescription}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="longDescription">Descrição Longa</Label>
-              <Textarea
-                id="longDescription"
-                name="longDescription"
-                value={formData.longDescription}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="education">Formação</Label>
-              <Input
-                type="text"
-                id="education"
-                name="education"
-                value={formData.education}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="thumbnailUrl">URL da Imagem</Label>
-              <Input
-                type="text"
-                id="thumbnailUrl"
-                name="thumbnailUrl"
-                value={formData.thumbnailUrl}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="areasOfExpertise">Áreas de Expertise (separadas por vírgula)</Label>
-              <Input
-                type="text"
-                id="areasOfExpertise"
-                name="areasOfExpertise"
-                value={formData.areasOfExpertise}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="languages">Línguas (separadas por vírgula)</Label>
-              <Input
-                type="text"
-                id="languages"
-                name="languages"
-                value={formData.languages}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="certifications">Certificações (separadas por vírgula)</Label>
-              <Input
-                type="text"
-                id="certifications"
-                name="certifications"
-                value={formData.certifications}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="sessionsCompleted">Sessões Completadas</Label>
-              <Input
-                type="number"
-                id="sessionsCompleted"
-                name="sessionsCompleted"
-                value={formData.sessionsCompleted}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleAddSpecialist} disabled={isSubmitting}>
-              {isSubmitting ? "Salvando..." : "Salvar Especialista"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog para editar especialista */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Editar Especialista</DialogTitle>
-            <DialogDescription>
-              Atualize as informações do especialista.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="fullName">Nome Completo</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="specialty">Especialidade</Label>
-              <Input
-                type="text"
-                id="specialty"
-                name="specialty"
-                value={formData.specialty}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="experienceYears">Anos de Experiência</Label>
-              <Input
-                type="number"
-                id="experienceYears"
-                name="experienceYears"
-                value={formData.experienceYears}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            {/* Campos de detalhes */}
-            <div>
-              <Label htmlFor="shortDescription">Descrição Curta</Label>
-              <Input
-                type="text"
-                id="shortDescription"
-                name="shortDescription"
-                value={formData.shortDescription}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="longDescription">Descrição Longa</Label>
-              <Textarea
-                id="longDescription"
-                name="longDescription"
-                value={formData.longDescription}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="education">Formação</Label>
-              <Input
-                type="text"
-                id="education"
-                name="education"
-                value={formData.education}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="thumbnailUrl">URL da Imagem</Label>
-              <Input
-                type="text"
-                id="thumbnailUrl"
-                name="thumbnailUrl"
-                value={formData.thumbnailUrl}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="areasOfExpertise">Áreas de Expertise (separadas por vírgula)</Label>
-              <Input
-                type="text"
-                id="areasOfExpertise"
-                name="areasOfExpertise"
-                value={formData.areasOfExpertise}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="languages">Línguas (separadas por vírgula)</Label>
-              <Input
-                type="text"
-                id="languages"
-                name="languages"
-                value={formData.languages}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="certifications">Certificações (separadas por vírgula)</Label>
-              <Input
-                type="text"
-                id="certifications"
-                name="certifications"
-                value={formData.certifications}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="sessionsCompleted">Sessões Completadas</Label>
-              <Input
-                type="number"
-                id="sessionsCompleted"
-                name="sessionsCompleted"
-                value={formData.sessionsCompleted}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleUpdateSpecialist} disabled={isSubmitting}>
-              {isSubmitting ? "Salvando..." : "Atualizar Especialista"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-// Componente de card para exibir cada especialista na lista
-const SpecialistCard = ({ specialist, onEdit }: { specialist: Specialist, onEdit: () => void }) => {
-  return (
-    <Card className="overflow-hidden">
-      <CardHeader className="p-0 h-40 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60">
-          <div className="absolute bottom-4 left-4 flex items-center text-white">
-            <Avatar className="h-12 w-12 border-2 border-white">
-              <AvatarImage src={specialist.details?.thumbnail_url || specialist.avatar_url} alt={specialist.full_name} />
-              <AvatarFallback>{specialist.full_name?.[0]}</AvatarFallback>
-            </Avatar>
-            <div className="ml-3">
-              <h3 className="font-semibold">{specialist.full_name}</h3>
-              <p className="text-sm text-gray-200">{specialist.specialty}</p>
-            </div>
-          </div>
+          <Button variant="outline">
+            <UserSearch className="mr-2 h-4 w-4" />
+            Adicionar Especialista
+          </Button>
         </div>
-        <img
-          src={specialist.details?.thumbnail_url || specialist.avatar_url || 'https://via.placeholder.com/500x200'}
-          alt={specialist.full_name}
-          className="w-full h-full object-cover"
-        />
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="flex items-center text-amber-500 mb-2">
-          <Star className="h-4 w-4 mr-1 fill-amber-500" />
-          <span>{specialist.details?.rating || specialist.rating || 0}</span>
-          <span className="text-sm text-gray-500 ml-2">
-            ({specialist.details?.sessions_completed || 0} sessões)
-          </span>
-        </div>
-        <p className="text-sm text-gray-600 line-clamp-3">
-          {specialist.details?.short_description || specialist.bio}
-        </p>
-        
-        <div className="grid grid-cols-2 gap-2 mt-4 text-xs text-gray-500">
-          <div className="flex items-center">
-            <BookOpen className="h-3 w-3 mr-1" />
-            <span>{specialist.experience_years} anos</span>
-          </div>
-          <div className="flex items-center">
-            <Award className="h-3 w-3 mr-1" />
-            <span>{specialist.details?.education?.split(" ")[0] || "Graduação"}</span>
-          </div>
-          <div className="flex items-center">
-            <Globe className="h-3 w-3 mr-1" />
-            <span>
-              {specialist.details?.languages 
-                ? specialist.details.languages.slice(0, 2).join(", ") 
-                : "Português"}
-            </span>
-          </div>
-          <div className="flex items-center">
-            <User className="h-3 w-3 mr-1" />
-            <span>Disponível</span>
-          </div>
-        </div>
+      <CardContent>
+        {loading ? (
+          <div className="text-center py-8">Carregando especialistas...</div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Especialidade</TableHead>
+                <TableHead>Qualificações</TableHead>
+                <TableHead>Data de Inscrição</TableHead>
+                <TableHead>Sessões Realizadas</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSpecialists.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    Nenhum especialista encontrado
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredSpecialists.map((specialist) => (
+                  <TableRow key={specialist.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={specialist.details?.thumbnail_url || specialist.avatar_url} alt={specialist.full_name || ""} />
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {specialist.full_name ? specialist.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ES'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span>{specialist.full_name || "Especialista sem nome"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{specialist.email || "Sem email"}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Briefcase className="mr-2 h-4 w-4 text-muted-foreground" />
+                        {specialist.specialty || "Não especificada"}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {specialist.details?.areas_of_expertise && specialist.details.areas_of_expertise.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {specialist.details.areas_of_expertise.slice(0, 2).map((area, index) => (
+                            <span key={index} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs">
+                              {area}
+                            </span>
+                          ))}
+                          {specialist.details.areas_of_expertise.length > 2 && (
+                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs">
+                              +{specialist.details.areas_of_expertise.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Não informadas</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                        {format(new Date(specialist.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
+                        {specialist.details?.sessions_completed || specialist.sessionCount || 0} sessões
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm" onClick={() => handleViewDetails(specialist)}>
+                        Ver detalhes
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
-      <CardFooter className="p-4 pt-0 border-t flex justify-end">
-        <Button variant="ghost" size="sm" onClick={onEdit}>
-          <Edit className="h-4 w-4 mr-1" />
-          Editar
-        </Button>
+      <CardFooter className="flex justify-between">
+        <div className="text-sm text-muted-foreground">
+          Mostrando {filteredSpecialists.length} de {totalSpecialists} especialistas
+        </div>
       </CardFooter>
+
+      {/* Dialog para exibir detalhes do especialista */}
+      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Detalhes do Especialista</DialogTitle>
+            <DialogDescription>
+              Informações detalhadas sobre o especialista selecionado
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedSpecialist && (
+            <div className="grid gap-6 py-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={selectedSpecialist.details?.thumbnail_url || selectedSpecialist.avatar_url} alt={selectedSpecialist.full_name || ""} />
+                  <AvatarFallback className="text-lg bg-primary/10 text-primary">
+                    {selectedSpecialist.full_name ? selectedSpecialist.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ES'}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div>
+                  <h3 className="text-xl font-semibold">{selectedSpecialist.full_name}</h3>
+                  <p className="text-muted-foreground">{selectedSpecialist.email}</p>
+                  <div className="flex items-center mt-1">
+                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
+                    <span>{selectedSpecialist.rating || selectedSpecialist.details?.rating || 0}</span>
+                    <span className="mx-2">•</span>
+                    <Briefcase className="h-4 w-4 text-muted-foreground mr-1" />
+                    <span>{selectedSpecialist.specialty}</span>
+                    <span className="mx-2">•</span>
+                    <span>{selectedSpecialist.experience_years || 0} anos de experiência</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-medium mb-2 flex items-center">
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    Formação
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedSpecialist.details?.education || "Não informada"}
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-2 flex items-center">
+                    <Languages className="h-4 w-4 mr-2" />
+                    Idiomas
+                  </h4>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedSpecialist.details?.languages && selectedSpecialist.details.languages.length > 0 ? (
+                      selectedSpecialist.details.languages.map((language, index) => (
+                        <span key={index} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs">
+                          {language}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Não informados</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2 flex items-center">
+                  <Award className="h-4 w-4 mr-2" />
+                  Áreas de Especialização
+                </h4>
+                <div className="flex flex-wrap gap-1">
+                  {selectedSpecialist.details?.areas_of_expertise && selectedSpecialist.details.areas_of_expertise.length > 0 ? (
+                    selectedSpecialist.details.areas_of_expertise.map((area, index) => (
+                      <span key={index} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs">
+                        {area}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Não informadas</span>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Descrição Curta</h4>
+                <p className="text-sm text-muted-foreground">
+                  {selectedSpecialist.details?.short_description || selectedSpecialist.bio || "Não informada"}
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-2">Descrição Completa</h4>
+                <p className="text-sm text-muted-foreground">
+                  {selectedSpecialist.details?.long_description || "Não informada"}
+                </p>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
+              Fechar
+            </Button>
+            <Button>
+              Editar Especialista
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
-};
+}
