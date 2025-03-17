@@ -56,15 +56,15 @@ export default function AdminSpecialistList() {
         setLoading(true);
         
         // Load all specialists
-        const specialistsData = await SessionController.getSpecialists();
+        const specialistsData = await SessionController.getAllSpecialists();
         
         // Add session count to each specialist
         const specialistsWithSessionCount = await Promise.all(
           specialistsData.map(async (specialist) => {
-            const sessionCount = await SessionController.getSpecialistSessions(specialist.id);
+            const sessionCount = await SessionController.getSpecialistSessionCount(specialist.id);
             return {
               ...specialist,
-              sessionCount: sessionCount.length
+              sessionCount
             };
           })
         );

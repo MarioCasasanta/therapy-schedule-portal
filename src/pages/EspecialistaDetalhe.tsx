@@ -1,268 +1,319 @@
 
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Star, ArrowLeft, CalendarDays, Clock, MapPin, User, Mail, Phone, GraduationCap, Languages } from "lucide-react";
+import { SessionController } from "@/controllers/SessionController";
+import Navigation from "@/components/Navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WeeklyCalendar } from "@/components/calendar/WeeklyCalendar";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Mail, MapPin, Phone, Clock, Star, CheckCircle, MessageCircle, CalendarPlus } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
-interface SpecialistDetails {
-  id: string;
-  full_name?: string;
-  email?: string;
-  created_at: string;
-  specialty?: string;
-  bio?: string;
-  experience_years?: number;
-  rating?: number;
-  details?: {
-    short_description?: string;
-    long_description?: string;
-    education?: string;
-    thumbnail_url?: string;
-    sessions_completed?: number;
-    areas_of_expertise?: string[];
-    languages?: string[];
-    certifications?: string[];
-  };
-  telefone?: string; // Optional phone property
+interface SpecialistDetail {
+  short_description?: string;
+  long_description?: string;
+  education?: string;
+  thumbnail_url?: string;
+  sessions_completed?: number;
+  areas_of_expertise?: string[];
+  languages?: string[];
+  certifications?: string[];
 }
 
-export default function EspecialistaDetalhe() {
+interface Especialista {
+  id: string;
+  full_name?: string;
+  avatar_url?: string;
+  description?: string;
+  notes?: string;
+  specialty?: string;
+  bio?: string;
+  session_price?: number;
+  rating?: number;
+  experience_years?: number;
+  email?: string;
+  phone?: string;
+  details?: SpecialistDetail;
+}
+
+const EspecialistaDetalhe = () => {
   const { id } = useParams<{ id: string }>();
-  const [specialist, setSpecialist] = useState<SpecialistDetails | null>(null);
+  const [especialista, setEspecialista] = useState<Especialista | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
+  const [confirmStep, setConfirmStep] = useState(false);
 
   useEffect(() => {
-    async function loadSpecialistData() {
+    const fetchEspecialista = async () => {
+      if (!id) return;
+      
       try {
         setLoading(true);
-        
-        // First, get basic profile data
-        const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("id, full_name, email, created_at, telefone")
-          .eq("id", id)
-          .single();
-        
-        if (profileError) throw profileError;
-        
-        // Get specialist data if available
-        const { data: specialistData, error: specialistError } = await supabase
-          .from("specialists")
-          .select("id, specialty, bio, experience_years, rating")
-          .eq("id", id)
-          .maybeSingle();
-          
-        // Get specialist details if available
-        const { data: detailsData, error: detailsError } = await supabase
-          .from("specialist_details")
-          .select("*")
-          .eq("specialist_id", id)
-          .maybeSingle();
-        
-        // Combine the data
-        setSpecialist({
-          ...profileData,
-          ...(specialistData || {}),
-          details: detailsData || undefined
+        // Usando o novo método do SessionController para buscar detalhes do especialista
+        const data = await SessionController.getSpecialistDetails(id);
+
+        setEspecialista({
+          id: data.id,
+          full_name: data.full_name || "Especialista",
+          avatar_url: data.details?.thumbnail_url, 
+          description: data.details?.short_description || data.bio || "Especialista em terapia e desenvolvimento pessoal.",
+          bio: data.bio,
+          specialty: data.specialty || "Psicanálise",
+          session_price: 150, // Valor padrão, idealmente viria do banco
+          rating: data.rating || 4.8,
+          experience_years: data.experience_years || 5,
+          email: data.email,
+          phone: data.phone,
+          details: data.details
         });
-      } catch (err: any) {
-        console.error("Error loading specialist data:", err);
-        setError(err.message);
+      } catch (error) {
+        console.error("Erro ao buscar dados do especialista:", error);
       } finally {
         setLoading(false);
       }
-    }
-    
-    if (id) {
-      loadSpecialistData();
-    }
+    };
+
+    fetchEspecialista();
   }, [id]);
-  
+
+  const handleSelectSlot = (date: Date, time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    const dateTime = new Date(date);
+    dateTime.setHours(hours, minutes, 0, 0);
+    setSelectedDateTime(dateTime);
+    setConfirmStep(true);
+  };
+
   if (loading) {
-    return <div className="container mx-auto py-12 text-center">Carregando detalhes do especialista...</div>;
-  }
-  
-  if (error || !specialist) {
     return (
-      <div className="container mx-auto py-12 text-center">
-        <h2 className="text-2xl font-bold mb-4">Erro ao carregar dados</h2>
-        <p className="text-red-500 mb-4">{error || "Especialista não encontrado"}</p>
-        <Link to="/especialistas">
-          <Button>Voltar para lista de especialistas</Button>
-        </Link>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="pt-24 flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!especialista) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-10">
+            <h1 className="text-2xl font-bold mb-4">Especialista não encontrado</h1>
+            <Link to="/especialistas">
+              <Button>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Voltar para lista de especialistas
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-1">
-          <Card>
-            <CardHeader className="text-center">
-              <Avatar className="h-24 w-24 mx-auto mb-4">
-                <AvatarImage src={specialist.details?.thumbnail_url || "/placeholder.svg"} alt={specialist.full_name} />
-                <AvatarFallback className="text-2xl">{specialist.full_name?.charAt(0) || "?"}</AvatarFallback>
-              </Avatar>
-              <CardTitle>{specialist.full_name}</CardTitle>
-              <CardDescription>{specialist.specialty}</CardDescription>
-              {specialist.rating && (
-                <div className="flex items-center justify-center mt-2">
-                  <Star className="h-4 w-4 text-yellow-500 mr-1" fill="currentColor" />
-                  <span>{specialist.rating}/5.0</span>
-                </div>
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {specialist.email && (
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>{specialist.email}</span>
-                  </div>
-                )}
-                {specialist.telefone && (
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>{specialist.telefone}</span>
-                  </div>
-                )}
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                  <span>Desde {format(new Date(specialist.created_at), "MMMM yyyy", { locale: ptBR })}</span>
-                </div>
-                {specialist.experience_years && (
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-gray-500" />
-                    <span>{specialist.experience_years} anos de experiência</span>
-                  </div>
-                )}
-                {specialist.details?.sessions_completed && (
-                  <div className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    <span>{specialist.details.sessions_completed} sessões realizadas</span>
-                  </div>
-                )}
-              </div>
-              
-              {specialist.details?.areas_of_expertise && specialist.details.areas_of_expertise.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-medium mb-2">Áreas de Especialização</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {specialist.details.areas_of_expertise.map((area, index) => (
-                      <Badge key={index} variant="secondary">{area}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {specialist.details?.languages && specialist.details.languages.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-medium mb-2">Idiomas</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {specialist.details.languages.map((language, index) => (
-                      <Badge key={index} variant="outline">{language}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-            <CardFooter className="flex justify-center space-x-2">
-              <Button size="sm">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Contatar
-              </Button>
-              <Button size="sm" variant="outline">
-                <CalendarPlus className="h-4 w-4 mr-2" />
-                Agendar
-              </Button>
-            </CardFooter>
-          </Card>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
+      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="mb-6">
+          <Link 
+            to="/especialistas" 
+            className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Voltar para lista de especialistas
+          </Link>
         </div>
-        
-        <div className="md:col-span-2">
-          <Tabs defaultValue="about">
-            <TabsList className="mb-4">
-              <TabsTrigger value="about">Sobre</TabsTrigger>
-              <TabsTrigger value="qualifications">Qualificações</TabsTrigger>
-              <TabsTrigger value="services">Serviços</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="about">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sobre o Especialista</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {specialist.details?.short_description && (
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Coluna de informações do especialista */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-24">
+              <CardContent className="p-6">
+                <div className="flex flex-col items-center text-center mb-6">
+                  <div className="mb-4">
+                    <Avatar className="h-32 w-32 border-4 border-white shadow-md">
+                      <AvatarImage src={especialista.avatar_url} alt={especialista.full_name || ""} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                        {especialista.full_name ? especialista.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'ES'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  
+                  <h1 className="text-2xl font-bold text-gray-900 mb-1">{especialista.full_name}</h1>
+                  <p className="text-primary mb-2">{especialista.specialty}</p>
+                  
+                  <div className="flex items-center mb-4">
+                    <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                    <span className="ml-1 text-gray-700">{especialista.rating} (Excelente)</span>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-4 rounded-lg w-full mb-6">
+                    <p className="text-lg font-semibold text-gray-900 mb-1">
+                      R$ {especialista.session_price?.toFixed(2).replace('.', ',')}
+                    </p>
+                    <p className="text-gray-500 text-sm">por sessão de 50 minutos</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <GraduationCap className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                     <div>
-                      <h3 className="font-medium mb-2">Resumo</h3>
-                      <p>{specialist.details.short_description}</p>
+                      <h3 className="font-medium text-gray-900">Formação</h3>
+                      <p className="text-gray-600 text-sm">{especialista.details?.education || "Não informada"}</p>
+                    </div>
+                  </div>
+                
+                  <div className="flex items-start gap-3">
+                    <CalendarDays className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">Experiência</h3>
+                      <p className="text-gray-600 text-sm">{especialista.experience_years} anos de experiência</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Clock className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">Duração</h3>
+                      <p className="text-gray-600 text-sm">Sessões de 50 minutos</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">Atendimento</h3>
+                      <p className="text-gray-600 text-sm">Online via videoconferência</p>
+                    </div>
+                  </div>
+                  
+                  {especialista.details?.languages && especialista.details.languages.length > 0 && (
+                    <div className="flex items-start gap-3">
+                      <Languages className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h3 className="font-medium text-gray-900">Idiomas</h3>
+                        <p className="text-gray-600 text-sm">{especialista.details.languages.join(", ")}</p>
+                      </div>
                     </div>
                   )}
                   
-                  {specialist.bio || specialist.details?.long_description ? (
-                    <div>
-                      <h3 className="font-medium mb-2">Biografia</h3>
-                      <p>{specialist.details?.long_description || specialist.bio}</p>
+                  {especialista.email && (
+                    <div className="flex items-start gap-3">
+                      <Mail className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h3 className="font-medium text-gray-900">Email</h3>
+                        <p className="text-gray-600 text-sm">{especialista.email}</p>
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground">Biografia não disponível.</p>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="qualifications">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Qualificações & Educação</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {specialist.details?.education ? (
-                    <div>
-                      <h3 className="font-medium mb-2">Formação Acadêmica</h3>
-                      <p>{specialist.details.education}</p>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">Informações de educação não disponíveis.</p>
                   )}
                   
-                  {specialist.details?.certifications && specialist.details.certifications.length > 0 ? (
-                    <div className="mt-6">
-                      <h3 className="font-medium mb-2">Certificações</h3>
-                      <ul className="list-disc pl-5 space-y-1">
-                        {specialist.details.certifications.map((cert, index) => (
-                          <li key={index}>{cert}</li>
-                        ))}
-                      </ul>
+                  {especialista.phone && (
+                    <div className="flex items-start gap-3">
+                      <Phone className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h3 className="font-medium text-gray-900">Telefone</h3>
+                        <p className="text-gray-600 text-sm">{especialista.phone}</p>
+                      </div>
                     </div>
-                  ) : null}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="services">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Serviços Oferecidos</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Informações sobre serviços não disponíveis no momento.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Coluna de conteúdo e agendamento */}
+          <div className="lg:col-span-2">
+            <Tabs defaultValue="about">
+              <TabsList className="mb-6">
+                <TabsTrigger value="about">Sobre</TabsTrigger>
+                <TabsTrigger value="schedule">Agendar</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="about">
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-xl font-semibold mb-4">Sobre o profissional</h2>
+                    <div className="prose max-w-none text-gray-700">
+                      <p>{especialista.details?.short_description || especialista.description}</p>
+                      
+                      {especialista.details?.long_description && (
+                        <p className="mt-4">{especialista.details.long_description}</p>
+                      )}
+                      
+                      {!especialista.details?.long_description && (
+                        <>
+                          <p className="mt-4">
+                            Com {especialista.experience_years} anos de experiência, {especialista.full_name} é 
+                            especialista em atender pessoas que buscam desenvolvimento pessoal, 
+                            autoconhecimento e bem-estar emocional.
+                          </p>
+                          <p className="mt-4">
+                            Cada sessão é personalizada de acordo com as necessidades individuais, 
+                            utilizando técnicas baseadas em evidências para ajudar no processo terapêutico.
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    
+                    <div className="mt-8">
+                      <h3 className="text-lg font-semibold mb-3">Especializações</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {especialista.details?.areas_of_expertise && especialista.details.areas_of_expertise.length > 0 ? (
+                          especialista.details.areas_of_expertise.map((area, index) => (
+                            <Badge key={index} variant="secondary" className="rounded-full">
+                              {area}
+                            </Badge>
+                          ))
+                        ) : (
+                          <>
+                            <Badge variant="secondary" className="rounded-full">Ansiedade</Badge>
+                            <Badge variant="secondary" className="rounded-full">Depressão</Badge>
+                            <Badge variant="secondary" className="rounded-full">Autoconhecimento</Badge>
+                            <Badge variant="secondary" className="rounded-full">Relacionamentos</Badge>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {especialista.details?.certifications && especialista.details.certifications.length > 0 && (
+                      <div className="mt-8">
+                        <h3 className="text-lg font-semibold mb-3">Certificações</h3>
+                        <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                          {especialista.details.certifications.map((cert, index) => (
+                            <li key={index}>{cert}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="schedule">
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-xl font-semibold mb-6">Agende sua sessão</h2>
+                    
+                    <WeeklyCalendar
+                      onSelectSlot={handleSelectSlot}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default EspecialistaDetalhe;
