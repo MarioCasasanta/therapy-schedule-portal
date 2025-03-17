@@ -18,7 +18,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Select,
@@ -28,8 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { UserSearch, Calendar, CheckCircle2, Users } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { UserSearch, Calendar, CheckCircle2 } from "lucide-react";
 
 interface Client {
   id: string;
@@ -56,6 +54,13 @@ export function AdminClientList() {
   const [selectedSpecialist, setSelectedSpecialist] = useState<string>("all");
   const { toast } = useToast();
 
+  // Mock data for specialists and their clients
+  const mockSpecialistClients: Record<string, string[]> = {
+    "1": ["2", "3", "5"],
+    "2": ["4", "6", "9"],
+    "3": ["7", "8", "10"],
+  };
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -71,38 +76,35 @@ export function AdminClientList() {
         // Add session count to each client
         const clientsWithSessionCount = await Promise.all(
           clientsData.map(async (client) => {
-            try {
-              const sessionCount = await SessionController.getClientSessionCount(client.id);
-              
-              // For now, assign random specialists until we have a proper relationship
-              const randomSpecialistIndex = Math.floor(Math.random() * (specialistsData.length || 1));
-              const specialistName = specialistsData[randomSpecialistIndex]?.full_name || 
-                                     specialistsData[randomSpecialistIndex]?.name || 
-                                     "Não atribuído";
-              
-              return {
-                ...client,
-                sessionCount,
-                specialist: specialistName
-              };
-            } catch (err) {
-              console.error(`Error getting session count for client ${client.id}:`, err);
-              return {
-                ...client,
-                sessionCount: 0,
-                specialist: "Não atribuído"
-              };
+            const sessionCount = await SessionController.getClientSessionCount(client.id);
+            
+            // Determine the specialist for this client (using mock data for now)
+            let specialistName = "Não atribuído";
+            const specialistId = Object.keys(mockSpecialistClients).find(
+              (specId) => mockSpecialistClients[specId].includes(client.id.toString().slice(0, 1))
+            );
+            
+            if (specialistId) {
+              const specialist = specialistsData.find((s) => s.id.toString().slice(0, 1) === specialistId);
+              if (specialist) {
+                specialistName = specialist.full_name || specialist.name || specialist.email || "Especialista";
+              }
             }
+            
+            return {
+              ...client,
+              sessionCount,
+              specialist: specialistName
+            };
           })
         );
         
         setClients(clientsWithSessionCount);
       } catch (error: any) {
-        console.error("Error loading clients:", error);
         toast({
           variant: "destructive",
           title: "Erro ao carregar clientes",
-          description: error.message || "Ocorreu um erro ao carregar os dados dos clientes",
+          description: error.message,
         });
       } finally {
         setLoading(false);
@@ -115,23 +117,20 @@ export function AdminClientList() {
   // Filter clients based on selected specialist
   const filteredClients = selectedSpecialist === "all" 
     ? clients 
-    : clients.filter(client => client.specialist === specialists.find(s => s.id === selectedSpecialist)?.full_name);
+    : clients.filter(client => {
+        const specialistId = Object.keys(mockSpecialistClients).find(
+          (specId) => mockSpecialistClients[specId].includes(client.id.toString().slice(0, 1))
+        );
+        return specialistId === selectedSpecialist;
+      });
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl">Clientes</CardTitle>
-            <CardDescription>
-              Gerencie os clientes cadastrados na plataforma
-            </CardDescription>
-          </div>
-          <Badge variant="secondary" className="text-lg px-3 py-1">
-            <Users className="mr-2 h-4 w-4" />
-            Total: {clients.length}
-          </Badge>
-        </div>
+        <CardTitle className="text-2xl">Clientes</CardTitle>
+        <CardDescription>
+          Gerencie os clientes cadastrados na plataforma
+        </CardDescription>
         <div className="flex justify-between mt-4">
           <Select
             value={selectedSpecialist}
@@ -142,12 +141,12 @@ export function AdminClientList() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os especialistas</SelectItem>
-              {specialists.map((specialist) => (
+              {specialists.map((specialist, index) => (
                 <SelectItem 
                   key={specialist.id} 
-                  value={specialist.id}
+                  value={(index + 1).toString()}
                 >
-                  {specialist.full_name || specialist.name || specialist.email || "Especialista"}
+                  {specialist.full_name || specialist.name || specialist.email || `Especialista ${index + 1}`}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -166,7 +165,6 @@ export function AdminClientList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
                 <TableHead>Data de Inscrição</TableHead>
                 <TableHead>Sessões Realizadas</TableHead>
                 <TableHead>Especialista</TableHead>
@@ -176,7 +174,7 @@ export function AdminClientList() {
             <TableBody>
               {filteredClients.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={5} className="text-center py-8">
                     Nenhum cliente encontrado
                   </TableCell>
                 </TableRow>
@@ -184,9 +182,8 @@ export function AdminClientList() {
                 filteredClients.map((client) => (
                   <TableRow key={client.id}>
                     <TableCell className="font-medium">
-                      {client.full_name || client.name || "Cliente sem nome"}
+                      {client.full_name || client.name || client.email || "Cliente sem nome"}
                     </TableCell>
-                    <TableCell>{client.email || "Email não cadastrado"}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -212,11 +209,6 @@ export function AdminClientList() {
           </Table>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <div className="text-sm text-muted-foreground">
-          Mostrando {filteredClients.length} de {clients.length} clientes
-        </div>
-      </CardFooter>
     </Card>
   );
 }

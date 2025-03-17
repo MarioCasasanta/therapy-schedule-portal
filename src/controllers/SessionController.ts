@@ -32,11 +32,6 @@ export const SessionController = {
   },
 
   createSession: async (sessionData: Partial<Session>): Promise<Session> => {
-    // Ensure data_hora is provided if it's not
-    if (!sessionData.data_hora) {
-      sessionData.data_hora = new Date().toISOString();
-    }
-    
     const { data, error } = await supabase.from("sessoes").insert(sessionData).select().single();
 
     if (error) throw error;
@@ -98,28 +93,6 @@ export const SessionController = {
 
     if (error) throw error;
     return count || 0;
-  },
-
-  getAllClients: async (): Promise<{id: string, full_name: string, email: string, created_at: string}[]> => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name, email, created_at")
-      .eq("role", "cliente")
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-    return data || [];
-  },
-
-  getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string, created_at: string}[]> => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name, email, created_at")
-      .eq("role", "especialista")
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-    return data || [];
   },
 
   listClients: async (especialistaId?: string): Promise<{id: string, full_name: string, email: string, created_at: string}[]> => {

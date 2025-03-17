@@ -51,16 +51,16 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
   const getMenuItems = () => {
     // Base items for admin
     const adminBaseItems: MenuItem[] = [
-      { icon: LayoutDashboard, label: "Visão Geral", path: "/admin-dashboard" },
-      { icon: Calendar, label: "Sessões", path: "/admin-sessions" },
-      { icon: Bell, label: "Notificações", path: "/admin-notifications" },
-      { icon: Settings, label: "Configurações", path: "/admin-settings" },
-      { icon: UserCircle, label: "Meu Perfil", path: "/admin-profile" },
+      { icon: LayoutDashboard, label: "Visão Geral", path: "/admin" },
+      { icon: Calendar, label: "Sessões", path: "/admin/sessions" },
+      { icon: Bell, label: "Notificações", path: "/admin/notifications" },
+      { icon: Settings, label: "Configurações", path: "/admin/settings" },
+      { icon: UserCircle, label: "Meu Perfil", path: "/admin/profile" },
     ];
     
     // Base items for specialist
     const specialistBaseItems: MenuItem[] = [
-      { icon: LayoutDashboard, label: "Visão Geral", path: "/specialist-dashboard" },
+      { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
       { icon: Calendar, label: "Sessões", path: "/specialist-sessions" },
       { icon: Bell, label: "Notificações", path: "/specialist-notifications" },
       { icon: Settings, label: "Configurações", path: "/specialist-settings" },
@@ -69,13 +69,13 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
     
     // Admin-specific items
     const adminItems: MenuItem[] = [
-      { icon: Users, label: "Clientes", path: "/admin-clients", position: 1 },
-      { icon: UserCog, label: "Especialistas", path: "/admin-specialists", position: 2 },
-      { icon: CreditCard, label: "Financeiro", path: "/admin-payments", position: 4 },
-      { icon: FileText, label: "Blog", path: "/admin-blog-posts", position: 5 },
-      { icon: TestTube, label: "Testes", path: "/admin-tests", position: 6 },
-      { icon: PencilRuler, label: "Editor de Site", path: "/admin-site-editor", position: 7 },
-      { icon: BarChart, label: "Relatórios", path: "/admin-reports", position: 8 },
+      { icon: Users, label: "Clientes", path: "/admin/clients", position: 1 },
+      { icon: UserCog, label: "Especialistas", path: "/admin/specialists", position: 2 },
+      { icon: CreditCard, label: "Financeiro", path: "/admin/payments", position: 4 },
+      { icon: FileText, label: "Blog", path: "/admin/blog-posts", position: 5 },
+      { icon: TestTube, label: "Testes", path: "/admin/tests", position: 6 },
+      { icon: PencilRuler, label: "Editor de Site", path: "/admin/site-editor", position: 7 },
+      { icon: BarChart, label: "Relatórios", path: "/admin/reports", position: 8 },
     ];
     
     // Specialist-specific items
