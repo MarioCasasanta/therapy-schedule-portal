@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { SessionController } from "@/controllers/SessionController";
+import { supabase } from '@/integrations/supabase/client';
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -62,19 +62,35 @@ export function AdminClientList() {
         setLoading(true);
         
         // Load specialists
-        const specialistsData = await SessionController.getAllSpecialists();
-        setSpecialists(specialistsData);
+        const { data: specialistsData, error: specialistsError } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .eq('role', 'especialista');
+          
+        if (specialistsError) throw specialistsError;
+        setSpecialists(specialistsData || []);
         
         // Load all clients
-        const clientsData = await SessionController.getAllClients();
+        const { data: clientsData, error: clientsError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', 'client');
+          
+        if (clientsError) throw clientsError;
         
-        // Add session count to each client
+        console.log("Fetched clients:", clientsData);
+        
+        // Add session count to each client (simplified for now)
         const clientsWithSessionCount = await Promise.all(
-          clientsData.map(async (client) => {
-            const sessionCount = await SessionController.getClientSessionCount(client.id);
+          (clientsData || []).map(async (client) => {
+            const { count } = await supabase
+              .from('sessoes')
+              .select('*', { count: 'exact' })
+              .eq('cliente_id', client.id);
+              
             return {
               ...client,
-              sessionCount
+              sessionCount: count || 0
             };
           })
         );
@@ -82,6 +98,7 @@ export function AdminClientList() {
         setClients(clientsWithSessionCount);
         setTotalClients(clientsWithSessionCount.length);
       } catch (error: any) {
+        console.error("Error loading clients:", error);
         toast({
           variant: "destructive",
           title: "Erro ao carregar clientes",
@@ -95,13 +112,15 @@ export function AdminClientList() {
     loadData();
   }, [toast]);
 
-  // Filter clients based on search term
+  // Filter clients based on search term and selected specialist
   const filteredClients = clients.filter(client => {
     const matchesSearch = searchTerm === "" || 
       (client.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
        client.email?.toLowerCase().includes(searchTerm.toLowerCase()));
+       
+    const matchesSpecialist = selectedSpecialist === "all" || client.specialist === selectedSpecialist;
     
-    return matchesSearch;
+    return matchesSearch && matchesSpecialist;
   });
 
   return (
