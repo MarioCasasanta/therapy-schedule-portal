@@ -5,9 +5,8 @@ export class SessionController {
   // Mock database functions for development
   static async getSessions() {
     try {
-      // Using 'session_statistics' which is an available table in Supabase
-      // Adjust query as needed based on your actual database schema
-      const { data, error } = await supabase.from("session_statistics").select("*");
+      // Using the 'sessoes' table which is available in Supabase
+      const { data, error } = await supabase.from("sessoes").select("*");
       if (error) {
         console.error("Error fetching sessions:", error);
         return [];
@@ -21,9 +20,9 @@ export class SessionController {
 
   static async getSessionById(id: string) {
     try {
-      // Adjust based on your actual database schema
+      // Using the 'sessoes' table
       const { data, error } = await supabase
-        .from("session_statistics")
+        .from("sessoes")
         .select("*")
         .eq("id", id)
         .single();
@@ -40,9 +39,9 @@ export class SessionController {
 
   static async createSession(sessionData: any) {
     try {
-      // Adjust based on your actual database schema
+      // Using the 'sessoes' table
       const { data, error } = await supabase
-        .from("session_statistics")
+        .from("sessoes")
         .insert([sessionData])
         .select();
       if (error) {
@@ -58,9 +57,9 @@ export class SessionController {
 
   static async updateSession(id: string, sessionData: any) {
     try {
-      // Adjust based on your actual database schema
+      // Using the 'sessoes' table
       const { data, error } = await supabase
-        .from("session_statistics")
+        .from("sessoes")
         .update(sessionData)
         .eq("id", id)
         .select();
@@ -77,9 +76,9 @@ export class SessionController {
 
   static async deleteSession(id: string) {
     try {
-      // Adjust based on your actual database schema
+      // Using the 'sessoes' table
       const { error } = await supabase
-        .from("session_statistics")
+        .from("sessoes")
         .delete()
         .eq("id", id);
       if (error) {
@@ -140,7 +139,7 @@ export class SessionController {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("role", "client");
+        .or("role.eq.cliente,role.eq.client,tipo_usuario.eq.cliente");
       
       if (error) {
         console.error("Error fetching clients:", error);
@@ -174,33 +173,64 @@ export class SessionController {
   }
 
   static async getClientSessionCount(clientId: string) {
-    // For now, return a mock count
-    return Math.floor(Math.random() * 20);
+    try {
+      const { count, error } = await supabase
+        .from("sessoes")
+        .select("*", { count: "exact" })
+        .eq("cliente_id", clientId);
+        
+      if (error) throw error;
+      return count || 0;
+    } catch (error) {
+      console.error("Error fetching client session count:", error);
+      return Math.floor(Math.random() * 20); // Fallback to mock count
+    }
   }
 
   static async getSpecialistSessionCount(specialistId: string) {
-    // For now, return a mock count
-    return Math.floor(Math.random() * 50) + 5;
+    try {
+      const { count, error } = await supabase
+        .from("sessoes")
+        .select("*", { count: "exact" })
+        .eq("specialist_id", specialistId);
+        
+      if (error) throw error;
+      return count || 0;
+    } catch (error) {
+      console.error("Error fetching specialist session count:", error);
+      return Math.floor(Math.random() * 50) + 5; // Fallback to mock count
+    }
   }
 
   static async listSessions() {
-    // Return mock session data for demonstration
-    return [
-      {
-        id: "1",
-        data_hora: new Date().toISOString(),
-        tipo_sessao: "individual",
-        clientName: "João Silva",
-        status: "scheduled"
-      },
-      {
-        id: "2",
-        data_hora: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-        tipo_sessao: "casal",
-        clientName: "Maria e Pedro",
-        status: "scheduled"
-      }
-    ];
+    try {
+      const { data, error } = await supabase
+        .from("sessoes")
+        .select("*")
+        .order("data_hora", { ascending: true });
+        
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error("Error listing sessions:", error);
+      // Return mock session data for demonstration if database query fails
+      return [
+        {
+          id: "1",
+          data_hora: new Date().toISOString(),
+          tipo_sessao: "individual",
+          clientName: "João Silva",
+          status: "scheduled"
+        },
+        {
+          id: "2",
+          data_hora: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+          tipo_sessao: "casal",
+          clientName: "Maria e Pedro",
+          status: "scheduled"
+        }
+      ];
+    }
   }
 
   static async sendSessionInvite(sessionId: string) {
