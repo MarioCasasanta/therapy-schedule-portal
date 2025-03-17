@@ -157,13 +157,40 @@ export const SessionController = {
     return SessionController.sendSessionInvite(sessionId);
   },
 
-  getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string}[]> => {
+  getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string, created_at: string, bio?: string, specialty?: string}[]> => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, full_name, email")
-      .eq("role", "especialista");
+      .select("id, full_name, email, created_at, bio, specialty")
+      .eq("role", "especialista")
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     return data || [];
+  },
+  
+  searchSpecialists: async (searchTerm: string): Promise<{id: string, full_name: string, email: string, created_at: string, bio?: string, specialty?: string}[]> => {
+    let query = supabase
+      .from("profiles")
+      .select("id, full_name, email, created_at, bio, specialty")
+      .eq("role", "especialista");
+      
+    if (searchTerm) {
+      query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,specialty.ilike.%${searchTerm}%`);
+    }
+    
+    const { data, error } = await query.order("created_at", { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  },
+  
+  getSpecialistSessionCount: async (specialistId: string): Promise<number> => {
+    const { count, error } = await supabase
+      .from("sessoes")
+      .select("*", { count: "exact", head: true })
+      .eq("especialista_id", specialistId);
+
+    if (error) throw error;
+    return count || 0;
   }
 };
