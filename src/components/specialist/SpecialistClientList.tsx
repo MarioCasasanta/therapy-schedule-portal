@@ -2,11 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { User, Mail, Calendar, Phone } from "lucide-react";
 
 interface Client {
   id: string;
   full_name: string;
   email: string;
+  created_at: string;
+  telefone?: string;
   // Add other client properties as needed
 }
 
@@ -62,29 +80,78 @@ export const SpecialistClientList = ({ especialistaId }: SpecialistClientListPro
   }, []);
 
   if (loading) {
-    return <div>Loading clients...</div>;
+    return <div className="py-8 text-center">Carregando clientes...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="py-8 text-center text-red-500">Erro: {error}</div>;
   }
 
   return (
-    <div>
-      <h2>Client List</h2>
-      {clientList.length > 0 ? (
-        <ul>
-          {clientList.map((client) => (
-            <li key={client.id}>
-              <Link to={`/admin/clients/${client.id}`}>
-                {client.full_name} ({client.email})
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div>No clients found.</div>
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Lista de Clientes</CardTitle>
+        <CardDescription>
+          Gerencie seus {clientList.length} clientes
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {clientList.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Telefone</TableHead>
+                <TableHead>Data de Cadastro</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {clientList.map((client) => (
+                <TableRow key={client.id}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center">
+                      <User className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {client.full_name || "Cliente sem nome"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Mail className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {client.email || "Sem email"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {client.telefone || "Não informado"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {new Date(client.created_at).toLocaleDateString('pt-BR')}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link 
+                      to={`/admin/clients/${client.id}`} 
+                      className="text-primary hover:underline"
+                    >
+                      Ver detalhes
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="py-8 text-center text-muted-foreground">
+            Nenhum cliente encontrado.
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
