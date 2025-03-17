@@ -51,26 +51,37 @@ function App() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         
-        {/* Admin Routes */}
+        {/* Dashboard Routes - Access point */}
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/settings" element={<Settings />} />
-        <Route path="/dashboard/sessions" element={<Sessions />} />
-        <Route path="/dashboard/sessions/new" element={<NewSession />} />
-        <Route path="/dashboard/sessions/:id" element={<SessionDetails />} />
-        <Route path="/dashboard/reports" element={<Reports />} />
-        <Route path="/dashboard/payments" element={<Payments />} />
-        <Route path="/dashboard/availability" element={<Availability />} />
-        <Route path="/dashboard/notifications" element={<Notifications />} />
-        <Route path="/dashboard/profile" element={<Profile />} />
-        <Route path="/dashboard/clients" element={<DashboardClients />} />
-        <Route path="/dashboard/specialist-clients" element={<SpecialistClients />} />
-        <Route path="/dashboard/clients/:id" element={<ClientDetail />} />
         
-        {/* Admin Dashboard Routes */}
+        {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/clients" element={<DashboardClients />} />
+        <Route path="/admin/clients/:id" element={<ClientDetail />} />
+        <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/admin/sessions" element={<Sessions />} />
+        <Route path="/admin/sessions/new" element={<NewSession />} />
+        <Route path="/admin/sessions/:id" element={<SessionDetails />} />
+        <Route path="/admin/reports" element={<Reports />} />
+        <Route path="/admin/payments" element={<Payments />} />
+        <Route path="/admin/availability" element={<Availability />} />
+        <Route path="/admin/notifications" element={<Notifications />} />
+        <Route path="/admin/profile" element={<Profile />} />
         <Route path="/admin/blog-posts" element={<BlogPosts />} />
         <Route path="/admin/blog-posts/new" element={<BlogPostEditor />} />
         <Route path="/admin/blog-posts/edit/:id" element={<BlogPostEditor />} />
+        
+        {/* Specialist Routes */}
+        <Route path="/specialist-clients" element={<SpecialistClients />} />
+        <Route path="/specialist-settings" element={<Settings />} />
+        <Route path="/specialist-sessions" element={<Sessions />} />
+        <Route path="/specialist-sessions/new" element={<NewSession />} />
+        <Route path="/specialist-sessions/:id" element={<SessionDetails />} />
+        <Route path="/specialist-reports" element={<Reports />} />
+        <Route path="/specialist-payments" element={<Payments />} />
+        <Route path="/specialist-availability" element={<Availability />} />
+        <Route path="/specialist-notifications" element={<Notifications />} />
+        <Route path="/specialist-profile" element={<Profile />} />
         
         {/* Client Routes */}
         <Route path="/client-dashboard" element={<ClientDashboard />} />

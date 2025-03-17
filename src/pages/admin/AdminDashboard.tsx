@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,27 +72,22 @@ const AdminDashboard = () => {
           isAuthenticated = true;
         }
 
-        // Fetch statistics
         const fetchStatistics = async () => {
           try {
-            // Get specialists count
             const { count: specialistsCount } = await supabase
               .from('profiles')
               .select('*', { count: 'exact', head: true })
               .eq('role', 'admin');
 
-            // Get clients count
             const { count: clientsCount } = await supabase
               .from('profiles')
               .select('*', { count: 'exact', head: true })
               .eq('role', 'cliente');
 
-            // Get sessions count
             const { count: sessionsCount } = await supabase
               .from('sessoes')
               .select('*', { count: 'exact', head: true });
 
-            // Get blog posts count
             const { count: blogPostsCount } = await supabase
               .from('blog_posts')
               .select('*', { count: 'exact', head: true });
@@ -102,7 +96,7 @@ const AdminDashboard = () => {
               specialists: specialistsCount || 0,
               clients: clientsCount || 0,
               sessions: sessionsCount || 0,
-              payments: 0, // Will need to implement this when we have payment data
+              payments: 0,
               blogPosts: blogPostsCount || 0
             });
           } catch (error) {

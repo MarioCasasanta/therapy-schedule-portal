@@ -49,41 +49,53 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
 
   // Define menu items based on role
   const getMenuItems = () => {
-    // Base items for all users
-    const baseItems: MenuItem[] = [
+    // Base items for admin
+    const adminBaseItems: MenuItem[] = [
+      { icon: LayoutDashboard, label: "Visão Geral", path: "/admin" },
+      { icon: Calendar, label: "Sessões", path: "/admin/sessions" },
+      { icon: Bell, label: "Notificações", path: "/admin/notifications" },
+      { icon: Settings, label: "Configurações", path: "/admin/settings" },
+      { icon: UserCircle, label: "Meu Perfil", path: "/admin/profile" },
+    ];
+    
+    // Base items for specialist
+    const specialistBaseItems: MenuItem[] = [
       { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
-      { icon: Calendar, label: "Sessões", path: "/dashboard/sessions" },
-      { icon: Bell, label: "Notificações", path: "/dashboard/notifications" },
-      { icon: Settings, label: "Configurações", path: "/dashboard/settings" },
-      { icon: UserCircle, label: "Meu Perfil", path: "/dashboard/profile" },
+      { icon: Calendar, label: "Sessões", path: "/specialist-sessions" },
+      { icon: Bell, label: "Notificações", path: "/specialist-notifications" },
+      { icon: Settings, label: "Configurações", path: "/specialist-settings" },
+      { icon: UserCircle, label: "Meu Perfil", path: "/specialist-profile" },
     ];
     
     // Admin-specific items
     const adminItems: MenuItem[] = [
-      { icon: Users, label: "Clientes", path: "/dashboard/clients", position: 1 },
-      { icon: UserCog, label: "Especialistas", path: "/dashboard/specialists", position: 2 },
-      { icon: CreditCard, label: "Financeiro", path: "/dashboard/payments", position: 4 },
+      { icon: Users, label: "Clientes", path: "/admin/clients", position: 1 },
+      { icon: UserCog, label: "Especialistas", path: "/admin/specialists", position: 2 },
+      { icon: CreditCard, label: "Financeiro", path: "/admin/payments", position: 4 },
       { icon: FileText, label: "Blog", path: "/admin/blog-posts", position: 5 },
-      { icon: TestTube, label: "Testes", path: "/dashboard/tests", position: 6 },
-      { icon: PencilRuler, label: "Editor de Site", path: "/dashboard/site-editor", position: 7 },
-      { icon: BarChart, label: "Relatórios", path: "/dashboard/reports", position: 8 },
+      { icon: TestTube, label: "Testes", path: "/admin/tests", position: 6 },
+      { icon: PencilRuler, label: "Editor de Site", path: "/admin/site-editor", position: 7 },
+      { icon: BarChart, label: "Relatórios", path: "/admin/reports", position: 8 },
     ];
     
     // Specialist-specific items
     const specialistItems: MenuItem[] = [
-      { icon: Users, label: "Meus Clientes", path: "/dashboard/specialist-clients", position: 1 },
+      { icon: Users, label: "Meus Clientes", path: "/specialist-clients", position: 1 },
+      { icon: CreditCard, label: "Financeiro", path: "/specialist-payments", position: 4 },
+      { icon: BarChart, label: "Relatórios", path: "/specialist-reports", position: 5 },
+      { icon: Calendar, label: "Disponibilidade", path: "/specialist-availability", position: 6 },
     ];
 
     if (userRole === "admin") {
       // Combine base items with admin items
-      return [...baseItems, ...adminItems].sort((a, b) => {
+      return [...adminBaseItems, ...adminItems].sort((a, b) => {
         const posA = a.position || 999;
         const posB = b.position || 999;
         return posA - posB;
       });
     } else {
       // For specialists, combine base items with specialist items
-      return [...baseItems, ...specialistItems].sort((a, b) => {
+      return [...specialistBaseItems, ...specialistItems].sort((a, b) => {
         const posA = a.position || 999;
         const posB = b.position || 999;
         return posA - posB;

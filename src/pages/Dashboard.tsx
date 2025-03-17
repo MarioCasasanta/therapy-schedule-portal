@@ -55,7 +55,13 @@ const Dashboard = () => {
 
         setUserRole(profile.role);
 
-        if (profile.role !== 'admin' && profile.role !== 'especialista') {
+        // Redirect based on user role
+        if (profile.role === 'admin') {
+          navigate("/admin", { replace: true });
+          return;
+        } else if (profile.role === 'especialista') {
+          // Stay on this page for specialists
+        } else {
           console.warn("⚠️ Usuário não é admin ou especialista. Redirecionando...");
           navigate("/client-dashboard", { replace: true });
           return;
@@ -86,7 +92,7 @@ const Dashboard = () => {
         <AdminSidebar currentPath="/dashboard" userRole={userRole} />
         <SidebarInset className="overflow-auto">
           <div className="p-6">
-            <h1 className="text-2xl font-semibold">Dashboard {userRole === 'admin' ? 'Administrativo' : 'do Especialista'}</h1>
+            <h1 className="text-2xl font-semibold">Dashboard do Especialista</h1>
             <p className="text-gray-700">Bem-vindo ao seu painel de controle.</p>
           </div>
         </SidebarInset>

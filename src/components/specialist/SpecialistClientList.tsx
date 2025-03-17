@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { SessionController } from "@/controllers/SessionController";
@@ -74,7 +73,7 @@ export function SpecialistClientList({ especialistaId }: { especialistaId?: stri
   }, [especialistaId, toast]);
 
   const handleViewClient = (clientId: string) => {
-    navigate(`/dashboard/clients/${clientId}`);
+    navigate(`/admin/clients/${clientId}`);
   };
 
   return (
