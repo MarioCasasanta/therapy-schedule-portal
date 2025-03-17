@@ -18,6 +18,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Select,
@@ -26,23 +27,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { UserSearch, Calendar, CheckCircle2 } from "lucide-react";
+import { UserSearch, Calendar, CheckCircle2, Search } from "lucide-react";
 
 interface Client {
   id: string;
   created_at: string;
-  name?: string;
   full_name?: string;
   email?: string;
-  tipo_usuario?: string;
   sessionCount?: number;
   specialist?: string;
 }
 
 interface Specialist {
   id: string;
-  name?: string;
   full_name?: string;
   email?: string;
 }
@@ -52,14 +51,9 @@ export function AdminClientList() {
   const [specialists, setSpecialists] = useState<Specialist[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpecialist, setSelectedSpecialist] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [totalClients, setTotalClients] = useState<number>(0);
   const { toast } = useToast();
-
-  // Mock data for specialists and their clients
-  const mockSpecialistClients: Record<string, string[]> = {
-    "1": ["2", "3", "5"],
-    "2": ["4", "6", "9"],
-    "3": ["7", "8", "10"],
-  };
 
   useEffect(() => {
     async function loadData() {
@@ -70,36 +64,22 @@ export function AdminClientList() {
         const specialistsData = await SessionController.getAllSpecialists();
         setSpecialists(specialistsData);
         
-        // Load clients
+        // Load all clients
         const clientsData = await SessionController.getAllClients();
         
         // Add session count to each client
         const clientsWithSessionCount = await Promise.all(
           clientsData.map(async (client) => {
             const sessionCount = await SessionController.getClientSessionCount(client.id);
-            
-            // Determine the specialist for this client (using mock data for now)
-            let specialistName = "Não atribuído";
-            const specialistId = Object.keys(mockSpecialistClients).find(
-              (specId) => mockSpecialistClients[specId].includes(client.id.toString().slice(0, 1))
-            );
-            
-            if (specialistId) {
-              const specialist = specialistsData.find((s) => s.id.toString().slice(0, 1) === specialistId);
-              if (specialist) {
-                specialistName = specialist.full_name || specialist.name || specialist.email || "Especialista";
-              }
-            }
-            
             return {
               ...client,
-              sessionCount,
-              specialist: specialistName
+              sessionCount
             };
           })
         );
         
         setClients(clientsWithSessionCount);
+        setTotalClients(clientsWithSessionCount.length);
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -114,43 +94,53 @@ export function AdminClientList() {
     loadData();
   }, [toast]);
 
-  // Filter clients based on selected specialist
-  const filteredClients = selectedSpecialist === "all" 
-    ? clients 
-    : clients.filter(client => {
-        const specialistId = Object.keys(mockSpecialistClients).find(
-          (specId) => mockSpecialistClients[specId].includes(client.id.toString().slice(0, 1))
-        );
-        return specialistId === selectedSpecialist;
-      });
+  // Filter clients based on search term and selected specialist
+  const filteredClients = clients.filter(client => {
+    const matchesSearch = searchTerm === "" || 
+      (client.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+       client.email?.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    return selectedSpecialist === "all" ? matchesSearch : false; // For now we don't have specialist filtering
+  });
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-2xl">Clientes</CardTitle>
         <CardDescription>
-          Gerencie os clientes cadastrados na plataforma
+          Gerencie os {totalClients} clientes cadastrados na plataforma
         </CardDescription>
-        <div className="flex justify-between mt-4">
-          <Select
-            value={selectedSpecialist}
-            onValueChange={setSelectedSpecialist}
-          >
-            <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Filtrar por especialista" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os especialistas</SelectItem>
-              {specialists.map((specialist, index) => (
-                <SelectItem 
-                  key={specialist.id} 
-                  value={(index + 1).toString()}
-                >
-                  {specialist.full_name || specialist.name || specialist.email || `Especialista ${index + 1}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex flex-col gap-4 mt-4 md:flex-row md:justify-between">
+          <div className="flex flex-1 gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome ou email"
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Select
+              value={selectedSpecialist}
+              onValueChange={setSelectedSpecialist}
+            >
+              <SelectTrigger className="w-[220px]">
+                <SelectValue placeholder="Filtrar por especialista" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os especialistas</SelectItem>
+                {specialists.map((specialist) => (
+                  <SelectItem 
+                    key={specialist.id} 
+                    value={specialist.id}
+                  >
+                    {specialist.full_name || specialist.email || `Especialista`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Button variant="outline">
             <UserSearch className="mr-2 h-4 w-4" />
             Adicionar Cliente
@@ -165,9 +155,9 @@ export function AdminClientList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Data de Inscrição</TableHead>
                 <TableHead>Sessões Realizadas</TableHead>
-                <TableHead>Especialista</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -182,8 +172,9 @@ export function AdminClientList() {
                 filteredClients.map((client) => (
                   <TableRow key={client.id}>
                     <TableCell className="font-medium">
-                      {client.full_name || client.name || client.email || "Cliente sem nome"}
+                      {client.full_name || "Cliente sem nome"}
                     </TableCell>
+                    <TableCell>{client.email || "Sem email"}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -196,7 +187,6 @@ export function AdminClientList() {
                         {client.sessionCount || 0} sessões
                       </div>
                     </TableCell>
-                    <TableCell>{client.specialist}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm">
                         Ver detalhes
@@ -209,6 +199,11 @@ export function AdminClientList() {
           </Table>
         )}
       </CardContent>
+      <CardFooter className="flex justify-between">
+        <div className="text-sm text-muted-foreground">
+          Mostrando {filteredClients.length} de {totalClients} clientes
+        </div>
+      </CardFooter>
     </Card>
   );
 }

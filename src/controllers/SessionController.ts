@@ -31,7 +31,12 @@ export const SessionController = {
     return data as Session[];
   },
 
-  createSession: async (sessionData: Partial<Session>): Promise<Session> => {
+  createSession: async (sessionData: any): Promise<Session> => {
+    // Make sure data_hora is provided as required by the database
+    if (!sessionData.data_hora) {
+      throw new Error("data_hora is required");
+    }
+    
     const { data, error } = await supabase.from("sessoes").insert(sessionData).select().single();
 
     if (error) throw error;
@@ -95,9 +100,19 @@ export const SessionController = {
     return count || 0;
   },
 
-  listClients: async (especialistaId?: string): Promise<{id: string, full_name: string, email: string, created_at: string}[]> => {
-    let query = supabase.from("profiles").select("id, full_name, email, created_at");
+  getAllClients: async (): Promise<{id: string, full_name: string, email: string, created_at: string}[]> => {
+    // Get all clients regardless of association with a specialist
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, full_name, email, created_at")
+      .eq("role", "cliente")
+      .order("created_at", { ascending: false });
 
+    if (error) throw error;
+    return data || [];
+  },
+
+  listClients: async (especialistaId?: string): Promise<{id: string, full_name: string, email: string, created_at: string}[]> => {
     if (especialistaId) {
       // Get clients assigned to this specialist
       const { data: sessionData, error: sessionError } = await supabase
@@ -110,19 +125,23 @@ export const SessionController = {
 
       if (sessionData && sessionData.length > 0) {
         const clientIds = [...new Set(sessionData.map((session) => session.cliente_id))];
-        query = query.in("id", clientIds);
+        
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, full_name, email, created_at")
+          .in("id", clientIds)
+          .eq("role", "cliente");
+
+        if (error) throw error;
+        return data || [];
       } else {
         // No clients found for this specialist
         return [];
       }
+    } else {
+      // If no especialistaId provided, return all clients
+      return SessionController.getAllClients();
     }
-
-    query = query.eq("role", "cliente");
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-    return data || [];
   },
 
   // Alias for backward compatibility
@@ -136,5 +155,15 @@ export const SessionController = {
 
   sendInvite: async (sessionId: string): Promise<void> => {
     return SessionController.sendSessionInvite(sessionId);
+  },
+
+  getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string}[]> => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .eq("role", "especialista");
+
+    if (error) throw error;
+    return data || [];
   }
 };
