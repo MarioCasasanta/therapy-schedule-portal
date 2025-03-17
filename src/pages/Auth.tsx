@@ -17,20 +17,25 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [userType, setUserType] = useState("cliente"); // "cliente" ou "especialista"
   const [passwordError, setPasswordError] = useState("");
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const [checkingUser, setCheckingUser] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const checkSession = async () => {
+      setCheckingUser(true);
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
         console.error("❌ Erro ao obter sessão:", error);
+        setCheckingUser(false);
         return;
       }
 
       if (!session?.user) {
         console.log("❌ Nenhum usuário autenticado.");
+        setCheckingUser(false);
         return;
       }
 
@@ -42,12 +47,18 @@ const Auth = () => {
 
       if (profileError || !profile) {
         console.error("❌ Erro ao buscar perfil do usuário:", profileError);
+        setCheckingUser(false);
         return;
       }
 
+      setCurrentUserRole(profile.role);
+      console.log("✅ Usuário está cadastrado como:", profile.role);
+      
       navigate(profile.role === "admin" ? "/dashboard" : 
              profile.role === "especialista" ? "/dashboard" : 
              "/client-dashboard", { replace: true });
+      
+      setCheckingUser(false);
     };
 
     checkSession();
@@ -155,116 +166,138 @@ const Auth = () => {
         Além do Apego
       </Link>
       
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <Tabs defaultValue="cliente" className="mb-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger 
-              value="cliente" 
-              onClick={() => setUserType("cliente")}
-              className={userType === "cliente" ? "font-semibold" : ""}
-            >
-              Para Clientes
-            </TabsTrigger>
-            <TabsTrigger 
-              value="especialista" 
-              onClick={() => setUserType("especialista")}
-              className={userType === "especialista" ? "font-semibold" : ""}
-            >
-              Para Especialistas
-            </TabsTrigger>
-          </TabsList>
+      {checkingUser ? (
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+          <p className="text-center">Verificando seu cadastro...</p>
+        </div>
+      ) : currentUserRole ? (
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+          <h2 className="text-xl font-medium text-center mb-4">Informações do Usuário</h2>
+          <p className="text-center mb-4">
+            Você está atualmente cadastrado como: <span className="font-bold">{currentUserRole}</span>
+          </p>
+          <Button 
+            onClick={() => {
+              supabase.auth.signOut();
+              setCurrentUserRole(null);
+            }}
+            className="w-full bg-sage-600 text-white hover:bg-sage-700"
+          >
+            Sair da Conta
+          </Button>
+        </div>
+      ) : (
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+          <Tabs defaultValue="cliente" className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger 
+                value="cliente" 
+                onClick={() => setUserType("cliente")}
+                className={userType === "cliente" ? "font-semibold" : ""}
+              >
+                Para Clientes
+              </TabsTrigger>
+              <TabsTrigger 
+                value="especialista" 
+                onClick={() => setUserType("especialista")}
+                className={userType === "especialista" ? "font-semibold" : ""}
+              >
+                Para Especialistas
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="cliente" className="mt-4">
+              <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
+                {isLogin ? "Login" : "Crie sua conta"}
+              </h2>
+              <p className="text-center text-gray-600 mb-4">
+                Acesse como cliente para marcar suas consultas
+              </p>
+            </TabsContent>
+            
+            <TabsContent value="especialista" className="mt-4">
+              <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
+                {isLogin ? "Login" : "Cadastro"} de Especialista
+              </h2>
+              <p className="text-center text-gray-600 mb-4">
+                Acesse como especialista para gerenciar suas consultas
+              </p>
+            </TabsContent>
+          </Tabs>
           
-          <TabsContent value="cliente" className="mt-4">
-            <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
-              {isLogin ? "Login" : "Crie sua conta"}
-            </h2>
-            <p className="text-center text-gray-600 mb-4">
-              Acesse como cliente para marcar suas consultas
-            </p>
-          </TabsContent>
-          
-          <TabsContent value="especialista" className="mt-4">
-            <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
-              {isLogin ? "Login" : "Cadastro"} de Especialista
-            </h2>
-            <p className="text-center text-gray-600 mb-4">
-              Acesse como especialista para gerenciar suas consultas
-            </p>
-          </TabsContent>
-        </Tabs>
-        
-        <form onSubmit={handleAuth} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Senha
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full"
-              required
-            />
-          </div>
-          
-          {!isLogin && (
+          <form onSubmit={handleAuth} className="space-y-4">
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirmar Senha
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
               </label>
               <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full"
                 required
               />
-              {passwordError && (
-                <p className="text-sm text-red-500 mt-1">{passwordError}</p>
-              )}
             </div>
-          )}
-          
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-sage-600 text-white py-2 px-4 rounded-md hover:bg-sage-700 transition-colors disabled:opacity-50"
-          >
-            {loading ? "Carregando..." : isLogin ? "Entrar" : "Cadastrar"}
-          </button>
-          
-          <div className="text-center mt-4">
-            <Button
-              variant="link"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setPasswordError("");
-                setConfirmPassword("");
-              }}
-              className="text-sm"
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Senha
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full"
+                required
+              />
+            </div>
+            
+            {!isLogin && (
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirmar Senha
+                </label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="mt-1 block w-full"
+                  required
+                />
+                {passwordError && (
+                  <p className="text-sm text-red-500 mt-1">{passwordError}</p>
+                )}
+              </div>
+            )}
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-sage-600 text-white py-2 px-4 rounded-md hover:bg-sage-700 transition-colors disabled:opacity-50"
             >
-              {isLogin
-                ? "Não tem uma conta? Cadastre-se"
-                : "Já tem uma conta? Faça login"}
-            </Button>
-          </div>
-        </form>
-      </div>
+              {loading ? "Carregando..." : isLogin ? "Entrar" : "Cadastrar"}
+            </button>
+            
+            <div className="text-center mt-4">
+              <Button
+                variant="link"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setPasswordError("");
+                  setConfirmPassword("");
+                }}
+                className="text-sm"
+              >
+                {isLogin
+                  ? "Não tem uma conta? Cadastre-se"
+                  : "Já tem uma conta? Faça login"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

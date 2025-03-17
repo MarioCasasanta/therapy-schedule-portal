@@ -1,9 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { SessionType } from '@/types/session';
 
 export class SessionController {
-  static async getSessions(): Promise<SessionType[]> {
+  static async getSessions() {
     try {
       const { data, error } = await supabase
         .from('sessoes')
@@ -18,7 +17,7 @@ export class SessionController {
     }
   }
 
-  static async getSessionsByClient(clientId: string): Promise<SessionType[]> {
+  static async getSessionsByClient(clientId: string) {
     try {
       const { data, error } = await supabase
         .from('sessoes')
@@ -34,7 +33,7 @@ export class SessionController {
     }
   }
 
-  static async getSessionsBySpecialist(specialistId: string): Promise<SessionType[]> {
+  static async getSessionsBySpecialist(specialistId: string) {
     try {
       const { data, error } = await supabase
         .from('sessoes')
@@ -50,7 +49,7 @@ export class SessionController {
     }
   }
 
-  static async createSession(sessionData: Partial<SessionType>): Promise<SessionType | null> {
+  static async createSession(sessionData: any) {
     try {
       const { data, error } = await supabase
         .from('sessoes')
@@ -67,7 +66,7 @@ export class SessionController {
     }
   }
 
-  static async updateSession(id: string, sessionData: Partial<SessionType>): Promise<SessionType | null> {
+  static async updateSession(id: string, sessionData: any) {
     try {
       const { data, error } = await supabase
         .from('sessoes')
@@ -85,7 +84,7 @@ export class SessionController {
     }
   }
 
-  static async deleteSession(id: string): Promise<boolean> {
+  static async deleteSession(id: string) {
     try {
       const { error } = await supabase
         .from('sessoes')
@@ -97,6 +96,107 @@ export class SessionController {
       return true;
     } catch (error) {
       console.error('Error deleting session:', error);
+      return false;
+    }
+  }
+
+  // Additional methods needed for components
+  static async getAllSpecialists() {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'especialista');
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching specialists:', error);
+      return [];
+    }
+  }
+
+  static async getAllClients() {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'cliente');
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+      return [];
+    }
+  }
+  
+  static async listClients() {
+    return this.getAllClients();
+  }
+
+  static async listSessions() {
+    return this.getSessions();
+  }
+
+  static async getClientSessionCount(clientId: string) {
+    try {
+      const { count, error } = await supabase
+        .from('sessoes')
+        .select('*', { count: 'exact', head: true })
+        .eq('cliente_id', clientId);
+
+      if (error) throw error;
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error counting client sessions:', error);
+      return 0;
+    }
+  }
+
+  static async getSpecialistSessionCount(specialistId: string) {
+    try {
+      const { count, error } = await supabase
+        .from('sessoes')
+        .select('*', { count: 'exact', head: true })
+        .eq('especialista_id', specialistId);
+
+      if (error) throw error;
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error counting specialist sessions:', error);
+      return 0;
+    }
+  }
+
+  static async getSpecialistDetails(specialistId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('specialist_details')
+        .select('*, specialists(*)')
+        .eq('specialist_id', specialistId)
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching specialist details:', error);
+      return null;
+    }
+  }
+
+  static async sendSessionInvite(sessionId: string) {
+    try {
+      // Placeholder for sending session invite
+      console.log(`Sending invite for session ${sessionId}`);
+      return true;
+    } catch (error) {
+      console.error('Error sending session invite:', error);
       return false;
     }
   }
