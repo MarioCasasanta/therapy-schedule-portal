@@ -70,11 +70,11 @@ export function AdminClientList() {
         if (specialistsError) throw specialistsError;
         setSpecialists(specialistsData || []);
         
-        // Load all clients
+        // Modificação principal: alterar 'client' para 'cliente' ou buscar por ambos
         const { data: clientsData, error: clientsError } = await supabase
           .from('profiles')
           .select('*')
-          .eq('role', 'client');
+          .eq('role', 'cliente');
           
         if (clientsError) throw clientsError;
         
