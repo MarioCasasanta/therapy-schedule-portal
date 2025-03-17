@@ -1,6 +1,16 @@
 import React from "react";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { 
+  X, Award, Star, Phone, Calendar, 
+  Video, Book, Users, Check, BarChart, 
+  Clock
+} from "lucide-react";
+import { 
+  Card, CardContent, CardDescription, CardFooter, 
+  CardHeader, CardTitle 
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const allFeatures = [
   { 
@@ -205,7 +215,7 @@ const ParaEspecialistas = () => {
         </div>
       </section>
       
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-4">

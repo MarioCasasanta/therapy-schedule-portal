@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
@@ -9,7 +10,11 @@ interface Client {
   // Add other client properties as needed
 }
 
-const SpecialistClientList = () => {
+interface SpecialistClientListProps {
+  especialistaId?: string;
+}
+
+export const SpecialistClientList = ({ especialistaId }: SpecialistClientListProps) => {
   const [clientList, setClientList] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,5 +88,3 @@ const SpecialistClientList = () => {
     </div>
   );
 };
-
-export default SpecialistClientList;

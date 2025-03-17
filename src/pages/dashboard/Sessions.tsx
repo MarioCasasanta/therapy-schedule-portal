@@ -22,7 +22,7 @@ const Sessions = () => {
     const fetchSessions = async () => {
       try {
         const data = await SessionController.listSessions();
-        setSessions(data);
+        setSessions(data as Session[]);
       } catch (error: any) {
         toast({
           variant: "destructive",
