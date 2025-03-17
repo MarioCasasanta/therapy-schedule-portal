@@ -891,6 +891,36 @@ export type Database = {
           },
         ]
       }
+      specialists: {
+        Row: {
+          bio: string | null
+          created_at: string
+          experience_years: number | null
+          id: string
+          rating: number | null
+          specialty: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          experience_years?: number | null
+          id: string
+          rating?: number | null
+          specialty?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          experience_years?: number | null
+          id?: string
+          rating?: number | null
+          specialty?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_config: {
         Row: {
           created_at: string

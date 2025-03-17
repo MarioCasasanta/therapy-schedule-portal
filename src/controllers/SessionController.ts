@@ -158,9 +158,42 @@ export const SessionController = {
   },
 
   getAllSpecialists: async (): Promise<{id: string, full_name: string, email: string, created_at: string, specialty?: string}[]> => {
+    // Primeiro, obter dados da tabela de especialistas
+    const { data: specialistsData, error: specialistsError } = await supabase
+      .from("specialists")
+      .select("id, specialty")
+      .order("created_at", { ascending: false });
+    
+    if (specialistsError) throw specialistsError;
+    
+    // Em seguida, obter os dados complementares da tabela profiles
+    if (specialistsData && specialistsData.length > 0) {
+      const specialistIds = specialistsData.map(spec => spec.id);
+      
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, created_at")
+        .in("id", specialistIds)
+        .eq("role", "especialista");
+      
+      if (profilesError) throw profilesError;
+      
+      // Combinar os dados das duas tabelas
+      const combinedData = profilesData?.map(profile => {
+        const specialist = specialistsData.find(s => s.id === profile.id);
+        return {
+          ...profile,
+          specialty: specialist?.specialty || "Não especificada"
+        };
+      }) || [];
+      
+      return combinedData;
+    }
+    
+    // Caso não encontre especialistas na nova tabela, busca da tabela de profiles como fallback
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, full_name, email, created_at, specialty")
+      .select("id, full_name, email, created_at")
       .eq("role", "especialista")
       .order("created_at", { ascending: false });
 
@@ -169,13 +202,60 @@ export const SessionController = {
   },
   
   searchSpecialists: async (searchTerm: string): Promise<{id: string, full_name: string, email: string, created_at: string, specialty?: string}[]> => {
+    // Primeiro, buscar todos os especialistas da nova tabela
+    const { data: allSpecialistsData, error: specialistsError } = await supabase
+      .from("specialists")
+      .select("id, specialty");
+    
+    if (specialistsError) throw specialistsError;
+    
+    // Se temos especialistas na nova tabela
+    if (allSpecialistsData && allSpecialistsData.length > 0) {
+      const specialistIds = allSpecialistsData.map(s => s.id);
+      
+      // Buscar profiles correspondentes, filtrando pela busca
+      let query = supabase
+        .from("profiles")
+        .select("id, full_name, email, created_at")
+        .in("id", specialistIds);
+      
+      if (searchTerm) {
+        query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`);
+      }
+      
+      const { data: profilesData, error: profilesError } = await query.order("created_at", { ascending: false });
+      
+      if (profilesError) throw profilesError;
+      
+      // Combinar os dados
+      const combinedData = profilesData?.map(profile => {
+        const specialist = allSpecialistsData.find(s => s.id === profile.id);
+        return {
+          ...profile,
+          specialty: specialist?.specialty || "Não especificada"
+        };
+      }) || [];
+      
+      // Filtrar também por especialidade
+      if (searchTerm) {
+        return combinedData.filter(specialist => 
+          specialist.specialty?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          specialist.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          specialist.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+      
+      return combinedData;
+    }
+    
+    // Fallback para a versão antiga usando apenas profiles
     let query = supabase
       .from("profiles")
-      .select("id, full_name, email, created_at, specialty")
+      .select("id, full_name, email, created_at")
       .eq("role", "especialista");
       
     if (searchTerm) {
-      query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,specialty.ilike.%${searchTerm}%`);
+      query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`);
     }
     
     const { data, error } = await query.order("created_at", { ascending: false });
@@ -192,5 +272,91 @@ export const SessionController = {
 
     if (error) throw error;
     return count || 0;
+  },
+  
+  // Método para cadastrar um especialista
+  registerSpecialist: async (userId: string, specialistData: { specialty?: string, bio?: string, experience_years?: number }): Promise<void> => {
+    // Primeiro, verificar se o usuário já existe na tabela de especialistas
+    const { data: existingSpecialist, error: checkError } = await supabase
+      .from("specialists")
+      .select("id")
+      .eq("id", userId)
+      .maybeSingle();
+    
+    if (checkError) throw checkError;
+    
+    // Se já existe, atualizar
+    if (existingSpecialist) {
+      const { error: updateError } = await supabase
+        .from("specialists")
+        .update(specialistData)
+        .eq("id", userId);
+      
+      if (updateError) throw updateError;
+    } else {
+      // Se não existe, inserir
+      const { error: insertError } = await supabase
+        .from("specialists")
+        .insert({
+          id: userId,
+          ...specialistData
+        });
+      
+      if (insertError) throw insertError;
+      
+      // Também atualizar o role na tabela profiles
+      const { error: profileUpdateError } = await supabase
+        .from("profiles")
+        .update({ role: "especialista" })
+        .eq("id", userId);
+      
+      if (profileUpdateError) throw profileUpdateError;
+    }
+  },
+  
+  // Método para obter detalhes de um especialista
+  getSpecialistDetails: async (specialistId: string): Promise<{
+    id: string, 
+    full_name?: string, 
+    email?: string, 
+    created_at: string, 
+    specialty?: string,
+    bio?: string,
+    experience_years?: number,
+    rating?: number
+  }> => {
+    // Buscar dados da tabela specialists
+    const { data: specialistData, error: specialistError } = await supabase
+      .from("specialists")
+      .select("*")
+      .eq("id", specialistId)
+      .maybeSingle();
+    
+    if (specialistError) throw specialistError;
+    
+    // Buscar dados da tabela profiles
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, full_name, email, created_at")
+      .eq("id", specialistId)
+      .maybeSingle();
+    
+    if (profileError) throw profileError;
+    
+    // Combinar os dados
+    if (specialistData && profileData) {
+      return {
+        ...profileData,
+        specialty: specialistData.specialty,
+        bio: specialistData.bio,
+        experience_years: specialistData.experience_years,
+        rating: specialistData.rating
+      };
+    } else if (profileData) {
+      // Caso não tenha dados na tabela specialists
+      return profileData;
+    } else {
+      throw new Error("Especialista não encontrado");
+    }
   }
 };
