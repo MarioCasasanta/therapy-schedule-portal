@@ -6,13 +6,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [userType, setUserType] = useState("cliente"); // "cliente" ou "especialista"
+  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -61,6 +65,14 @@ const Auth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError("");
+    
+    // If not login and passwords don't match, show error
+    if (!isLogin && password !== confirmPassword) {
+      setPasswordError("As senhas não coincidem");
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -186,12 +198,12 @@ const Auth = () => {
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full"
               required
             />
           </div>
@@ -199,15 +211,35 @@ const Auth = () => {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Senha
             </label>
-            <input
+            <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full"
               required
             />
           </div>
+          
+          {!isLogin && (
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirmar Senha
+              </label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="mt-1 block w-full"
+                required
+              />
+              {passwordError && (
+                <p className="text-sm text-red-500 mt-1">{passwordError}</p>
+              )}
+            </div>
+          )}
+          
           <button
             type="submit"
             disabled={loading}
@@ -219,7 +251,11 @@ const Auth = () => {
           <div className="text-center mt-4">
             <Button
               variant="link"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setPasswordError("");
+                setConfirmPassword("");
+              }}
               className="text-sm"
             >
               {isLogin

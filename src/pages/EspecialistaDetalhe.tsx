@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Star, ArrowLeft, CalendarDays, Clock, MapPin, User, Mail, Phone, GraduationCap, Languages } from "lucide-react";
@@ -51,7 +50,6 @@ const EspecialistaDetalhe = () => {
       
       try {
         setLoading(true);
-        // Usando o novo método do SessionController para buscar detalhes do especialista
         const data = await SessionController.getSpecialistDetails(id);
 
         setEspecialista({
@@ -132,7 +130,6 @@ const EspecialistaDetalhe = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Coluna de informações do especialista */}
           <div className="lg:col-span-1">
             <Card className="sticky top-24">
               <CardContent className="p-6">
@@ -215,21 +212,19 @@ const EspecialistaDetalhe = () => {
                     </div>
                   )}
                   
-                  {especialista.phone && (
-                    <div className="flex items-start gap-3">
-                      <Phone className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                      <div>
-                        <h3 className="font-medium text-gray-900">Telefone</h3>
-                        <p className="text-gray-600 text-sm">{especialista.phone}</p>
-                      </div>
+                  {/* Phone property is not available in the specialist type */}
+                  {/* <div className="flex items-start gap-3">
+                    <Phone className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">Telefone</h3>
+                      <p className="text-gray-600 text-sm">{especialista.phone}</p>
                     </div>
-                  )}
+                  </div> */}
                 </div>
               </CardContent>
             </Card>
           </div>
           
-          {/* Coluna de conteúdo e agendamento */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="about">
               <TabsList className="mb-6">
