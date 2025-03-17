@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { UserSearch, Calendar, CheckCircle2, Search, RefreshCw } from "lucide-react";
+import { UserSearch, Calendar, CheckCircle2, Search, RefreshCw, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Client {
@@ -67,17 +67,31 @@ export function AdminClientList() {
         .eq('role', 'especialista');
         
       if (specialistsError) throw specialistsError;
+      console.log("Especialistas carregados:", specialistsData);
       setSpecialists(specialistsData || []);
       
-      // Buscar todos os clientes com role = 'cliente'
-      const { data: clientsData, error: clientsError } = await supabase
+      // Vamos melhorar a query de clientes para ser mais flexível
+      let query = supabase
         .from('profiles')
-        .select('*')
-        .eq('role', 'cliente');
+        .select('*');
+      
+      // Tenta buscar todos que têm role cliente ou cliente (diferentes formatos)
+      const { data: clientsData, error: clientsError } = await query.or('role.eq.cliente,role.eq.client,tipo_usuario.eq.cliente');
         
       if (clientsError) throw clientsError;
       
-      console.log("Fetched clients:", clientsData);
+      console.log("Clientes encontrados:", clientsData);
+      
+      if (!clientsData || clientsData.length === 0) {
+        // Se não encontrou nenhum, busca todos os perfis e exibe para debug
+        const { data: allProfiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('*');
+          
+        console.log("Todos os perfis no banco:", allProfiles);
+        
+        if (profilesError) throw profilesError;
+      }
       
       // Add session count to each client (simplified for now)
       const clientsWithSessionCount = await Promise.all(
@@ -97,7 +111,7 @@ export function AdminClientList() {
       setClients(clientsWithSessionCount);
       setTotalClients(clientsWithSessionCount.length);
     } catch (error: any) {
-      console.error("Error loading clients:", error);
+      console.error("Erro ao carregar clientes:", error);
       toast({
         variant: "destructive",
         title: "Erro ao carregar clientes",
@@ -110,7 +124,7 @@ export function AdminClientList() {
 
   useEffect(() => {
     loadData();
-  }, [toast]);
+  }, []);
 
   // Filter clients based on search term and selected specialist
   const filteredClients = clients.filter(client => {
@@ -167,7 +181,7 @@ export function AdminClientList() {
               Atualizar Lista
             </Button>
             <Button variant="outline">
-              <UserSearch className="mr-2 h-4 w-4" />
+              <PlusCircle className="mr-2 h-4 w-4" />
               Adicionar Cliente
             </Button>
           </div>
