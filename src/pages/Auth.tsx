@@ -1,13 +1,18 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Heart } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [userType, setUserType] = useState("cliente"); // "cliente" ou "especialista"
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,7 +41,9 @@ const Auth = () => {
         return;
       }
 
-      navigate(profile.role === "admin" ? "/dashboard" : "/client-dashboard", { replace: true });
+      navigate(profile.role === "admin" ? "/dashboard" : 
+             profile.role === "especialista" ? "/dashboard" : 
+             "/client-dashboard", { replace: true });
     };
 
     checkSession();
@@ -66,12 +73,29 @@ const Auth = () => {
         if (loginError) throw loginError;
 
         if (session) {
-          navigate("/dashboard", { replace: true });
+          // After login, we'll check the profile and redirect accordingly
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single();
+            
+          if (profileError) throw profileError;
+          
+          navigate(profile.role === "admin" ? "/dashboard" : 
+                 profile.role === "especialista" ? "/dashboard" : 
+                 "/client-dashboard", { replace: true });
         }
       } else {
+        // For signup, we include the user type in metadata
         const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              role: userType  // This will be used by the trigger function
+            }
+          }
         });
 
         if (signUpError) throw signUpError;
@@ -94,11 +118,50 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-sage-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-sage-50 p-4">
+      <Link to="/" className="mb-8 flex items-center text-2xl font-playfair font-semibold text-sage-600">
+        <Heart className="h-8 w-8 text-pink-500 mr-2 fill-pink-500" />
+        Além do Apego
+      </Link>
+      
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-playfair font-semibold text-center mb-6">
-          {isLogin ? "Login" : "Criar conta"}
-        </h2>
+        <Tabs defaultValue="cliente" className="mb-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger 
+              value="cliente" 
+              onClick={() => setUserType("cliente")}
+              className={userType === "cliente" ? "font-semibold" : ""}
+            >
+              Para Clientes
+            </TabsTrigger>
+            <TabsTrigger 
+              value="especialista" 
+              onClick={() => setUserType("especialista")}
+              className={userType === "especialista" ? "font-semibold" : ""}
+            >
+              Para Especialistas
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="cliente" className="mt-4">
+            <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
+              {isLogin ? "Login" : "Crie sua conta"}
+            </h2>
+            <p className="text-center text-gray-600 mb-4">
+              Acesse como cliente para marcar suas consultas
+            </p>
+          </TabsContent>
+          
+          <TabsContent value="especialista" className="mt-4">
+            <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
+              {isLogin ? "Login" : "Cadastro"} de Especialista
+            </h2>
+            <p className="text-center text-gray-600 mb-4">
+              Acesse como especialista para gerenciar suas consultas
+            </p>
+          </TabsContent>
+        </Tabs>
+        
         <form onSubmit={handleAuth} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -133,6 +196,18 @@ const Auth = () => {
           >
             {loading ? "Carregando..." : isLogin ? "Entrar" : "Cadastrar"}
           </button>
+          
+          <div className="text-center mt-4">
+            <Button
+              variant="link"
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-sm"
+            >
+              {isLogin
+                ? "Não tem uma conta? Cadastre-se"
+                : "Já tem uma conta? Faça login"}
+            </Button>
+          </div>
         </form>
       </div>
     </div>
