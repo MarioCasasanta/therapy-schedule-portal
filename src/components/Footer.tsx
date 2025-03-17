@@ -40,7 +40,7 @@ export const Footer = () => {
           <div>
             <h3 className="font-semibold text-lg mb-4">Contato</h3>
             <p className="text-sage-300 mb-2">contato@alemdoapego.com.br</p>
-            <p className="text-sage-300">+55 (11) 99999-9999</p>
+            <p className="text-sage-300">+55 21 996223993</p>
             <div className="flex space-x-4 mt-4">
               <a href="#" className="text-sage-300 hover:text-white">
                 <span className="sr-only">Facebook</span>
