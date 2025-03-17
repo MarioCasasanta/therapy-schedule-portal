@@ -44,13 +44,12 @@ export class SessionController {
       const { data, error } = await supabase
         .from("session_statistics")
         .insert([sessionData])
-        .select()
-        .single();
+        .select();
       if (error) {
         console.error("Error creating session:", error);
         return null;
       }
-      return data;
+      return data ? data[0] : null;
     } catch (error) {
       console.error("Error creating session:", error);
       return null;
@@ -64,13 +63,12 @@ export class SessionController {
         .from("session_statistics")
         .update(sessionData)
         .eq("id", id)
-        .select()
-        .single();
+        .select();
       if (error) {
         console.error("Error updating session:", error);
         return null;
       }
-      return data;
+      return data ? data[0] : null;
     } catch (error) {
       console.error("Error updating session:", error);
       return null;
@@ -190,15 +188,15 @@ export class SessionController {
     return [
       {
         id: "1",
-        title: "Terapia Individual",
-        date: new Date().toISOString(),
+        data_hora: new Date().toISOString(),
+        tipo_sessao: "individual",
         clientName: "João Silva",
         status: "scheduled"
       },
       {
         id: "2",
-        title: "Terapia de Casal",
-        date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+        data_hora: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+        tipo_sessao: "casal",
         clientName: "Maria e Pedro",
         status: "scheduled"
       }
