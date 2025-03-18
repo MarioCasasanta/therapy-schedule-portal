@@ -1,11 +1,11 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { BlogController } from "@/controllers/BlogController";
 
 interface BlogPost {
   id: string;
@@ -13,7 +13,6 @@ interface BlogPost {
   slug: string;
   excerpt: string;
   created_at: string;
-  author_name?: string;
 }
 
 const getBlogImage = (index: number) => {
@@ -34,8 +33,18 @@ const FeaturedBlogCarousel = () => {
   useEffect(() => {
     const fetchFeaturedPosts = async () => {
       try {
-        const postsData = await BlogController.getPublishedPosts();
-        setPosts(postsData.slice(0, 5)); // Apenas os 5 primeiros posts
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('id, title, slug, excerpt, created_at')
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (error) {
+          throw error;
+        }
+
+        setPosts(data || []);
       } catch (error) {
         console.error("Erro ao buscar posts em destaque:", error);
       } finally {
