@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export class SessionController {
@@ -237,5 +236,24 @@ export class SessionController {
     // Função fictícia que normalmente enviaria um convite
     console.log(`Convite enviado para a sessão ${sessionId}`);
     return true;
+  }
+
+  static async getSessionsByClient(clientId: string): Promise<Session[]> {
+    try {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('client_id', clientId);
+
+      if (error) {
+        console.error('Error fetching sessions by client:', error);
+        throw error;
+      }
+
+      return data as Session[];
+    } catch (error) {
+      console.error('Error in getSessionsByClient:', error);
+      return [];
+    }
   }
 }
