@@ -8,7 +8,7 @@ export class BlogController {
         .from("blog_posts")
         .select(`
           *,
-          profiles:author_id (name, full_name, email)
+          profiles(name, full_name, email)
         `)
         .order("created_at", { ascending: false });
 
@@ -43,7 +43,7 @@ export class BlogController {
         .from("blog_posts")
         .select(`
           *,
-          profiles:author_id (name, full_name, email)
+          profiles(name, full_name, email)
         `)
         .eq("id", id)
         .single();
@@ -69,7 +69,7 @@ export class BlogController {
         .from("blog_posts")
         .select(`
           *,
-          profiles:author_id (name, full_name, email)
+          profiles(name, full_name, email)
         `)
         .eq("slug", slug)
         .single();
