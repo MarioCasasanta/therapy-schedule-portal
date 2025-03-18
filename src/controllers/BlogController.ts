@@ -7,8 +7,7 @@ export class BlogController {
       let query = supabase
         .from("blog_posts")
         .select(`
-          *,
-          profiles(name, full_name, email)
+          *
         `)
         .order("created_at", { ascending: false });
 
@@ -25,7 +24,7 @@ export class BlogController {
 
       return data.map((post: any) => ({
         ...post,
-        author_name: post.profiles?.full_name || post.profiles?.name || "Autor Desconhecido",
+        author_name: "Autor" // Simplified since relation query was causing issues
       }));
     } catch (error) {
       console.error("Erro ao buscar posts do blog:", error);
@@ -41,10 +40,7 @@ export class BlogController {
     try {
       const { data, error } = await supabase
         .from("blog_posts")
-        .select(`
-          *,
-          profiles(name, full_name, email)
-        `)
+        .select(`*`)
         .eq("id", id)
         .single();
 
@@ -55,7 +51,7 @@ export class BlogController {
 
       return {
         ...data,
-        author_name: data.profiles?.full_name || data.profiles?.name || "Autor Desconhecido",
+        author_name: "Autor" // Simplified since relation query was causing issues
       };
     } catch (error) {
       console.error("Erro ao buscar post do blog:", error);
@@ -67,10 +63,7 @@ export class BlogController {
     try {
       const { data, error } = await supabase
         .from("blog_posts")
-        .select(`
-          *,
-          profiles(name, full_name, email)
-        `)
+        .select(`*`)
         .eq("slug", slug)
         .single();
 
@@ -81,7 +74,7 @@ export class BlogController {
 
       return {
         ...data,
-        author_name: data.profiles?.full_name || data.profiles?.name || "Autor Desconhecido",
+        author_name: "Autor" // Simplified since relation query was causing issues
       };
     } catch (error) {
       console.error("Erro ao buscar post pelo slug:", error);

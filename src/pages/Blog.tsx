@@ -6,7 +6,8 @@ import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
-import FeaturedBlogCarousel from "@/components/FeaturedBlogCarousel";
+import { supabase } from "@/integrations/supabase/client";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 interface BlogPost {
   id: string;
@@ -34,7 +35,9 @@ const getBlogImage = (index: number) => {
 
 const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFeaturedLoading, setIsFeaturedLoading] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -48,15 +51,38 @@ const Blog = () => {
       }
     };
 
+    const fetchFeaturedPosts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('id, title, slug, excerpt, created_at')
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (error) {
+          throw error;
+        }
+
+        setFeaturedPosts(data || []);
+      } catch (error) {
+        console.error("Erro ao buscar posts em destaque:", error);
+      } finally {
+        setIsFeaturedLoading(false);
+      }
+    };
+
     fetchPosts();
+    fetchFeaturedPosts();
   }, []);
+
+  // Extract featured posts
+  const featuredPost = featuredPosts.length > 0 ? featuredPosts[0] : null;
+  const smallerFeaturedPosts = featuredPosts.slice(1);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
-      {/* Featured Posts Carousel */}
-      <FeaturedBlogCarousel />
       
       <div className="pt-16 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
@@ -66,6 +92,79 @@ const Blog = () => {
           </p>
         </div>
 
+        {/* Featured Posts Section - Now inside the selected div and without gradient */}
+        {!isFeaturedLoading && featuredPosts.length > 0 && (
+          <div className="mb-16">
+            {/* Large featured article */}
+            {featuredPost && (
+              <div className="mb-12">
+                <Link to={`/blog/${featuredPost.slug}`}>
+                  <Card className="overflow-hidden border-0 shadow-lg bg-white transition-all hover:shadow-xl">
+                    <div className="md:flex">
+                      <div className="md:w-1/2 lg:w-3/5">
+                        <div className="aspect-[16/9] h-full">
+                          <img 
+                            src={getBlogImage(0)} 
+                            alt={featuredPost.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                      <div className="md:w-1/2 lg:w-2/5 p-6 md:p-8 flex flex-col justify-center">
+                        <CardTitle className="text-2xl md:text-3xl mb-4">{featuredPost.title}</CardTitle>
+                        <p className="text-sm text-gray-500 mb-4">
+                          {format(new Date(featuredPost.created_at), 'dd/MM/yyyy')}
+                        </p>
+                        <p className="text-gray-700 mb-6 line-clamp-4">{featuredPost.excerpt}</p>
+                        <div className="mt-auto">
+                          <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                            Leia o artigo completo
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </div>
+            )}
+            
+            {/* Carousel of smaller articles */}
+            {smallerFeaturedPosts.length > 0 && (
+              <Carousel className="w-full max-w-5xl mx-auto">
+                <CarouselContent>
+                  {smallerFeaturedPosts.map((post, index) => (
+                    <CarouselItem key={post.id} className="md:basis-1/2 lg:basis-1/3">
+                      <Link to={`/blog/${post.slug}`}>
+                        <Card className="h-full border overflow-hidden hover:shadow-md transition-shadow bg-white">
+                          <div className="aspect-[16/9] w-full overflow-hidden">
+                            <img 
+                              src={getBlogImage(index + 1)} 
+                              alt={post.title}
+                              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+                            />
+                          </div>
+                          <CardContent className="p-5">
+                            <CardTitle className="text-lg mb-2 line-clamp-2">{post.title}</CardTitle>
+                            <p className="text-sm text-gray-500 mb-2">
+                              {format(new Date(post.created_at), 'dd/MM/yyyy')}
+                            </p>
+                            <p className="line-clamp-2 text-gray-600 text-sm">{post.excerpt}</p>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="flex justify-center mt-8">
+                  <CarouselPrevious className="static mr-4 translate-y-0 bg-white hover:bg-white/90" />
+                  <CarouselNext className="static ml-4 translate-y-0 bg-white hover:bg-white/90" />
+                </div>
+              </Carousel>
+            )}
+          </div>
+        )}
+
+        {/* All Blog Posts Section */}
         {isLoading ? (
           <div className="flex justify-center items-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
