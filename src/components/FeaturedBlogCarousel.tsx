@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 interface BlogPost {
   id: string;
@@ -68,7 +67,6 @@ const FeaturedBlogCarousel = () => {
   }
 
   const featuredPost = posts[0];
-  const smallerPosts = posts.slice(1);
 
   return (
     <div className="py-16 relative overflow-hidden" 
@@ -86,7 +84,7 @@ const FeaturedBlogCarousel = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {featuredPost && (
-          <div className="mb-12">
+          <div>
             <Link to={`/blog/${featuredPost.slug}`}>
               <Card className="overflow-hidden border-0 shadow-lg bg-white/90 backdrop-blur-sm transition-all hover:shadow-xl">
                 <div className="md:flex">
@@ -116,37 +114,6 @@ const FeaturedBlogCarousel = () => {
             </Link>
           </div>
         )}
-        
-        <Carousel className="w-full max-w-5xl mx-auto">
-          <CarouselContent>
-            {smallerPosts.map((post, index) => (
-              <CarouselItem key={post.id} className="md:basis-1/2 lg:basis-1/3">
-                <Link to={`/blog/${post.slug}`}>
-                  <Card className="h-full border overflow-hidden hover:shadow-md transition-shadow bg-white/90 backdrop-blur-sm">
-                    <div className="aspect-[16/9] w-full overflow-hidden">
-                      <img 
-                        src={getBlogImage(index + 1)} 
-                        alt={post.title}
-                        className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-                      />
-                    </div>
-                    <CardContent className="p-5">
-                      <CardTitle className="text-lg mb-2 line-clamp-2">{post.title}</CardTitle>
-                      <p className="text-sm text-gray-500 mb-2">
-                        {format(new Date(post.created_at), 'dd/MM/yyyy')}
-                      </p>
-                      <p className="line-clamp-2 text-gray-600 text-sm">{post.excerpt}</p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="flex justify-center mt-8">
-            <CarouselPrevious className="static mr-4 translate-y-0 bg-white/90 hover:bg-white" />
-            <CarouselNext className="static ml-4 translate-y-0 bg-white/90 hover:bg-white" />
-          </div>
-        </Carousel>
       </div>
     </div>
   );
