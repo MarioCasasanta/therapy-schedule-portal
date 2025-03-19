@@ -81,31 +81,4 @@ export class BlogController {
       return null;
     }
   }
-
-  static async createPost(postData: {
-    title: string;
-    slug: string;
-    excerpt: string;
-    content: string;
-    published: boolean;
-    author_id: string;
-  }) {
-    try {
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .insert(postData)
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Erro ao criar post do blog:", error);
-        throw error;
-      }
-
-      return data;
-    } catch (error) {
-      console.error("Erro ao criar post do blog:", error);
-      throw error;
-    }
-  }
 }

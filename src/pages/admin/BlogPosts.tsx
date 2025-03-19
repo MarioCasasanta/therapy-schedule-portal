@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,17 +23,6 @@ interface BlogPost {
   author_name?: string;
 }
 
-const getBlogImage = (index: number) => {
-  const images = [
-    "photo-1488590528505-98d2b5aba04b",
-    "photo-1581091226825-a6a2a5aee158", 
-    "photo-1649972904349-6e44c42644a7",
-    "photo-1497316730643-415fac54a2af",
-    "photo-1507842217343-583bb7270b66"
-  ];
-  return `https://images.unsplash.com/${images[index % images.length]}?auto=format&fit=crop&w=800&h=400&q=80`;
-};
-
 const BlogPosts = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -53,6 +43,7 @@ const BlogPosts = () => {
         throw error;
       }
 
+      // Transform data to match the BlogPost interface with author name
       const postsWithAuthorName = data.map((post: any) => ({
         ...post,
         author_name: post.profiles?.name || 'Autor Desconhecido'
@@ -203,81 +194,50 @@ const BlogPosts = () => {
                 </CardContent>
               </Card>
             ) : (
-              <>
-                <div className="grid gap-4 mb-10">
-                  {blogPosts.map((post) => (
-                    <Card key={post.id} className={post.published ? "" : "opacity-70"}>
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-xl">{post.title}</CardTitle>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/blog/${post.slug}`)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/admin/blog-posts/edit/${post.id}`)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDelete(post.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-gray-500 mb-2">
-                          Por {post.author_name} • {format(new Date(post.created_at), 'dd/MM/yyyy')}
-                        </p>
-                        <p className="line-clamp-2 text-gray-700 mb-3">{post.excerpt}</p>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              post.published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {post.published ? 'Publicado' : 'Rascunho'}
-                            </span>
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handlePublishToggle(post.id, post.published)}
-                          >
-                            {post.published ? 'Despublicar' : 'Publicar'}
+              <div className="grid gap-4">
+                {blogPosts.map((post) => (
+                  <Card key={post.id} className={post.published ? "" : "opacity-70"}>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-xl">{post.title}</CardTitle>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm" onClick={() => navigate(`/blog/${post.slug}`)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => navigate(`/admin/blog-posts/edit/${post.id}`)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDelete(post.id)}>
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-                
-                <div className="mt-10 border-t pt-10">
-                  <h2 className="text-xl font-semibold mb-6">Visualização em Grid</h2>
-                  
-                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {blogPosts.filter(post => post.published).map((post, index) => (
-                      <Link to={`/blog/${post.slug}`} key={post.id} className="h-full">
-                        <Card className="h-full transition-shadow hover:shadow-md overflow-hidden">
-                          <div className="aspect-[16/9] w-full overflow-hidden">
-                            <img 
-                              src={getBlogImage(index)} 
-                              alt={post.title}
-                              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-                            />
-                          </div>
-                          <CardHeader className="pb-2">
-                            <CardTitle className="line-clamp-2 text-xl">{post.title}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-gray-500 mb-2">
-                              {format(new Date(post.created_at), 'dd/MM/yyyy')}
-                            </p>
-                            <p className="line-clamp-4 text-gray-700">{post.excerpt}</p>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-500 mb-2">
+                        Por {post.author_name} • {format(new Date(post.created_at), 'dd/MM/yyyy')}
+                      </p>
+                      <p className="line-clamp-2 text-gray-700 mb-3">{post.excerpt}</p>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            post.published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {post.published ? 'Publicado' : 'Rascunho'}
+                          </span>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handlePublishToggle(post.id, post.published)}
+                        >
+                          {post.published ? 'Despublicar' : 'Publicar'}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             )}
           </div>
         </SidebarInset>
