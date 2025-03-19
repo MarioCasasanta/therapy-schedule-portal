@@ -1,6 +1,6 @@
 
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -22,6 +22,18 @@ interface BlogPost {
   updated_at: string;
   author_name?: string;
 }
+
+// Helper function to get image based on post index
+const getBlogImage = (index: number) => {
+  const images = [
+    "photo-1488590528505-98d2b5aba04b",
+    "photo-1581091226825-a6a2a5aee158", 
+    "photo-1649972904349-6e44c42644a7",
+    "photo-1497316730643-415fac54a2af",
+    "photo-1507842217343-583bb7270b66"
+  ];
+  return `https://images.unsplash.com/${images[index % images.length]}?auto=format&fit=crop&w=800&h=400&q=80`;
+};
 
 const BlogPosts = () => {
   const navigate = useNavigate();
@@ -184,6 +196,48 @@ const BlogPosts = () => {
               </Button>
             </div>
 
+            {/* Blog Posts Grid */}
+            <div className="mb-8">
+              <h2 className="text-xl font-medium mb-4">Visualização em Grid</h2>
+              
+              {blogPosts.length === 0 ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center p-6">
+                    <p className="text-lg text-gray-500 mb-4">Nenhum artigo encontrado</p>
+                    <Button onClick={() => navigate("/admin/blog-posts/new")}>
+                      <Plus className="h-4 w-4 mr-2" /> Criar Primeiro Artigo
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                  {blogPosts.map((post, index) => (
+                    <Link to={`/blog/${post.slug}`} key={post.id} className="h-full">
+                      <Card className="h-full transition-shadow hover:shadow-md overflow-hidden">
+                        <div className="aspect-[16/9] w-full overflow-hidden">
+                          <img 
+                            src={getBlogImage(index)} 
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+                          />
+                        </div>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="line-clamp-2 text-xl">{post.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-gray-500 mb-2">
+                            {format(new Date(post.created_at), 'dd/MM/yyyy')}
+                          </p>
+                          <p className="line-clamp-4 text-gray-700">{post.excerpt}</p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Original List of Blog Posts */}
             {blogPosts.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center p-6">
