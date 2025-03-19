@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
@@ -29,16 +28,7 @@ import SpecialistClients from "@/pages/dashboard/SpecialistClients";
 import ClientDetail from "@/pages/dashboard/ClientDetail";
 import DashboardSpecialists from "@/pages/dashboard/Specialists";
 import HR from "@/pages/HR";
-
-// Admin Dashboard Routes
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import BlogPosts from "@/pages/admin/BlogPosts";
-import BlogPostEditor from "@/pages/admin/BlogPostEditor";
-import AdminBlogOverview from "@/pages/admin/AdminBlogOverview";
-
-// Blog Public Routes
-import Blog from "@/pages/Blog";
-import BlogPost from "@/pages/BlogPost";
+import CreateAnxietyTDAHPost from "@/pages/CreateAnxietyTDAHPost";
 
 function App() {
   return (
@@ -78,6 +68,7 @@ function App() {
         <Route path="/admin/blog-overview" element={<AdminBlogOverview />} />
         <Route path="/admin/blog-posts/new" element={<BlogPostEditor />} />
         <Route path="/admin/blog-posts/edit/:id" element={<BlogPostEditor />} />
+        <Route path="/admin/blog-posts/create-anxiety-tdah-post" element={<CreateAnxietyTDAHPost />} />
         
         {/* Specialist Routes */}
         <Route path="/specialist-clients" element={<SpecialistClients />} />
