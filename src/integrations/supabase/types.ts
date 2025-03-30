@@ -119,6 +119,42 @@ export type Database = {
         }
         Relationships: []
       }
+      captura: {
+        Row: {
+          autoriza_notificacoes: boolean | null
+          created_at: string
+          email: string
+          id: string
+          nivel_resultado: string | null
+          nome: string
+          percentual_resultado: number | null
+          pontuacao_teste: number | null
+          telefone: string
+        }
+        Insert: {
+          autoriza_notificacoes?: boolean | null
+          created_at?: string
+          email: string
+          id?: string
+          nivel_resultado?: string | null
+          nome: string
+          percentual_resultado?: number | null
+          pontuacao_teste?: number | null
+          telefone: string
+        }
+        Update: {
+          autoriza_notificacoes?: boolean | null
+          created_at?: string
+          email?: string
+          id?: string
+          nivel_resultado?: string | null
+          nome?: string
+          percentual_resultado?: number | null
+          pontuacao_teste?: number | null
+          telefone?: string
+        }
+        Relationships: []
+      }
       checklist_items: {
         Row: {
           completed: boolean | null
@@ -184,6 +220,30 @@ export type Database = {
           id?: string
           secao?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      contact_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
         }
         Relationships: []
       }
@@ -1022,6 +1082,77 @@ export type Database = {
           settings_key?: string
           settings_value?: Json
           updated_at?: string
+        }
+        Relationships: []
+      }
+      teste_autismo: {
+        Row: {
+          data_teste: string
+          id: string
+          nivel_resultado: string
+          percentual: number
+          pontuacao: number
+          respostas: Json
+          user_id: string | null
+        }
+        Insert: {
+          data_teste?: string
+          id?: string
+          nivel_resultado: string
+          percentual: number
+          pontuacao: number
+          respostas: Json
+          user_id?: string | null
+        }
+        Update: {
+          data_teste?: string
+          id?: string
+          nivel_resultado?: string
+          percentual?: number
+          pontuacao?: number
+          respostas?: Json
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teste_autismo_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teste_tdah: {
+        Row: {
+          data_teste: string
+          id: string
+          nivel_resultado: string
+          percentual: number
+          pontuacao: number
+          respostas: Json
+          tipo_teste: string
+          user_id: string | null
+        }
+        Insert: {
+          data_teste?: string
+          id?: string
+          nivel_resultado: string
+          percentual: number
+          pontuacao: number
+          respostas: Json
+          tipo_teste: string
+          user_id?: string | null
+        }
+        Update: {
+          data_teste?: string
+          id?: string
+          nivel_resultado?: string
+          percentual?: number
+          pontuacao?: number
+          respostas?: Json
+          tipo_teste?: string
+          user_id?: string | null
         }
         Relationships: []
       }
