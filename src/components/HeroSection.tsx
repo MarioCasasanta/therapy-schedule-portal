@@ -1,3 +1,4 @@
+
 import { Brain, Heart, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,11 @@ const HeroSection = () => {
     }
     navigate("/client-dashboard");
   };
+  
+  const handleEspecialistaClick = () => {
+    navigate("/cadastro-especialista");
+  };
+  
   return <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
       <div className="absolute inset-0">
         <img src="/photo-1649972904349-6e44c42644a7" alt="Background" className="w-full h-full object-cover opacity-10" />
@@ -54,6 +60,9 @@ const HeroSection = () => {
           <div className="animate-fadeIn [animation-delay:800ms] flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <button onClick={handleAgendarClick} className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1 shadow-md">
               Quero agendar minha sessão
+            </button>
+            <button onClick={handleEspecialistaClick} className="bg-white border-2 border-sage-500 text-sage-600 px-8 py-3 rounded-md hover:bg-sage-50 transition-all transform hover:-translate-y-1 shadow-md">
+              Sou especialista e quero me cadastrar
             </button>
           </div>
           <div className="animate-fadeIn [animation-delay:1000ms] grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">

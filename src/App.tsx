@@ -29,6 +29,7 @@ import SpecialistClients from "@/pages/dashboard/SpecialistClients";
 import ClientDetail from "@/pages/dashboard/ClientDetail";
 import DashboardSpecialists from "@/pages/dashboard/Specialists";
 import HR from "@/pages/HR";
+import RegistroEspecialista from "@/pages/RegistroEspecialista";
 
 // Admin Dashboard Routes
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -52,6 +53,7 @@ function App() {
         <Route path="/especialistas/:id" element={<EspecialistaDetalhe />} />
         <Route path="/para-especialistas" element={<ParaEspecialistas />} />
         <Route path="/trabalhe-conosco" element={<HR />} />
+        <Route path="/cadastro-especialista" element={<RegistroEspecialista />} />
         
         {/* Blog Routes */}
         <Route path="/blog" element={<Blog />} />
