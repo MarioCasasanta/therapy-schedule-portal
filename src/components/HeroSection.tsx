@@ -1,12 +1,13 @@
+
 import { Brain, Heart, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
 const HeroSection = () => {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleAgendarClick = async () => {
     const {
       data: {
@@ -24,6 +25,7 @@ const HeroSection = () => {
     }
     navigate("/client-dashboard");
   };
+
   return <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
       <div className="absolute inset-0">
         <img src="/photo-1649972904349-6e44c42644a7" alt="Background" className="w-full h-full object-cover opacity-10" />
@@ -31,12 +33,21 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 pt-20 relative z-10">
         <div className="text-center max-w-4xl mx-auto">
           <div className="animate-fadeIn [animation-delay:200ms]">
-            <span className="inline-block px-4 py-1 mb-6 text-sm font-medium text-sage-600 bg-sage-100 rounded-full">
+            <span className="inline-block px-4 py-1 mb-6 text-sm font-medium text-sage-600 bg-sage-100 rounded-full shadow-sm">
               Terapia Rápida e Eficaz
             </span>
           </div>
-          <h1 className="animate-fadeIn [animation-delay:400ms] text-4xl md:text-6xl font-playfair font-semibold text-accent mb-6">Além do Apego: Um novo jeito de encarar a saúde mental e o desenvolvimento humano
-        </h1>
+          <div className="relative mb-10">
+            <h1 className="animate-fadeIn [animation-delay:400ms] text-4xl md:text-6xl font-playfair font-bold 
+            bg-gradient-to-r from-sage-700 via-sage-600 to-sage-500 bg-clip-text text-transparent 
+            leading-tight tracking-tight drop-shadow-sm mb-2">
+              Além do Apego
+              <span className="block mt-2 text-2xl md:text-4xl font-medium text-sage-600">
+                Um novo jeito de encarar a saúde mental e o desenvolvimento humano
+              </span>
+            </h1>
+            <div className="absolute -z-10 w-full h-full blur-3xl opacity-10 bg-sage-300 rounded-full"></div>
+          </div>
           <p className="animate-fadeIn [animation-delay:600ms] text-lg md:text-xl text-gray-600 mb-4">
             Um novo jeito de encarar a saúde mental e o desenvolvimento humano
           </p>
@@ -45,7 +56,7 @@ const HeroSection = () => {
             transformações logo na primeira sessão e acompanhamento 100% personalizado.
           </p>
           <div className="animate-fadeIn [animation-delay:800ms] flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button onClick={handleAgendarClick} className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1">
+            <button onClick={handleAgendarClick} className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1 shadow-md">
               Quero agendar minha sessão
             </button>
           </div>
@@ -70,4 +81,5 @@ const HeroSection = () => {
       </div>
     </div>;
 };
+
 export default HeroSection;

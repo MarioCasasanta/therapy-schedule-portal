@@ -41,6 +41,57 @@ export type Database = {
           },
         ]
       }
+      analise_influencia: {
+        Row: {
+          created_at: string
+          evento_gatilho: string | null
+          frequencia: string | null
+          id: string
+          impacto_vida: string | null
+          inicio_interferencia: string | null
+          intensidade: number | null
+          obstaculos: string | null
+          oportunidades_perdidas: string | null
+          pessoa_influenciada: string | null
+          tentativas_mudanca: string | null
+          tipo_relacao: string | null
+          user_id: string
+          visao_futura: string | null
+        }
+        Insert: {
+          created_at?: string
+          evento_gatilho?: string | null
+          frequencia?: string | null
+          id?: string
+          impacto_vida?: string | null
+          inicio_interferencia?: string | null
+          intensidade?: number | null
+          obstaculos?: string | null
+          oportunidades_perdidas?: string | null
+          pessoa_influenciada?: string | null
+          tentativas_mudanca?: string | null
+          tipo_relacao?: string | null
+          user_id: string
+          visao_futura?: string | null
+        }
+        Update: {
+          created_at?: string
+          evento_gatilho?: string | null
+          frequencia?: string | null
+          id?: string
+          impacto_vida?: string | null
+          inicio_interferencia?: string | null
+          intensidade?: number | null
+          obstaculos?: string | null
+          oportunidades_perdidas?: string | null
+          pessoa_influenciada?: string | null
+          tentativas_mudanca?: string | null
+          tipo_relacao?: string | null
+          user_id?: string
+          visao_futura?: string | null
+        }
+        Relationships: []
+      }
       availability: {
         Row: {
           created_at: string
@@ -350,6 +401,63 @@ export type Database = {
           },
         ]
       }
+      escudo_emocional: {
+        Row: {
+          analise_contrato: string | null
+          causa_insistencia: string | null
+          contrato_estabelecido: boolean | null
+          created_at: string
+          custo_interferencia: string | null
+          data_planejada: string | null
+          data_reflexao: string
+          envolvido: string | null
+          expectativa: string | null
+          id: string
+          mapa_navegacao: string | null
+          motivo_nao_realizado: string | null
+          padrao_identificado: string | null
+          plano_diferente: string | null
+          quem_descumpre: string | null
+          user_id: string
+        }
+        Insert: {
+          analise_contrato?: string | null
+          causa_insistencia?: string | null
+          contrato_estabelecido?: boolean | null
+          created_at?: string
+          custo_interferencia?: string | null
+          data_planejada?: string | null
+          data_reflexao?: string
+          envolvido?: string | null
+          expectativa?: string | null
+          id?: string
+          mapa_navegacao?: string | null
+          motivo_nao_realizado?: string | null
+          padrao_identificado?: string | null
+          plano_diferente?: string | null
+          quem_descumpre?: string | null
+          user_id: string
+        }
+        Update: {
+          analise_contrato?: string | null
+          causa_insistencia?: string | null
+          contrato_estabelecido?: boolean | null
+          created_at?: string
+          custo_interferencia?: string | null
+          data_planejada?: string | null
+          data_reflexao?: string
+          envolvido?: string | null
+          expectativa?: string | null
+          id?: string
+          mapa_navegacao?: string | null
+          motivo_nao_realizado?: string | null
+          padrao_identificado?: string | null
+          plano_diferente?: string | null
+          quem_descumpre?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_registrations: {
         Row: {
           created_at: string
@@ -552,6 +660,195 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      jornada_transformacao: {
+        Row: {
+          acordo: string | null
+          alvo: string | null
+          como_ajuda: string | null
+          created_at: string
+          danos_outros: string | null
+          danos_proprios: string | null
+          data_reflexao: string
+          expectativas: string | null
+          gravidade: number | null
+          id: string
+          intencao: string | null
+          limite: string | null
+          nova_expectativa: string | null
+          nova_intencao: string | null
+          padrao_controlador: string[] | null
+          quem_ajuda: string | null
+          quem_apoia: string | null
+          reparacao: string | null
+          retratacao: string | null
+          tem_ajuda: boolean | null
+          tem_apoio: boolean | null
+          user_id: string
+        }
+        Insert: {
+          acordo?: string | null
+          alvo?: string | null
+          como_ajuda?: string | null
+          created_at?: string
+          danos_outros?: string | null
+          danos_proprios?: string | null
+          data_reflexao?: string
+          expectativas?: string | null
+          gravidade?: number | null
+          id?: string
+          intencao?: string | null
+          limite?: string | null
+          nova_expectativa?: string | null
+          nova_intencao?: string | null
+          padrao_controlador?: string[] | null
+          quem_ajuda?: string | null
+          quem_apoia?: string | null
+          reparacao?: string | null
+          retratacao?: string | null
+          tem_ajuda?: boolean | null
+          tem_apoio?: boolean | null
+          user_id: string
+        }
+        Update: {
+          acordo?: string | null
+          alvo?: string | null
+          como_ajuda?: string | null
+          created_at?: string
+          danos_outros?: string | null
+          danos_proprios?: string | null
+          data_reflexao?: string
+          expectativas?: string | null
+          gravidade?: number | null
+          id?: string
+          intencao?: string | null
+          limite?: string | null
+          nova_expectativa?: string | null
+          nova_intencao?: string | null
+          padrao_controlador?: string[] | null
+          quem_ajuda?: string | null
+          quem_apoia?: string | null
+          reparacao?: string | null
+          retratacao?: string | null
+          tem_ajuda?: boolean | null
+          tem_apoio?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      liberacao_culpa: {
+        Row: {
+          acontecimento: string | null
+          analise_fatos: string | null
+          created_at: string
+          data_reflexao: string
+          id: string
+          impacto_outros: string | null
+          impacto_proprio: string | null
+          momento_culpa: string | null
+          motivo_razao: string | null
+          origem_informacao: string | null
+          pessoa_envolvida: string | null
+          responsabilidade_outro: string | null
+          responsabilidade_proprio: string | null
+          resumo_inicial: string | null
+          sentimento_culpa: string | null
+          sentimento_passado: string | null
+          sentimento_presente: string | null
+          tipo_utilidade: string | null
+          user_id: string
+          utilidade_natureza: string | null
+        }
+        Insert: {
+          acontecimento?: string | null
+          analise_fatos?: string | null
+          created_at?: string
+          data_reflexao?: string
+          id?: string
+          impacto_outros?: string | null
+          impacto_proprio?: string | null
+          momento_culpa?: string | null
+          motivo_razao?: string | null
+          origem_informacao?: string | null
+          pessoa_envolvida?: string | null
+          responsabilidade_outro?: string | null
+          responsabilidade_proprio?: string | null
+          resumo_inicial?: string | null
+          sentimento_culpa?: string | null
+          sentimento_passado?: string | null
+          sentimento_presente?: string | null
+          tipo_utilidade?: string | null
+          user_id: string
+          utilidade_natureza?: string | null
+        }
+        Update: {
+          acontecimento?: string | null
+          analise_fatos?: string | null
+          created_at?: string
+          data_reflexao?: string
+          id?: string
+          impacto_outros?: string | null
+          impacto_proprio?: string | null
+          momento_culpa?: string | null
+          motivo_razao?: string | null
+          origem_informacao?: string | null
+          pessoa_envolvida?: string | null
+          responsabilidade_outro?: string | null
+          responsabilidade_proprio?: string | null
+          resumo_inicial?: string | null
+          sentimento_culpa?: string | null
+          sentimento_passado?: string | null
+          sentimento_presente?: string | null
+          tipo_utilidade?: string | null
+          user_id?: string
+          utilidade_natureza?: string | null
+        }
+        Relationships: []
+      }
+      mapa_transformacao: {
+        Row: {
+          acoes_abandonar: string | null
+          acoes_evitadas: string | null
+          acoes_iniciar: string | null
+          acoes_sem_sentido: string | null
+          compromisso_repeticao: boolean | null
+          created_at: string
+          data_reflexao: string
+          id: string
+          lembretes_escolhidos: string[] | null
+          nome: string | null
+          usa_pausa_reflexiva: boolean | null
+          user_id: string
+        }
+        Insert: {
+          acoes_abandonar?: string | null
+          acoes_evitadas?: string | null
+          acoes_iniciar?: string | null
+          acoes_sem_sentido?: string | null
+          compromisso_repeticao?: boolean | null
+          created_at?: string
+          data_reflexao?: string
+          id?: string
+          lembretes_escolhidos?: string[] | null
+          nome?: string | null
+          usa_pausa_reflexiva?: boolean | null
+          user_id: string
+        }
+        Update: {
+          acoes_abandonar?: string | null
+          acoes_evitadas?: string | null
+          acoes_iniciar?: string | null
+          acoes_sem_sentido?: string | null
+          compromisso_repeticao?: boolean | null
+          created_at?: string
+          data_reflexao?: string
+          id?: string
+          lembretes_escolhidos?: string[] | null
+          nome?: string | null
+          usa_pausa_reflexiva?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -1153,6 +1450,45 @@ export type Database = {
           respostas?: Json
           tipo_teste?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      trilha_desenvolvimento: {
+        Row: {
+          acoes_diferentes: string | null
+          acoes_imediatas: string | null
+          acoes_repetir: string | null
+          created_at: string
+          fatores_aproximacao: string | null
+          fatores_distanciamento: string | null
+          id: string
+          licoes_aprendidas: string | null
+          sonho_grande: string | null
+          user_id: string
+        }
+        Insert: {
+          acoes_diferentes?: string | null
+          acoes_imediatas?: string | null
+          acoes_repetir?: string | null
+          created_at?: string
+          fatores_aproximacao?: string | null
+          fatores_distanciamento?: string | null
+          id?: string
+          licoes_aprendidas?: string | null
+          sonho_grande?: string | null
+          user_id: string
+        }
+        Update: {
+          acoes_diferentes?: string | null
+          acoes_imediatas?: string | null
+          acoes_repetir?: string | null
+          created_at?: string
+          fatores_aproximacao?: string | null
+          fatores_distanciamento?: string | null
+          id?: string
+          licoes_aprendidas?: string | null
+          sonho_grande?: string | null
+          user_id?: string
         }
         Relationships: []
       }
