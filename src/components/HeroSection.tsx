@@ -1,13 +1,12 @@
-
 import { Brain, Heart, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleAgendarClick = async () => {
     const {
       data: {
@@ -25,7 +24,6 @@ const HeroSection = () => {
     }
     navigate("/client-dashboard");
   };
-
   return <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
       <div className="absolute inset-0">
         <img src="/photo-1649972904349-6e44c42644a7" alt="Background" className="w-full h-full object-cover opacity-10" />
@@ -48,9 +46,7 @@ const HeroSection = () => {
             </h1>
             <div className="absolute -z-10 w-full h-full blur-3xl opacity-10 bg-sage-300 rounded-full"></div>
           </div>
-          <p className="animate-fadeIn [animation-delay:600ms] text-lg md:text-xl text-gray-600 mb-4">
-            Um novo jeito de encarar a saúde mental e o desenvolvimento humano
-          </p>
+          
           <p className="animate-fadeIn [animation-delay:600ms] text-lg md:text-xl text-gray-600 mb-8">
             Chegou a hora de dar um basta! Descubra o método de terapia que oferece resultados rápidos, 
             transformações logo na primeira sessão e acompanhamento 100% personalizado.
@@ -81,5 +77,4 @@ const HeroSection = () => {
       </div>
     </div>;
 };
-
 export default HeroSection;
