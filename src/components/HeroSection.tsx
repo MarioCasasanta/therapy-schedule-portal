@@ -1,16 +1,18 @@
-
 import { Brain, Heart, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleAgendarClick = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
+    const {
+      data: {
+        session
+      }
+    } = await supabase.auth.getSession();
     if (!session) {
       toast({
         title: "Login necessário",
@@ -20,18 +22,11 @@ const HeroSection = () => {
       navigate("/auth");
       return;
     }
-    
     navigate("/client-dashboard");
   };
-
-  return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
+  return <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
       <div className="absolute inset-0">
-        <img
-          src="/photo-1649972904349-6e44c42644a7"
-          alt="Background"
-          className="w-full h-full object-cover opacity-10"
-        />
+        <img src="/photo-1649972904349-6e44c42644a7" alt="Background" className="w-full h-full object-cover opacity-10" />
       </div>
       <div className="container mx-auto px-4 pt-20 relative z-10">
         <div className="text-center max-w-4xl mx-auto">
@@ -40,9 +35,8 @@ const HeroSection = () => {
               Terapia Rápida e Eficaz
             </span>
           </div>
-          <h1 className="animate-fadeIn [animation-delay:400ms] text-4xl md:text-6xl font-playfair font-semibold text-accent mb-6">
-            Além do Apego: Transforme sua vida através da terapia!
-          </h1>
+          <h1 className="animate-fadeIn [animation-delay:400ms] text-4xl md:text-6xl font-playfair font-semibold text-accent mb-6">Além do Apego: Um novo jeito de encarar a saúde mental e o desenvolvimento humano
+        </h1>
           <p className="animate-fadeIn [animation-delay:600ms] text-lg md:text-xl text-gray-600 mb-4">
             Um novo jeito de encarar a saúde mental e o desenvolvimento humano
           </p>
@@ -51,10 +45,7 @@ const HeroSection = () => {
             transformações logo na primeira sessão e acompanhamento 100% personalizado.
           </p>
           <div className="animate-fadeIn [animation-delay:800ms] flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button 
-              onClick={handleAgendarClick}
-              className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1"
-            >
+            <button onClick={handleAgendarClick} className="bg-sage-500 text-white px-8 py-3 rounded-md hover:bg-sage-600 transition-all transform hover:-translate-y-1">
               Quero agendar minha sessão
             </button>
           </div>
@@ -77,8 +68,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default HeroSection;
