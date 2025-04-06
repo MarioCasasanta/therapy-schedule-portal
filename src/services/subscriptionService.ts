@@ -105,7 +105,7 @@ export const subscribeToPlan = async (
 ): Promise<{ success: boolean, error?: any }> => {
   const table = userType === 'therapist' ? 'therapist_subscriptions' : 'client_subscriptions';
   
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from(table)
     .insert({
       user_id: userId,
@@ -121,5 +121,5 @@ export const subscribeToPlan = async (
     return { success: false, error };
   }
   
-  return { success: true, data };
+  return { success: true };
 };

@@ -1967,6 +1967,50 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_teste_ansiedade: {
+        Args: {
+          user_id_param: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          data_teste: string
+          pontuacao: number
+          percentual: number
+          respostas: Json
+          tipo_teste: string
+          nivel_resultado: string
+        }[]
+      }
+      get_teste_burnout: {
+        Args: {
+          user_id_param: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          data_teste: string
+          pontuacao: number
+          percentual: number
+          respostas: Json
+          nivel_resultado: string
+        }[]
+      }
+      get_teste_estresse: {
+        Args: {
+          user_id_param: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          data_teste: string
+          pontuacao: number
+          percentual: number
+          respostas: Json
+          tipo_teste: string
+          nivel_resultado: string
+        }[]
+      }
       is_admin: {
         Args: {
           user_id: string
