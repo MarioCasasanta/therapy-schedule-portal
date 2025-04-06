@@ -134,6 +134,36 @@ export type Database = {
         }
         Relationships: []
       }
+      benefits: {
+        Row: {
+          audience: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          audience: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string
@@ -250,6 +280,113 @@ export type Database = {
           },
         ]
       }
+      client_plan_benefits: {
+        Row: {
+          benefit_id: string
+          created_at: string
+          id: string
+          plan_id: string
+        }
+        Insert: {
+          benefit_id: string
+          created_at?: string
+          id?: string
+          plan_id: string
+        }
+        Update: {
+          benefit_id?: string
+          created_at?: string
+          id?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_plan_benefits_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_plan_benefits_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          plan_type?: Database["public"]["Enums"]["plan_type"]
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      client_subscriptions: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          plan_id: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracoes_site: {
         Row: {
           conteudo: string
@@ -295,6 +432,72 @@ export type Database = {
           id?: string
           message?: string
           name?: string
+        }
+        Relationships: []
+      }
+      couple_plans: {
+        Row: {
+          children_plans: string | null
+          communication_goals: string | null
+          created_at: string
+          creator_id: string
+          financial_goals: string | null
+          id: string
+          living_location: string | null
+          mutual_support: string | null
+          partner_accepted: boolean | null
+          partner_email: string | null
+          partner_id: string | null
+          religious_practices: string | null
+          shared_hobbies: string | null
+          shared_with_partner: boolean | null
+          timeframe: Database["public"]["Enums"]["timeframe"]
+          title: string
+          travel_plans: string | null
+          updated_at: string
+          work_arrangements: string | null
+        }
+        Insert: {
+          children_plans?: string | null
+          communication_goals?: string | null
+          created_at?: string
+          creator_id: string
+          financial_goals?: string | null
+          id?: string
+          living_location?: string | null
+          mutual_support?: string | null
+          partner_accepted?: boolean | null
+          partner_email?: string | null
+          partner_id?: string | null
+          religious_practices?: string | null
+          shared_hobbies?: string | null
+          shared_with_partner?: boolean | null
+          timeframe: Database["public"]["Enums"]["timeframe"]
+          title: string
+          travel_plans?: string | null
+          updated_at?: string
+          work_arrangements?: string | null
+        }
+        Update: {
+          children_plans?: string | null
+          communication_goals?: string | null
+          created_at?: string
+          creator_id?: string
+          financial_goals?: string | null
+          id?: string
+          living_location?: string | null
+          mutual_support?: string | null
+          partner_accepted?: boolean | null
+          partner_email?: string | null
+          partner_id?: string | null
+          religious_practices?: string | null
+          shared_hobbies?: string | null
+          shared_with_partner?: boolean | null
+          timeframe?: Database["public"]["Enums"]["timeframe"]
+          title?: string
+          travel_plans?: string | null
+          updated_at?: string
+          work_arrangements?: string | null
         }
         Relationships: []
       }
@@ -1041,6 +1244,41 @@ export type Database = {
         }
         Relationships: []
       }
+      protocolo_respostas: {
+        Row: {
+          created_at: string
+          id: string
+          protocolo_tipo: string
+          respostas: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          protocolo_tipo: string
+          respostas: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          protocolo_tipo?: string
+          respostas?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protocolo_respostas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questionnaire_responses: {
         Row: {
           answers: Json
@@ -1072,6 +1310,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "questionnaire_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relacionamento_casal: {
+        Row: {
+          areas_melhorar: string[] | null
+          created_at: string
+          data_teste: string
+          id: string
+          nivel_rapport: number | null
+          partner_email: string | null
+          partner_name: string | null
+          pontos_fortes: string[] | null
+          respostas: Json
+          user_id: string | null
+        }
+        Insert: {
+          areas_melhorar?: string[] | null
+          created_at?: string
+          data_teste?: string
+          id?: string
+          nivel_rapport?: number | null
+          partner_email?: string | null
+          partner_name?: string | null
+          pontos_fortes?: string[] | null
+          respostas: Json
+          user_id?: string | null
+        }
+        Update: {
+          areas_melhorar?: string[] | null
+          created_at?: string
+          data_teste?: string
+          id?: string
+          nivel_rapport?: number | null
+          partner_email?: string | null
+          partner_name?: string | null
+          pontos_fortes?: string[] | null
+          respostas?: Json
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relacionamento_casal_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1453,6 +1738,113 @@ export type Database = {
         }
         Relationships: []
       }
+      therapist_plan_benefits: {
+        Row: {
+          benefit_id: string
+          created_at: string
+          id: string
+          plan_id: string
+        }
+        Insert: {
+          benefit_id: string
+          created_at?: string
+          id?: string
+          plan_id: string
+        }
+        Update: {
+          benefit_id?: string
+          created_at?: string
+          id?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapist_plan_benefits_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_plan_benefits_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "therapist_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      therapist_subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          plan_type?: Database["public"]["Enums"]["plan_type"]
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      therapist_subscriptions: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          plan_id: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapist_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "therapist_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trilha_desenvolvimento: {
         Row: {
           acoes_diferentes: string | null
@@ -1584,6 +1976,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      plan_type: "basic" | "professional" | "premium"
       questionnaire_type:
         | "tdah"
         | "iq"
@@ -1592,6 +1985,8 @@ export type Database = {
         | "burnout"
         | "attachment"
         | "saboteurs"
+        | "relacionamento"
+      timeframe: "short" | "medium" | "long"
     }
     CompositeTypes: {
       [_ in never]: never

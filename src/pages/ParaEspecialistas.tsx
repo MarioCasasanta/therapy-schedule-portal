@@ -1,150 +1,16 @@
-import React from "react";
+
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { 
-  X, Award, Star, Phone, Calendar, 
-  Video, Book, Users, Check, BarChart, 
-  Clock
+  Clock, BarChart, Calendar, Users
 } from "lucide-react";
-import { 
-  Card, CardContent, CardDescription, CardFooter, 
-  CardHeader, CardTitle 
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-const allFeatures = [
-  { 
-    name: "Perfil completo na plataforma", 
-    available: { basic: true, professional: true, premium: true },
-    icon: "profile"
-  },
-  { 
-    name: "Integração com Google Calendar", 
-    available: { basic: true, professional: true, premium: true },
-    icon: "calendar"
-  },
-  { 
-    name: "Pagamentos via plataforma", 
-    available: { basic: true, professional: true, premium: true },
-    icon: "payment"
-  },
-  { 
-    name: "Calendário na página do perfil", 
-    available: { basic: false, professional: true, premium: true },
-    icon: "calendar"
-  },
-  { 
-    name: "Botão de WhatsApp no perfil", 
-    available: { basic: false, professional: true, premium: true },
-    icon: "whatsapp"
-  },
-  { 
-    name: "Prioridade nos resultados de busca", 
-    available: { basic: false, professional: true, premium: true },
-    icon: "search"
-  },
-  { 
-    name: "Lembretes automáticos para clientes", 
-    available: { basic: false, professional: true, premium: true },
-    icon: "reminder"
-  },
-  { 
-    name: "Vídeo de apresentação", 
-    available: { basic: false, professional: true, premium: true },
-    icon: "video"
-  },
-  { 
-    name: "Ferramentas e testes da comunidade", 
-    available: { basic: false, professional: true, premium: true },
-    icon: "community"
-  },
-  { 
-    name: "Agendamentos por mês", 
-    available: { basic: "5", professional: "Ilimitados", premium: "Ilimitados" },
-    icon: "schedule"
-  },
-  { 
-    name: "Perfil destacado na plataforma", 
-    available: { basic: false, professional: false, premium: true },
-    icon: "highlight"
-  },
-  { 
-    name: "Selo 'Além do Apego' após certificação", 
-    available: { basic: false, professional: false, premium: true },
-    icon: "award"
-  },
-  { 
-    name: "Exibição em campanhas de dependência emocional", 
-    available: { basic: false, professional: false, premium: true },
-    icon: "campaign"
-  },
-  { 
-    name: "Ferramentas de análise avançadas", 
-    available: { basic: false, professional: false, premium: true },
-    icon: "analytics"
-  },
-  { 
-    name: "Artigos destacados no blog", 
-    available: { basic: false, professional: false, premium: true },
-    icon: "blog"
-  },
-  { 
-    name: "Acesso à biblioteca de vídeos", 
-    available: { basic: false, professional: false, premium: true },
-    icon: "video-library"
-  },
-  { 
-    name: "Suporte", 
-    available: { basic: "Email", professional: "Prioritário", premium: "24/7" },
-    icon: "support"
-  },
-  { 
-    name: "Relatórios de desempenho", 
-    available: { basic: false, professional: "Mensais", premium: "Semanais" },
-    icon: "reports"
-  }
-];
-
-const getSortedFeatures = (planType: string) => {
-  return [...allFeatures].sort((a, b) => {
-    const aAvailable = a.available[planType as keyof typeof a.available];
-    const bAvailable = b.available[planType as keyof typeof b.available];
-    
-    if (!!aAvailable === !!bAvailable) {
-      return 0;
-    }
-    
-    return !!aAvailable ? -1 : 1;
-  });
-};
-
-const plans = [
-  {
-    name: "Básico",
-    price: "R$ 49,90",
-    description: "Ideal para terapeutas iniciantes",
-    planType: "basic",
-    color: "bg-white",
-    buttonColor: "bg-primary hover:bg-primary/90"
-  },
-  {
-    name: "Profissional",
-    price: "R$ 99,90",
-    description: "Para terapeutas estabelecidos",
-    planType: "professional",
-    color: "bg-primary/5",
-    buttonColor: "bg-primary hover:bg-primary/90",
-    highlighted: true
-  },
-  {
-    name: "Premium",
-    price: "R$ 149,90",
-    description: "Para práticas avançadas",
-    planType: "premium",
-    color: "bg-white",
-    buttonColor: "bg-primary hover:bg-primary/90"
-  }
-];
+import SubscriptionPlanCard from "@/components/subscription/SubscriptionPlanCard";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { getTherapistPlans, SubscriptionPlan } from "@/services/subscriptionService";
 
 const steps = [
   {
@@ -170,6 +36,113 @@ const steps = [
 ];
 
 const ParaEspecialistas = () => {
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const fetchedPlans = await getTherapistPlans();
+        setPlans(fetchedPlans);
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+        toast({
+          title: "Erro ao carregar planos",
+          description: "Não foi possível carregar os planos de assinatura.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPlans();
+  }, [toast]);
+
+  const handleSelectPlan = async (plan: SubscriptionPlan) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Login necessário",
+          description: "Por favor, faça login para assinar um plano.",
+          variant: "default"
+        });
+        navigate("/auth");
+        return;
+      }
+      
+      // Call Supabase Edge Function to create Stripe checkout
+      const response = await fetch(
+        "https://mwsogytsctdjuijgcpbn.supabase.co/functions/v1/create-subscription",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            planId: plan.id,
+            userType: "therapist",
+            price: plan.price,
+            planName: plan.name
+          })
+        }
+      );
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        toast({
+          title: "Erro",
+          description: data.error,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (data.url) {
+        window.location.href = data.url;
+      }
+      
+    } catch (error) {
+      console.error("Error selecting plan:", error);
+      toast({
+        title: "Erro ao processar assinatura",
+        description: "Ocorreu um erro ao processar sua solicitação.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Format the plans and benefits for display
+  const formatPlansForDisplay = () => {
+    return plans.map(plan => {
+      // Find the "professional" plan to highlight
+      const isHighlighted = plan.plan_type === 'professional';
+      
+      // Format benefits for display
+      const formattedBenefits = plan.benefits?.map(benefit => ({
+        id: benefit.id,
+        name: benefit.name,
+        available: true,
+        description: benefit.description
+      })) || [];
+      
+      return {
+        id: plan.id,
+        name: plan.name,
+        description: plan.description || '',
+        price: plan.price,
+        benefits: formattedBenefits,
+        isHighlighted
+      };
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -183,7 +156,10 @@ const ParaEspecialistas = () => {
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
               Junte-se à plataforma Além do Apego e conecte-se com clientes que buscam seu apoio especializado
             </p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg">
+            <Button 
+              onClick={() => navigate('/cadastro-especialista')}
+              size="lg" 
+              className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg">
               Comece agora
             </Button>
           </div>
@@ -226,79 +202,25 @@ const ParaEspecialistas = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
-              <Card key={index} className={`relative ${plan.color} ${plan.highlighted ? 'shadow-lg ring-2 ring-primary/20' : 'shadow'}`}>
-                {plan.highlighted && (
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-white text-sm font-medium py-1 px-4 rounded-full">
-                    Mais popular
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
-                  <div className="mt-2">
-                    <span className="text-3xl font-bold">{plan.price}</span>
-                    <span className="text-gray-500 ml-2">/mês</span>
-                  </div>
-                  <CardDescription className="mt-2">{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {getSortedFeatures(plan.planType).map((feature, i) => {
-                      const available = feature.available[plan.planType as keyof typeof feature.available];
-                      
-                      let icon;
-                      
-                      if (available === false) {
-                        icon = <X className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />;
-                      } else {
-                        if (feature.icon === "award" || feature.name.includes("Selo")) {
-                          icon = <Award className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" />;
-                        } else if (feature.icon === "highlight" || feature.name.includes("destacado")) {
-                          icon = <Star className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />;
-                        } else if (feature.icon === "whatsapp" || feature.name.includes("WhatsApp")) {
-                          icon = <Phone className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />;
-                        } else if (feature.icon === "calendar" || feature.name.includes("Calendar") || feature.name.includes("Calendário")) {
-                          icon = <Calendar className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />;
-                        } else if (feature.icon === "video" || feature.name.includes("Vídeo")) {
-                          icon = <Video className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />;
-                        } else if (feature.icon === "blog" || feature.name.includes("blog") || feature.icon === "video-library" || feature.name.includes("biblioteca")) {
-                          icon = <Book className="h-5 w-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" />;
-                        } else if (feature.icon === "community" || feature.name.includes("comunidade")) {
-                          icon = <Users className="h-5 w-5 text-teal-500 mr-2 flex-shrink-0 mt-0.5" />;
-                        } else {
-                          icon = <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />;
-                        }
-                      }
-                      
-                      let displayText = feature.name;
-                      if (typeof available === 'string') {
-                        if (feature.name === "Agendamentos por mês") {
-                          displayText = `${feature.name}: ${available}`;
-                        } else if (feature.name === "Suporte" || feature.name === "Relatórios de desempenho") {
-                          displayText = `${feature.name}: ${available}`;
-                        }
-                      }
-                      
-                      return (
-                        <li key={i} className="flex items-start">
-                          {icon}
-                          <span className={`${available === false ? 'text-gray-400' : 'text-gray-700'}`}>
-                            {displayText}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button className={`w-full ${plan.buttonColor}`}>
-                    Selecionar plano
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center my-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {formatPlansForDisplay().map((plan, index) => (
+                <SubscriptionPlanCard
+                  key={plan.id}
+                  name={plan.name}
+                  description={plan.description}
+                  price={plan.price}
+                  benefits={plan.benefits}
+                  isHighlighted={plan.isHighlighted}
+                  onSelectPlan={() => handleSelectPlan(plans[index])}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
       
@@ -369,10 +291,20 @@ const ParaEspecialistas = () => {
             Junte-se a centenas de terapeutas que estão expandindo seus horizontes com a Além do Apego
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button 
+              onClick={() => navigate('/cadastro-especialista')}
+              size="lg" 
+              className="bg-primary hover:bg-primary/90">
               Criar minha conta
             </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
+            <Button 
+              onClick={() => {
+                const plansSection = document.querySelector('section:nth-of-type(2)');
+                plansSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              size="lg" 
+              variant="outline" 
+              className="border-primary text-primary hover:bg-primary/10">
               Saiba mais
             </Button>
           </div>

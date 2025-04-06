@@ -3,17 +3,13 @@ import { Brain, Heart, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
 const HeroSection = () => {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  
   const handleAgendarClick = async () => {
-    const {
-      data: {
-        session
-      }
-    } = await supabase.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       toast({
         title: "Login necessário",
@@ -30,7 +26,12 @@ const HeroSection = () => {
     navigate("/cadastro-especialista");
   };
   
-  return <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
+  const handlePlanosClick = () => {
+    navigate("/planos");
+  };
+  
+  return (
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-sage-50 to-white">
       <div className="absolute inset-0">
         <img src="/photo-1649972904349-6e44c42644a7" alt="Background" className="w-full h-full object-cover opacity-10" />
       </div>
@@ -64,6 +65,9 @@ const HeroSection = () => {
             <button onClick={handleEspecialistaClick} className="bg-white border-2 border-sage-500 text-sage-600 px-8 py-3 rounded-md hover:bg-sage-50 transition-all transform hover:-translate-y-1 shadow-md">
               Sou especialista e quero me cadastrar
             </button>
+            <button onClick={handlePlanosClick} className="bg-sage-100 border-2 border-sage-300 text-sage-700 px-8 py-3 rounded-md hover:bg-sage-200 transition-all transform hover:-translate-y-1 shadow-md">
+              Ver planos de assinatura
+            </button>
           </div>
           <div className="animate-fadeIn [animation-delay:1000ms] grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
             <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -84,6 +88,8 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default HeroSection;

@@ -21,6 +21,7 @@ import SessionFeedback from "@/pages/client/sessions/SessionFeedback";
 import Especialistas from "@/pages/Especialistas";
 import EspecialistaDetalhe from "@/pages/EspecialistaDetalhe";
 import ParaEspecialistas from "@/pages/ParaEspecialistas";
+import PlansPage from "@/pages/PlansPage";
 import ChatGPTIntegration from "@/pages/Documentation/ChatGPTIntegration";
 import NotFound from "@/pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
@@ -30,6 +31,8 @@ import ClientDetail from "@/pages/dashboard/ClientDetail";
 import DashboardSpecialists from "@/pages/dashboard/Specialists";
 import HR from "@/pages/HR";
 import RegistroEspecialista from "@/pages/RegistroEspecialista";
+import SubscriptionSuccess from "@/pages/subscription/SubscriptionSuccess";
+import SubscriptionCancel from "@/pages/subscription/SubscriptionCancel";
 
 // Admin Dashboard Routes
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -52,8 +55,13 @@ function App() {
         <Route path="/especialistas" element={<Especialistas />} />
         <Route path="/especialistas/:id" element={<EspecialistaDetalhe />} />
         <Route path="/para-especialistas" element={<ParaEspecialistas />} />
+        <Route path="/planos" element={<PlansPage />} />
         <Route path="/trabalhe-conosco" element={<HR />} />
         <Route path="/cadastro-especialista" element={<RegistroEspecialista />} />
+        
+        {/* Subscription Routes */}
+        <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+        <Route path="/subscription/cancel" element={<SubscriptionCancel />} />
         
         {/* Blog Routes */}
         <Route path="/blog" element={<Blog />} />
