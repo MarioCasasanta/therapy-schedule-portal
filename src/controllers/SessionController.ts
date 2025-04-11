@@ -1,48 +1,16 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-// Define the Session interface to match the database schema
-export interface Session {
+// Define a Session type to prevent errors
+interface Session {
   id: string;
-  client_id?: string;
-  data_hora: string;
-  created_at: string;
-  updated_at: string;
-  invitation_sent_at?: string;
-  valor?: number;
-  data_pagamento?: string;
-  reminder_sent_at?: string;
-  tipo_sessao: string;
+  client_id: string;
+  specialist_id: string;
+  start_time: string;
+  end_time: string;
   status: string;
-  notas?: string;
-  google_event_id?: string;
-  guest_email?: string;
-  invitation_status?: string;
-  status_pagamento?: string;
-  post_session_notes?: string;
-  feedback?: string;
-}
-
-// Specialist details interface
-export interface SpecialistDetails {
-  id: string;
-  full_name: string;
-  specialty: string;
-  bio: string;
-  email: string;
-  phone: string;
-  rating: number;
-  experience_years: number;
-  details: {
-    thumbnail_url: string;
-    short_description: string;
-    long_description: string;
-    education: string;
-    areas_of_expertise: string[];
-    languages: string[];
-    certifications: string[];
-    sessions_completed: number;
-  };
+  notes?: string;
+  created_at: string;
 }
 
 export class SessionController {
@@ -136,7 +104,7 @@ export class SessionController {
     }
   }
 
-  static async getSpecialistDetails(id: string): Promise<SpecialistDetails | null> {
+  static async getSpecialistDetails(id: string) {
     try {
       // Usando a tabela profiles já que specialist_profiles pode não existir
       const { data, error } = await supabase
@@ -149,7 +117,7 @@ export class SessionController {
       if (error) throw error;
 
       // Transformar os dados para corresponder à estrutura esperada
-      const result: SpecialistDetails = {
+      const result = {
         id: data.id,
         full_name: data.full_name || "Desconhecido",
         specialty: "Psicologia",
@@ -173,7 +141,7 @@ export class SessionController {
       return result;
     } catch (error) {
       console.error("Erro ao buscar detalhes do especialista:", error);
-      return null;
+      throw error;
     }
   }
 
@@ -283,10 +251,10 @@ export class SessionController {
     return true;
   }
 
-  static async getSessionsByClient(clientId: string) {
+  static async getSessionsByClient(clientId: string): Promise<Session[]> {
     try {
       const { data, error } = await supabase
-        .from("sessoes")
+        .from("sessoes") // Changed from 'sessions' to 'sessoes' to match the table name used elsewhere
         .select("*")
         .eq("client_id", clientId);
 
@@ -295,26 +263,10 @@ export class SessionController {
         throw error;
       }
 
-      return (data || []) as Session[];
+      return data as Session[];
     } catch (error) {
       console.error('Error in getSessionsByClient:', error);
-      return [] as Session[];
-    }
-  }
-
-  static async getAllSessions() {
-    try {
-      const { data, error } = await supabase
-        .from('sessoes')
-        .select('*')
-        .order('data_hora', { ascending: false });
-      
-      if (error) throw error;
-      
-      return (data || []) as Session[];
-    } catch (error) {
-      console.error("Error fetching sessions:", error);
-      return [] as Session[];
+      return [];
     }
   }
 }

@@ -28,8 +28,6 @@ const especialistaFormSchema = z.object({
 
 const RegistroEspecialista = () => {
   const [loading, setLoading] = useState(false);
-  const [showCompleteProfileButton, setShowCompleteProfileButton] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -51,7 +49,7 @@ const RegistroEspecialista = () => {
     
     try {
       // Cadastrar usuário na autenticação do Supabase
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
@@ -67,17 +65,13 @@ const RegistroEspecialista = () => {
 
       if (signUpError) throw signUpError;
 
-      if (data?.user) {
-        setUserId(data.user.id);
-        setShowCompleteProfileButton(true);
-      }
-
       toast({
         title: "Cadastro iniciado com sucesso!",
-        description: "Complete seu perfil profissional para agilizar o processo de aprovação.",
+        description: "Verifique seu email para confirmar o cadastro. Nossa equipe revisará seu perfil para aprovação.",
         variant: "default",
       });
       
+      navigate("/auth");
     } catch (error: any) {
       console.error("Erro no cadastro:", error);
       toast({
@@ -90,10 +84,6 @@ const RegistroEspecialista = () => {
     }
   };
 
-  const handleCompleteProfile = () => {
-    navigate('/complete-specialist-profile');
-  };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-sage-50 p-4">
       <Link to="/" className="mb-8 flex items-center text-2xl font-playfair font-semibold text-sage-600">
@@ -102,154 +92,132 @@ const RegistroEspecialista = () => {
       </Link>
       
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        {showCompleteProfileButton ? (
-          <div className="text-center">
-            <h2 className="text-2xl font-playfair font-semibold mb-4">
-              Cadastro Iniciado!
-            </h2>
-            <p className="mb-6 text-gray-600">
-              Seu cadastro básico foi realizado com sucesso. Complete seu perfil profissional para agilizar o processo de aprovação.
-            </p>
-            <Button 
-              onClick={handleCompleteProfile}
-              className="w-full bg-sage-600 hover:bg-sage-700 text-white"
-            >
-              Complete Seu Perfil Profissional
-            </Button>
-            <p className="mt-4 text-sm text-gray-500">
-              Você também receberá um email de confirmação. Você pode completar seu perfil agora ou mais tarde.
-            </p>
-          </div>
-        ) : (
-          <>
-            <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
-              Cadastro de Especialista
-            </h2>
-            <p className="text-center text-gray-600 mb-6">
-              Junte-se à nossa rede de especialistas em saúde mental e desenvolvimento humano
-            </p>
+        <h2 className="text-2xl font-playfair font-semibold text-center mb-2">
+          Cadastro de Especialista
+        </h2>
+        <p className="text-center text-gray-600 mb-6">
+          Junte-se à nossa rede de especialistas em saúde mental e desenvolvimento humano
+        </p>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="seuemail@exemplo.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="seuemail@exemplo.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Senha</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="******" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirmar Senha</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="******" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="nomeCompleto"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome Completo</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Seu nome completo" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone (opcional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="(00) 00000-0000" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="especializacao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Especialização</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Psicoterapeuta, Psicólogo, etc." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="biografia"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Biografia Profissional</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Conte sobre sua formação, experiência e abordagem terapêutica..." 
-                          className="min-h-[120px]" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-sage-600 text-white py-2 px-4 rounded-md hover:bg-sage-700 transition-colors disabled:opacity-50"
-                >
-                  {loading ? "Carregando..." : "Cadastrar como Especialista"}
-                </Button>
-                
-                <div className="text-center mt-4">
-                  <Link to="/auth" className="text-sm text-sage-600 hover:text-sage-800">
-                    Já tem uma conta? Faça login
-                  </Link>
-                </div>
-              </form>
-            </Form>
-          </>
-        )}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Senha</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="******" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirmar Senha</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="******" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="nomeCompleto"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome Completo</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Seu nome completo" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="telefone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Telefone (opcional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="(00) 00000-0000" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="especializacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Especialização</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Psicoterapeuta, Psicólogo, etc." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="biografia"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Biografia Profissional</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Conte sobre sua formação, experiência e abordagem terapêutica..." 
+                      className="min-h-[120px]" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-sage-600 text-white py-2 px-4 rounded-md hover:bg-sage-700 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Carregando..." : "Cadastrar como Especialista"}
+            </Button>
+            
+            <div className="text-center mt-4">
+              <Link to="/auth" className="text-sm text-sage-600 hover:text-sage-800">
+                Já tem uma conta? Faça login
+              </Link>
+            </div>
+          </form>
+        </Form>
       </div>
       
       <div className="mt-8 text-center max-w-md text-sm text-gray-600">

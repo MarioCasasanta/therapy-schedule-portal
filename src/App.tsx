@@ -23,7 +23,6 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/useAuth";
 import ParaVoce from "./pages/ParaVoce";
-import CompleteSpecialistProfile from "./pages/CompleteSpecialistProfile";
 
 function App() {
   const { user, loading } = useAuth();
@@ -55,23 +54,17 @@ function App() {
           <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           <Route path="/subscription/cancel" element={<SubscriptionCancel />} />
           
-          <Route 
-            path="/complete-specialist-profile" 
-            element={
-              <ProtectedRoute>
-                <CompleteSpecialistProfile />
-              </ProtectedRoute>
-            } 
-          />
-          
+          {/* Client Dashboard Routes */}
           <Route path="/dashboard/cliente" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>}>
             <Route index element={<ClientDashboard />} />
           </Route>
           
+          {/* Specialist Dashboard Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
           </Route>
           
+          {/* Admin Routes */}
           <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>}>
             <Route index element={<AdminDashboard />} />
           </Route>
