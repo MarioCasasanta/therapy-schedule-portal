@@ -16,8 +16,6 @@ export interface SubscriptionPlan {
   price: number;
   plan_type: 'basic' | 'professional' | 'premium';
   benefits?: Benefit[];
-  created_at?: string;
-  updated_at?: string;
 }
 
 export const getTherapistPlans = async (): Promise<SubscriptionPlan[]> => {
@@ -53,16 +51,11 @@ export const getTherapistPlans = async (): Promise<SubscriptionPlan[]> => {
       return { ...plan, benefits: [] };
     }
 
-    // Cast the audience to the correct type
-    const benefits = benefitRelations.map(relation => ({
-      ...relation.benefits,
-      audience: relation.benefits.audience as 'therapist' | 'client' | 'both'
-    }));
-
+    const benefits = benefitRelations.map(relation => relation.benefits);
     return { ...plan, benefits };
   }));
 
-  return plansWithBenefits as SubscriptionPlan[];
+  return plansWithBenefits;
 };
 
 export const getClientPlans = async (): Promise<SubscriptionPlan[]> => {
@@ -98,16 +91,11 @@ export const getClientPlans = async (): Promise<SubscriptionPlan[]> => {
       return { ...plan, benefits: [] };
     }
 
-    // Cast the audience to the correct type
-    const benefits = benefitRelations.map(relation => ({
-      ...relation.benefits,
-      audience: relation.benefits.audience as 'therapist' | 'client' | 'both'
-    }));
-
+    const benefits = benefitRelations.map(relation => relation.benefits);
     return { ...plan, benefits };
   }));
 
-  return plansWithBenefits as SubscriptionPlan[];
+  return plansWithBenefits;
 };
 
 export const subscribeToPlan = async (

@@ -1,17 +1,4 @@
-
 import { supabase } from "@/integrations/supabase/client";
-
-// Define a Session type to prevent errors
-interface Session {
-  id: string;
-  client_id: string;
-  specialist_id: string;
-  start_time: string;
-  end_time: string;
-  status: string;
-  notes?: string;
-  created_at: string;
-}
 
 export class SessionController {
   // Funções do banco de dados para desenvolvimento
@@ -254,9 +241,9 @@ export class SessionController {
   static async getSessionsByClient(clientId: string): Promise<Session[]> {
     try {
       const { data, error } = await supabase
-        .from("sessoes") // Changed from 'sessions' to 'sessoes' to match the table name used elsewhere
-        .select("*")
-        .eq("client_id", clientId);
+        .from('sessions')
+        .select('*')
+        .eq('client_id', clientId);
 
       if (error) {
         console.error('Error fetching sessions by client:', error);
