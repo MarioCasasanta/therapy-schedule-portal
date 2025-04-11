@@ -1,4 +1,6 @@
+
 import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@/types/session";
 
 export class SessionController {
   // Funções do banco de dados para desenvolvimento
@@ -238,19 +240,19 @@ export class SessionController {
     return true;
   }
 
-  static async getSessionsByClient(clientId: string): Promise<Session[]> {
+  static async getSessionsByClient(clientId: string) {
     try {
       const { data, error } = await supabase
-        .from('sessions')
-        .select('*')
-        .eq('client_id', clientId);
+        .from("sessoes")
+        .select("*")
+        .eq("cliente_id", clientId);
 
       if (error) {
         console.error('Error fetching sessions by client:', error);
         throw error;
       }
 
-      return data as Session[];
+      return data || [];
     } catch (error) {
       console.error('Error in getSessionsByClient:', error);
       return [];
