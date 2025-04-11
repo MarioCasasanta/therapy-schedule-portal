@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Auth from "./pages/Auth";
@@ -22,7 +23,7 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/useAuth";
 import ParaVoce from "./pages/ParaVoce";
-import { CompleteSpecialistProfile } from "./pages/CompleteSpecialistProfile";
+import CompleteSpecialistProfile from "./pages/CompleteSpecialistProfile";
 
 function App() {
   const { user, loading } = useAuth();

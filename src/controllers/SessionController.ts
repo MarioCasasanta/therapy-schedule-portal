@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 // Define the Session interface to match the database schema
@@ -20,6 +21,28 @@ export interface Session {
   status_pagamento?: string;
   post_session_notes?: string;
   feedback?: string;
+}
+
+// Specialist details interface
+export interface SpecialistDetails {
+  id: string;
+  full_name: string;
+  specialty: string;
+  bio: string;
+  email: string;
+  phone: string;
+  rating: number;
+  experience_years: number;
+  details: {
+    thumbnail_url: string;
+    short_description: string;
+    long_description: string;
+    education: string;
+    areas_of_expertise: string[];
+    languages: string[];
+    certifications: string[];
+    sessions_completed: number;
+  };
 }
 
 export class SessionController {
@@ -113,7 +136,7 @@ export class SessionController {
     }
   }
 
-  static async getSpecialistDetails(id: string) {
+  static async getSpecialistDetails(id: string): Promise<SpecialistDetails | null> {
     try {
       // Usando a tabela profiles já que specialist_profiles pode não existir
       const { data, error } = await supabase
@@ -126,7 +149,7 @@ export class SessionController {
       if (error) throw error;
 
       // Transformar os dados para corresponder à estrutura esperada
-      const result = {
+      const result: SpecialistDetails = {
         id: data.id,
         full_name: data.full_name || "Desconhecido",
         specialty: "Psicologia",
@@ -150,7 +173,7 @@ export class SessionController {
       return result;
     } catch (error) {
       console.error("Erro ao buscar detalhes do especialista:", error);
-      throw error;
+      return null;
     }
   }
 
@@ -260,10 +283,10 @@ export class SessionController {
     return true;
   }
 
-  static async getSessionsByClient(clientId: string): Promise<Session[]> {
+  static async getSessionsByClient(clientId: string) {
     try {
       const { data, error } = await supabase
-        .from("sessoes") // Changed from 'sessions' to 'sessoes' to match the table name used elsewhere
+        .from("sessoes")
         .select("*")
         .eq("client_id", clientId);
 
@@ -272,10 +295,10 @@ export class SessionController {
         throw error;
       }
 
-      return data as Session[];
+      return (data || []) as Session[];
     } catch (error) {
       console.error('Error in getSessionsByClient:', error);
-      return [];
+      return [] as Session[];
     }
   }
 
@@ -288,11 +311,10 @@ export class SessionController {
       
       if (error) throw error;
       
-      // Type assertion to match the Session interface
-      return data as unknown as Session[];
+      return (data || []) as Session[];
     } catch (error) {
       console.error("Error fetching sessions:", error);
-      throw error;
+      return [] as Session[];
     }
   }
 }
