@@ -134,6 +134,36 @@ export type Database = {
         }
         Relationships: []
       }
+      benefits: {
+        Row: {
+          audience: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          audience: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string
@@ -250,6 +280,113 @@ export type Database = {
           },
         ]
       }
+      client_plan_benefits: {
+        Row: {
+          benefit_id: string
+          created_at: string
+          id: string
+          plan_id: string
+        }
+        Insert: {
+          benefit_id: string
+          created_at?: string
+          id?: string
+          plan_id: string
+        }
+        Update: {
+          benefit_id?: string
+          created_at?: string
+          id?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_plan_benefits_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_plan_benefits_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          plan_type?: Database["public"]["Enums"]["plan_type"]
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      client_subscriptions: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          plan_id: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "client_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracoes_site: {
         Row: {
           conteudo: string
@@ -295,6 +432,72 @@ export type Database = {
           id?: string
           message?: string
           name?: string
+        }
+        Relationships: []
+      }
+      couple_plans: {
+        Row: {
+          children_plans: string | null
+          communication_goals: string | null
+          created_at: string
+          creator_id: string
+          financial_goals: string | null
+          id: string
+          living_location: string | null
+          mutual_support: string | null
+          partner_accepted: boolean | null
+          partner_email: string | null
+          partner_id: string | null
+          religious_practices: string | null
+          shared_hobbies: string | null
+          shared_with_partner: boolean | null
+          timeframe: Database["public"]["Enums"]["timeframe"]
+          title: string
+          travel_plans: string | null
+          updated_at: string
+          work_arrangements: string | null
+        }
+        Insert: {
+          children_plans?: string | null
+          communication_goals?: string | null
+          created_at?: string
+          creator_id: string
+          financial_goals?: string | null
+          id?: string
+          living_location?: string | null
+          mutual_support?: string | null
+          partner_accepted?: boolean | null
+          partner_email?: string | null
+          partner_id?: string | null
+          religious_practices?: string | null
+          shared_hobbies?: string | null
+          shared_with_partner?: boolean | null
+          timeframe: Database["public"]["Enums"]["timeframe"]
+          title: string
+          travel_plans?: string | null
+          updated_at?: string
+          work_arrangements?: string | null
+        }
+        Update: {
+          children_plans?: string | null
+          communication_goals?: string | null
+          created_at?: string
+          creator_id?: string
+          financial_goals?: string | null
+          id?: string
+          living_location?: string | null
+          mutual_support?: string | null
+          partner_accepted?: boolean | null
+          partner_email?: string | null
+          partner_id?: string | null
+          religious_practices?: string | null
+          shared_hobbies?: string | null
+          shared_with_partner?: boolean | null
+          timeframe?: Database["public"]["Enums"]["timeframe"]
+          title?: string
+          travel_plans?: string | null
+          updated_at?: string
+          work_arrangements?: string | null
         }
         Relationships: []
       }
@@ -1041,6 +1244,41 @@ export type Database = {
         }
         Relationships: []
       }
+      protocolo_respostas: {
+        Row: {
+          created_at: string
+          id: string
+          protocolo_tipo: string
+          respostas: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          protocolo_tipo: string
+          respostas: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          protocolo_tipo?: string
+          respostas?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protocolo_respostas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questionnaire_responses: {
         Row: {
           answers: Json
@@ -1072,6 +1310,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "questionnaire_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relacionamento_casal: {
+        Row: {
+          areas_melhorar: string[] | null
+          created_at: string
+          data_teste: string
+          id: string
+          nivel_rapport: number | null
+          partner_email: string | null
+          partner_name: string | null
+          pontos_fortes: string[] | null
+          respostas: Json
+          user_id: string | null
+        }
+        Insert: {
+          areas_melhorar?: string[] | null
+          created_at?: string
+          data_teste?: string
+          id?: string
+          nivel_rapport?: number | null
+          partner_email?: string | null
+          partner_name?: string | null
+          pontos_fortes?: string[] | null
+          respostas: Json
+          user_id?: string | null
+        }
+        Update: {
+          areas_melhorar?: string[] | null
+          created_at?: string
+          data_teste?: string
+          id?: string
+          nivel_rapport?: number | null
+          partner_email?: string | null
+          partner_name?: string | null
+          pontos_fortes?: string[] | null
+          respostas?: Json
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relacionamento_casal_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1453,6 +1738,113 @@ export type Database = {
         }
         Relationships: []
       }
+      therapist_plan_benefits: {
+        Row: {
+          benefit_id: string
+          created_at: string
+          id: string
+          plan_id: string
+        }
+        Insert: {
+          benefit_id: string
+          created_at?: string
+          id?: string
+          plan_id: string
+        }
+        Update: {
+          benefit_id?: string
+          created_at?: string
+          id?: string
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapist_plan_benefits_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_plan_benefits_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "therapist_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      therapist_subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          plan_type: Database["public"]["Enums"]["plan_type"]
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          plan_type?: Database["public"]["Enums"]["plan_type"]
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      therapist_subscriptions: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          plan_id: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapist_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "therapist_subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trilha_desenvolvimento: {
         Row: {
           acoes_diferentes: string | null
@@ -1575,15 +1967,52 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
-      is_admin: {
-        Args: {
+      get_teste_ansiedade: {
+        Args: { user_id_param: string }
+        Returns: {
+          id: string
           user_id: string
-        }
+          data_teste: string
+          pontuacao: number
+          percentual: number
+          respostas: Json
+          tipo_teste: string
+          nivel_resultado: string
+        }[]
+      }
+      get_teste_burnout: {
+        Args: { user_id_param: string }
+        Returns: {
+          id: string
+          user_id: string
+          data_teste: string
+          pontuacao: number
+          percentual: number
+          respostas: Json
+          nivel_resultado: string
+        }[]
+      }
+      get_teste_estresse: {
+        Args: { user_id_param: string }
+        Returns: {
+          id: string
+          user_id: string
+          data_teste: string
+          pontuacao: number
+          percentual: number
+          respostas: Json
+          tipo_teste: string
+          nivel_resultado: string
+        }[]
+      }
+      is_admin: {
+        Args: { user_id: string }
         Returns: boolean
       }
     }
     Enums: {
       app_role: "admin" | "user"
+      plan_type: "basic" | "professional" | "premium"
       questionnaire_type:
         | "tdah"
         | "iq"
@@ -1592,6 +2021,8 @@ export type Database = {
         | "burnout"
         | "attachment"
         | "saboteurs"
+        | "relacionamento"
+      timeframe: "short" | "medium" | "long"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1599,27 +2030,29 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1627,20 +2060,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1648,20 +2083,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1669,21 +2106,23 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
@@ -1692,6 +2131,26 @@ export type CompositeTypes<
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      app_role: ["admin", "user"],
+      plan_type: ["basic", "professional", "premium"],
+      questionnaire_type: [
+        "tdah",
+        "iq",
+        "anxiety",
+        "depression",
+        "burnout",
+        "attachment",
+        "saboteurs",
+        "relacionamento",
+      ],
+      timeframe: ["short", "medium", "long"],
+    },
+  },
+} as const
