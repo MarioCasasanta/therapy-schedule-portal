@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export class SessionController {
@@ -250,7 +251,7 @@ export class SessionController {
         throw error;
       }
 
-      return data as Session[];
+      return (data || []) as Session[];
     } catch (error) {
       console.error('Error in getSessionsByClient:', error);
       return [];
