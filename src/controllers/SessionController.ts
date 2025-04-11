@@ -1,16 +1,25 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
-// Define a Session type to prevent errors
-interface Session {
+// Define the Session interface to match the database schema
+export interface Session {
   id: string;
-  client_id: string;
-  specialist_id: string;
-  start_time: string;
-  end_time: string;
-  status: string;
-  notes?: string;
+  client_id?: string;
+  data_hora: string;
   created_at: string;
+  updated_at: string;
+  invitation_sent_at?: string;
+  valor?: number;
+  data_pagamento?: string;
+  reminder_sent_at?: string;
+  tipo_sessao: string;
+  status: string;
+  notas?: string;
+  google_event_id?: string;
+  guest_email?: string;
+  invitation_status?: string;
+  status_pagamento?: string;
+  post_session_notes?: string;
+  feedback?: string;
 }
 
 export class SessionController {
@@ -267,6 +276,23 @@ export class SessionController {
     } catch (error) {
       console.error('Error in getSessionsByClient:', error);
       return [];
+    }
+  }
+
+  static async getAllSessions() {
+    try {
+      const { data, error } = await supabase
+        .from('sessoes')
+        .select('*')
+        .order('data_hora', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Type assertion to match the Session interface
+      return data as unknown as Session[];
+    } catch (error) {
+      console.error("Error fetching sessions:", error);
+      throw error;
     }
   }
 }
