@@ -1,27 +1,29 @@
+
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Auth } from "./pages/Auth";
-import { Index } from "./pages/Index";
-import { Blog } from "./pages/Blog";
-import { BlogPost } from "./pages/BlogPost";
-import { ParaEspecialistas } from "./pages/ParaEspecialistas";
-import { PlansPage } from "./pages/PlansPage";
-import { Especialistas } from "./pages/Especialistas";
-import { EspecialistaDetalhe } from "./pages/EspecialistaDetalhe";
-import { RegistroEspecialista } from "./pages/RegistroEspecialista";
-import { TermsOfService } from "./pages/TermsOfService";
-import { PrivacyPolicy } from "./pages/PrivacyPolicy";
-import { SubscriptionSuccess } from "./pages/subscription/SubscriptionSuccess";
-import { SubscriptionCancel } from "./pages/subscription/SubscriptionCancel";
-import { ClientDashboard } from "./pages/dashboard/ClientDashboard";
-import { Dashboard } from "./pages/dashboard/Dashboard";
-import { AdminDashboard } from "./pages/admin/AdminDashboard";
-import { NotFound } from "./pages/NotFound";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
+import Auth from "./pages/Auth";
+import Index from "./pages/Index";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import ParaEspecialistas from "./pages/ParaEspecialistas";
+import PlansPage from "./pages/PlansPage";
+import Especialistas from "./pages/Especialistas";
+import EspecialistaDetalhe from "./pages/EspecialistaDetalhe";
+import RegistroEspecialista from "./pages/RegistroEspecialista";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import SubscriptionSuccess from "./pages/subscription/SubscriptionSuccess";
+import SubscriptionCancel from "./pages/subscription/SubscriptionCancel";
+// NOTA: Estas páginas parecem estar faltando e devem ser criadas
+import Dashboard from "./pages/Dashboard";
+import ClientDashboard from "./pages/ClientDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import { Toaster } from "@/components/ui/sonner"
 import { useAuth } from "@/hooks/useAuth";
-import { ParaVoce } from "./pages/ParaVoce";
+import ParaVoce from "./pages/ParaVoce";
 
 function App() {
   const { user, loading } = useAuth();
@@ -54,19 +56,13 @@ function App() {
           <Route path="/subscription/cancel" element={<SubscriptionCancel />} />
           
           {/* Client Dashboard Routes */}
-          <Route path="/dashboard/cliente" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>}>
-            <Route index element={<ClientDashboard />} />
-          </Route>
+          <Route path="/dashboard/cliente" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>} />
           
           {/* Specialist Dashboard Routes */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
-          </Route>
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           
           {/* Admin Routes */}
-          <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>}>
-            <Route index element={<AdminDashboard />} />
-          </Route>
+          <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

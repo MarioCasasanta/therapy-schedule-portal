@@ -1,4 +1,5 @@
-interface Session {
+
+export interface Session {
   id: string;
   client_id?: string;
   specialist_id?: string;
