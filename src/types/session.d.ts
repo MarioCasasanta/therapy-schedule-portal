@@ -16,8 +16,6 @@ export interface Session {
   feedback?: string;
   created_at?: string;
   updated_at?: string;
-  specialist_id?: string;
-  clientName?: string;
 }
 
 export interface SessionFormData {
