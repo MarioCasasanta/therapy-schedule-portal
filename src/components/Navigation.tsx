@@ -1,12 +1,15 @@
 
-import { useState } from "react";
-import { Menu, X, Calendar, Heart } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Calendar, Heart, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
+import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, profile, loading } = useAuth();
 
   return (
     <nav className="fixed w-full bg-white/90 backdrop-blur-sm z-50 border-b border-gray-100">
@@ -29,12 +32,30 @@ const Navigation = () => {
             <Link to="/blog" className="text-sage-600 hover:text-sage-800 transition-colors">
               Blog
             </Link>
-            <Link 
-              to="/auth" 
-              className="text-sage-600 hover:text-sage-800 transition-colors"
-            >
-              Entrar
-            </Link>
+            
+            {loading ? (
+              <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+            ) : user ? (
+              <Link to={profile?.role === 'admin' ? '/dashboard' : '/client-dashboard'} className="flex items-center gap-2 text-sage-600 hover:text-sage-800">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarFallback className="bg-sage-100 text-sage-600">
+                    <UserCheck className="h-4 w-4 text-primary" />
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-primary font-medium hidden sm:inline-block">
+                  {profile?.full_name?.split(' ')[0] || 'Usuário'}
+                </span>
+              </Link>
+            ) : (
+              <Link 
+                to="/auth" 
+                className="text-sage-600 hover:text-sage-800 transition-colors"
+              >
+                Entrar
+              </Link>
+            )}
+            
             <Link 
               to="/especialistas" 
               className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 flex items-center gap-2 transition-colors"
