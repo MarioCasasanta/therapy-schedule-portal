@@ -4,9 +4,10 @@ import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, Shield, Heart, Clock, CalendarDays, Star } from "lucide-react";
+import { Check, X, Shield, Heart, Clock, CalendarDays, Star, Brain, TestTube, BarChart, Lock, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface ClientPlan {
   id: string;
@@ -111,7 +112,8 @@ const ParaVoce = () => {
       benefits: [
         { id: "1", name: "1 sessão mensal", type: "session", audience: "client" },
         { id: "2", name: "Acesso à biblioteca básica", type: "content", audience: "client" },
-        { id: "3", name: "Ferramentas de autoavaliação", type: "tool", audience: "client" },
+        { id: "3", name: "Testes básicos de autoanálise", type: "tool", audience: "client" },
+        { id: "4", name: "1 protocolo de desbloqueio emocional", type: "protocol", audience: "client" },
       ]
     },
     {
@@ -121,11 +123,12 @@ const ParaVoce = () => {
       price: 279.90,
       plan_type: "premium",
       benefits: [
-        { id: "4", name: "3 sessões mensais", type: "session", audience: "client" },
-        { id: "5", name: "Acesso à biblioteca completa", type: "content", audience: "client" },
-        { id: "6", name: "Ferramentas de autoavaliação avançadas", type: "tool", audience: "client" },
-        { id: "7", name: "Grupos de apoio exclusivos", type: "community", audience: "client" },
-        { id: "8", name: "Atendimento prioritário", type: "support", audience: "client" },
+        { id: "5", name: "3 sessões mensais", type: "session", audience: "client" },
+        { id: "6", name: "Acesso à biblioteca completa", type: "content", audience: "client" },
+        { id: "7", name: "Testes completos de autoanálise", type: "tool", audience: "client" },
+        { id: "8", name: "3 protocolos de desbloqueio emocional", type: "protocol", audience: "client" },
+        { id: "9", name: "Grupos de apoio exclusivos", type: "community", audience: "client" },
+        { id: "10", name: "Atendimento prioritário", type: "support", audience: "client" },
       ]
     },
     {
@@ -135,12 +138,13 @@ const ParaVoce = () => {
       price: 499.90,
       plan_type: "family",
       benefits: [
-        { id: "9", name: "5 sessões mensais compartilháveis", type: "session", audience: "client" },
-        { id: "10", name: "Acesso para até 4 membros da família", type: "access", audience: "client" },
-        { id: "11", name: "Biblioteca completa para todos os membros", type: "content", audience: "client" },
-        { id: "12", name: "Ferramentas para relacionamento familiar", type: "tool", audience: "client" },
-        { id: "13", name: "Sessões de terapia familiar", type: "session", audience: "client" },
-        { id: "14", name: "Acesso a especialistas em dinâmica familiar", type: "specialist", audience: "client" },
+        { id: "11", name: "5 sessões mensais compartilháveis", type: "session", audience: "client" },
+        { id: "12", name: "Acesso para até 4 membros da família", type: "access", audience: "client" },
+        { id: "13", name: "Biblioteca completa para todos os membros", type: "content", audience: "client" },
+        { id: "14", name: "Todos os protocolos de desbloqueio emocional", type: "protocol", audience: "client" },
+        { id: "15", name: "Sessões de terapia familiar", type: "session", audience: "client" },
+        { id: "16", name: "Testes completos para toda família", type: "tool", audience: "client" },
+        { id: "17", name: "Acesso a especialistas em dinâmica familiar", type: "specialist", audience: "client" },
       ]
     }
   ];
@@ -167,13 +171,19 @@ const ParaVoce = () => {
       case "session":
         return <CalendarDays className="h-5 w-5 text-primary mr-2 flex-shrink-0" />;
       case "content":
-        return <Clock className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" />;
+        return <BookOpen className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" />;
       case "tool":
-        return <Shield className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0" />;
+        return <TestTube className="h-5 w-5 text-purple-500 mr-2 flex-shrink-0" />;
+      case "protocol":
+        return <Brain className="h-5 w-5 text-orange-500 mr-2 flex-shrink-0" />;
       case "community":
         return <Heart className="h-5 w-5 text-pink-500 mr-2 flex-shrink-0" />;
       case "support":
         return <Star className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0" />;
+      case "access":
+        return <Lock className="h-5 w-5 text-indigo-500 mr-2 flex-shrink-0" />;
+      case "specialist":
+        return <Shield className="h-5 w-5 text-teal-500 mr-2 flex-shrink-0" />;
       default:
         return <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />;
     }
@@ -196,11 +206,14 @@ const ParaVoce = () => {
         </div>
       </div>
       
-      <section className="py-16 bg-white">
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
+            <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium inline-block mb-3">
+              Assinaturas
+            </span>
             <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-4">
-              Nossos Planos
+              Comece sua jornada de transformação
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Invista no seu bem-estar emocional com nossos planos personalizados
@@ -216,7 +229,7 @@ const ParaVoce = () => {
               {displayPlans.map((plan) => (
                 <Card 
                   key={plan.id} 
-                  className={`relative ${plan.id === highlightedPlanId ? 'shadow-lg ring-2 ring-primary/20 bg-primary/5' : 'shadow bg-white'}`}
+                  className={`relative h-full flex flex-col ${plan.id === highlightedPlanId ? 'shadow-lg ring-2 ring-primary/20 bg-primary/5' : 'shadow bg-white'}`}
                 >
                   {plan.id === highlightedPlanId && (
                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-white text-sm font-medium py-1 px-4 rounded-full">
@@ -231,7 +244,7 @@ const ParaVoce = () => {
                     </div>
                     <CardDescription className="mt-2">{plan.description}</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-grow">
                     <ul className="space-y-3">
                       {plan.benefits?.map((benefit) => (
                         <li key={benefit.id} className="flex items-start">
@@ -243,7 +256,7 @@ const ParaVoce = () => {
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="pt-4">
                     <Button className="w-full bg-primary hover:bg-primary/90">
                       Escolher plano
                     </Button>
@@ -259,36 +272,51 @@ const ParaVoce = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-4">
-              Por que escolher a Além do Apego?
+              Benefícios exclusivos
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Nosso compromisso é com seu bem-estar e desenvolvimento pessoal
+              Conheça as ferramentas que vão transformar sua relação consigo mesmo
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="bg-primary/10 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                <Shield className="h-10 w-10 text-primary" />
+              <div className="bg-orange-100 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                <Brain className="h-10 w-10 text-orange-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Especialistas qualificados</h3>
-              <p className="text-gray-600 text-center">Nossa equipe é formada por profissionais com ampla experiência e formação sólida em saúde mental.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Protocolos de desbloqueio emocional</h3>
+              <p className="text-gray-600 text-center">Metodologias exclusivas para identificar e superar padrões limitantes, desenvolvidas por nossa equipe de especialistas.</p>
+              <div className="mt-4 text-center">
+                <a href="https://resilience.alemdoapego.com.br" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 text-sm font-medium inline-flex items-center">
+                  Conhecer protocolos <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              </div>
             </div>
             
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="bg-primary/10 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                <Heart className="h-10 w-10 text-primary" />
+              <div className="bg-purple-100 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                <TestTube className="h-10 w-10 text-purple-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Abordagem personalizada</h3>
-              <p className="text-gray-600 text-center">Entendemos que cada pessoa é única e oferecemos um cuidado adaptado às suas necessidades específicas.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Testes de autoconhecimento</h3>
+              <p className="text-gray-600 text-center">Avaliações cientificamente validadas que ajudam a identificar padrões comportamentais, traços de personalidade e áreas para desenvolvimento.</p>
+              <div className="mt-4 text-center">
+                <a href="https://testes.alemdoapego.com.br" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 text-sm font-medium inline-flex items-center">
+                  Fazer testes <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              </div>
             </div>
             
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="bg-primary/10 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                <Clock className="h-10 w-10 text-primary" />
+              <div className="bg-blue-100 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                <CalendarDays className="h-10 w-10 text-blue-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Flexibilidade de horários</h3>
-              <p className="text-gray-600 text-center">Agende suas sessões em horários que funcionam para você, sem comprometer sua rotina.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Sessões terapêuticas</h3>
+              <p className="text-gray-600 text-center">Encontros personalizados com nossos especialistas qualificados para acompanhar sua jornada de desenvolvimento pessoal.</p>
+              <div className="mt-4 text-center">
+                <Link to="/especialistas" className="text-primary hover:text-primary/80 text-sm font-medium inline-flex items-center">
+                  Conhecer especialistas <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -298,57 +326,73 @@ const ParaVoce = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-4">
-              Depoimentos de clientes
+              Como nossos planos funcionam
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Veja como nossos serviços têm ajudado pessoas em sua jornada de autoconhecimento
+              Uma jornada completa para seu desenvolvimento pessoal e bem-estar emocional
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 p-8 rounded-xl">
-              <p className="text-gray-700 italic mb-6">
-                "Depois de anos lutando contra a ansiedade, finalmente encontrei o suporte que precisava. As sessões foram transformadoras para minha vida."
-              </p>
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                  MF
-                </div>
-                <div className="ml-4">
-                  <p className="font-semibold">Maria Fernandes</p>
-                  <p className="text-sm text-gray-500">Cliente há 8 meses</p>
-                </div>
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-primary/10 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 relative">
+                <span className="text-primary font-bold text-xl">1</span>
+                <div className="absolute hidden md:block h-1 bg-primary/20 w-full right-0 top-1/2 transform translate-x-1/2"></div>
               </div>
+              <h3 className="text-lg font-semibold mb-2">Escolha seu plano</h3>
+              <p className="text-gray-600 text-sm">Selecione a assinatura que melhor se adapta às suas necessidades e objetivos.</p>
             </div>
             
-            <div className="bg-gray-50 p-8 rounded-xl">
-              <p className="text-gray-700 italic mb-6">
-                "As ferramentas que aprendi me ajudaram a melhorar meus relacionamentos e a lidar com o estresse do dia a dia. Recomendo para todos."
-              </p>
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                  RS
-                </div>
-                <div className="ml-4">
-                  <p className="font-semibold">Ricardo Silva</p>
-                  <p className="text-sm text-gray-500">Cliente há 1 ano</p>
-                </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-primary/10 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 relative">
+                <span className="text-primary font-bold text-xl">2</span>
+                <div className="absolute hidden md:block h-1 bg-primary/20 w-full right-0 top-1/2 transform translate-x-1/2"></div>
               </div>
+              <h3 className="text-lg font-semibold mb-2">Acesse as ferramentas</h3>
+              <p className="text-gray-600 text-sm">Explore nossos protocolos de desbloqueio emocional e faça os testes de autoconhecimento.</p>
             </div>
             
-            <div className="bg-gray-50 p-8 rounded-xl">
-              <p className="text-gray-700 italic mb-6">
-                "Como mãe de dois filhos, eu precisava de ajuda para equilibrar minha vida pessoal e profissional. A terapia foi essencial nesse processo."
-              </p>
-              <div className="flex items-center">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                  JC
-                </div>
-                <div className="ml-4">
-                  <p className="font-semibold">Juliana Costa</p>
-                  <p className="text-sm text-gray-500">Cliente há 6 meses</p>
-                </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-primary/10 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4 relative">
+                <span className="text-primary font-bold text-xl">3</span>
+                <div className="absolute hidden md:block h-1 bg-primary/20 w-full right-0 top-1/2 transform translate-x-1/2"></div>
               </div>
+              <h3 className="text-lg font-semibold mb-2">Agende suas sessões</h3>
+              <p className="text-gray-600 text-sm">Marque encontros com nossos especialistas conforme a disponibilidade do seu plano.</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-primary/10 rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                <span className="text-primary font-bold text-xl">4</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Transforme sua vida</h3>
+              <p className="text-gray-600 text-sm">Acompanhe seu progresso e celebre cada conquista em sua jornada de autoconhecimento.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-6">
+            Perguntas frequentes
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8 mt-12 text-left max-w-4xl mx-auto">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Posso cancelar minha assinatura a qualquer momento?</h3>
+              <p className="text-gray-600">Sim, você pode cancelar sua assinatura quando quiser. O acesso aos benefícios permanece até o final do período pago.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Como funcionam as sessões com especialistas?</h3>
+              <p className="text-gray-600">As sessões podem ser realizadas online ou presencialmente, dependendo da sua localização e preferência.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Os protocolos funcionam para qualquer pessoa?</h3>
+              <p className="text-gray-600">Nossos protocolos são adaptáveis e foram desenvolvidos para atender diferentes perfis e necessidades emocionais.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Posso trocar de plano depois?</h3>
+              <p className="text-gray-600">Sim, você pode fazer upgrade ou downgrade do seu plano a qualquer momento, com os ajustes de valor proporcionais.</p>
             </div>
           </div>
         </div>
@@ -364,7 +408,7 @@ const ParaVoce = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button size="lg" className="bg-primary hover:bg-primary/90">
-              Começar agora
+              Escolher um plano
             </Button>
             <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
               Falar com um especialista
