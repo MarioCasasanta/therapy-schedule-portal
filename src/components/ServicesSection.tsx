@@ -1,5 +1,5 @@
 
-import { Brain, Heart, Clock, Battery, Users } from "lucide-react";
+import { Brain, Heart, Clock, Battery, Users, MessageSquare } from "lucide-react";
 
 const services = [
   {
@@ -26,6 +26,11 @@ const services = [
     title: "Conflitos familiares",
     description: "Mágoas e desconexão? Vamos restaurar o diálogo e fortalecer os laços familiares com respeito.",
     icon: Users
+  },
+  {
+    title: "Dificuldades no relacionamento",
+    description: "Problemas de comunicação e desgaste emocional? Vamos reconstruir pontes e fortalecer os laços afetivos com empatia e compreensão.",
+    icon: MessageSquare
   }
 ];
 
