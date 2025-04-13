@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -615,14 +614,14 @@ const ParaEspecialistas = () => {
                           <FormLabel>Biografia curta (para exibição em listagens)*</FormLabel>
                           <FormControl>
                             <Textarea 
-                              placeholder="Breve descrição de sua prática profissional (máx. 150 caracteres)" 
+                              placeholder="Breve descrição de sua prática profissional (máx. 300 caracteres)" 
                               {...field} 
                               className="h-20"
-                              maxLength={150}
+                              maxLength={300}
                             />
                           </FormControl>
                           <FormDescription>
-                            Usado em cartões de listagem. Máximo 150 caracteres.
+                            Usado em cartões de listagem. Máximo 300 caracteres.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -636,15 +635,38 @@ const ParaEspecialistas = () => {
                           <FormLabel>Biografia completa (para sua página de perfil)*</FormLabel>
                           <FormControl>
                             <Textarea 
-                              placeholder="Descrição detalhada de sua formação, experiência e abordagem terapêutica" 
+                              placeholder="Descrição detalhada de sua formação, experiência e abordagem terapêutica (máx. 1000 caracteres)" 
                               {...field} 
                               className="min-h-[150px]"
+                              maxLength={1000}
                             />
                           </FormControl>
                           <FormDescription>
-                            Será exibida na sua página de perfil completo.
+                            Será exibida na sua página de perfil completo. Máximo 1000 caracteres.
                           </FormDescription>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="preencher_depois"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 border rounded-md p-4 bg-gray-50">
+                          <FormControl>
+                            <Checkbox 
+                              checked={field.value} 
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Preencher biografia posteriormente
+                            </FormLabel>
+                            <FormDescription>
+                              Você pode adicionar ou editar sua biografia mais tarde no seu perfil.
+                            </FormDescription>
+                          </div>
                         </FormItem>
                       )}
                     />
