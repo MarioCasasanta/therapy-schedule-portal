@@ -1,23 +1,19 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   LayoutDashboard, 
   User,
+  Edit,
+  ArrowLeft,
+  LogOut,
   Settings,
   Calendar,
-  Receipt,
   Bell,
-  FileText,
   Lock,
   Mail,
-  MessageSquare,
   CalendarPlus,
   History,
-  Edit,
-  HelpCircle,
-  LogOut,
-  ArrowLeft
+  HelpCircle
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,15 +51,6 @@ export function ClientSidebar({ className }: SidebarProps) {
     <div className={cn("pb-12 border-r bg-white w-[250px]", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <Button
-            variant="ghost"
-            className="w-full justify-start mb-2"
-            onClick={handleGoBack}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar
-          </Button>
-          
           <Button
             variant="ghost"
             className="w-full justify-start mb-4"
