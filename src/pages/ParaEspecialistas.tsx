@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -19,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const allFeatures = [
   { 
@@ -181,6 +183,9 @@ const ParaEspecialistas = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [registrationSubmitted, setRegistrationSubmitted] = useState(false);
+  const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("basic");
+  
   const form = useForm({
     defaultValues: {
       nome_completo: "",
@@ -204,6 +209,7 @@ const ParaEspecialistas = () => {
 
   const onSubmit = async (data) => {
     try {
+      // Create table if it doesn't exist yet
       const { error } = await supabase.from("specialist_registrations").insert([
         {
           ...data,
@@ -214,6 +220,7 @@ const ParaEspecialistas = () => {
       if (error) throw error;
 
       setRegistrationSubmitted(true);
+      setRegistrationDialogOpen(false);
       toast({
         title: "Cadastro enviado com sucesso!",
         description: "Nossa equipe entrará em contato em breve.",
@@ -245,7 +252,6 @@ const ParaEspecialistas = () => {
 
     if (isValid) {
       setStep(step + 1);
-      window.scrollTo(0, 0);
     } else {
       fields.forEach(field => {
         if (!form.getValues(field)) {
@@ -260,7 +266,13 @@ const ParaEspecialistas = () => {
 
   const prevStep = () => {
     setStep(step - 1);
-    window.scrollTo(0, 0);
+  };
+
+  const openRegistrationDialog = (planType = "basic") => {
+    form.setValue("plano_escolhido", planType);
+    setSelectedPlan(planType);
+    setRegistrationDialogOpen(true);
+    setStep(1);
   };
 
   return (
@@ -280,7 +292,7 @@ const ParaEspecialistas = () => {
               <Button 
                 size="lg" 
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg"
-                onClick={() => document.getElementById('cadastro')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => openRegistrationDialog()}
               >
                 <UserPlus className="mr-2" />
                 Comece agora
@@ -403,10 +415,7 @@ const ParaEspecialistas = () => {
                 <CardFooter>
                   <Button 
                     className={`w-full ${plan.buttonColor}`}
-                    onClick={() => {
-                      document.getElementById('cadastro')?.scrollIntoView({ behavior: 'smooth' });
-                      form.setValue('plano_escolhido', plan.planType);
-                    }}
+                    onClick={() => openRegistrationDialog(plan.planType)}
                   >
                     Selecionar plano
                   </Button>
@@ -417,517 +426,515 @@ const ParaEspecialistas = () => {
         </div>
       </section>
       
-      {!registrationSubmitted ? (
-        <section id="cadastro" className="py-16 bg-gray-50">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white shadow-md rounded-lg p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-4">
-                  Cadastre-se como especialista
-                </h2>
-                <p className="text-lg text-gray-600">
-                  Preencha o formulário abaixo para iniciar seu processo de cadastro
-                </p>
-                <div className="flex justify-center mt-6 mb-8">
-                  <div className="flex items-center">
-                    {[1, 2, 3, 4, 5, 6].map((stepNum) => (
-                      <React.Fragment key={stepNum}>
-                        <div 
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm
-                            ${step === stepNum ? 'bg-primary text-white' : 
-                              step > stepNum ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                        >
-                          {step > stepNum ? <Check className="h-4 w-4" /> : stepNum}
-                        </div>
-                        {stepNum < 6 && (
-                          <div className={`w-10 h-1 ${step > stepNum ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-                        )}
-                      </React.Fragment>
-                    ))}
+      {/* Registration Dialog (Pop-up) */}
+      <Dialog open={registrationDialogOpen} onOpenChange={setRegistrationDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-playfair font-semibold text-center">Cadastre-se como especialista</DialogTitle>
+            <DialogDescription className="text-center">
+              Preencha o formulário abaixo para iniciar seu processo de cadastro
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex justify-center mt-2 mb-6">
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5, 6].map((stepNum) => (
+                <React.Fragment key={stepNum}>
+                  <div 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm
+                      ${step === stepNum ? 'bg-primary text-white' : 
+                        step > stepNum ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                  >
+                    {step > stepNum ? <Check className="h-4 w-4" /> : stepNum}
                   </div>
-                </div>
-              </div>
-
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  {step === 1 && (
-                    <>
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="nome_completo"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nome completo*</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Digite seu nome completo" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email profissional*</FormLabel>
-                              <FormControl>
-                                <Input type="email" placeholder="seu.email@exemplo.com" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="telefone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Telefone de contato*</FormLabel>
-                              <FormControl>
-                                <Input placeholder="(00) 00000-0000" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="pt-4">
-                        <Button 
-                          type="button" 
-                          onClick={nextStep} 
-                          className="w-full md:w-auto"
-                        >
-                          Continuar
-                        </Button>
-                      </div>
-                    </>
+                  {stepNum < 6 && (
+                    <div className={`w-8 h-1 ${step > stepNum ? 'bg-green-500' : 'bg-gray-200'}`}></div>
                   )}
-
-                  {step === 2 && (
-                    <>
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="especialidade"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Especialidade*</FormLabel>
-                              <FormControl>
-                                <RadioGroup 
-                                  onValueChange={field.onChange} 
-                                  defaultValue={field.value}
-                                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                                >
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="psicologia" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">Psicologia</FormLabel>
-                                  </FormItem>
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="psicanalise" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">Psicanálise</FormLabel>
-                                  </FormItem>
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="terapia_casal" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">Terapia de Casal</FormLabel>
-                                  </FormItem>
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="coaching" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">Coaching</FormLabel>
-                                  </FormItem>
-                                </RadioGroup>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="formacao"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Formação acadêmica*</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Ex: Psicologia pela USP" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="anos_experiencia"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Anos de experiência*</FormLabel>
-                              <FormControl>
-                                <Input type="number" min="0" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="flex justify-between pt-4">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={prevStep}
-                          className="w-full md:w-auto"
-                        >
-                          Voltar
-                        </Button>
-                        <Button 
-                          type="button" 
-                          onClick={nextStep}
-                          className="w-full md:w-auto"
-                        >
-                          Continuar
-                        </Button>
-                      </div>
-                    </>
-                  )}
-
-                  {step === 3 && (
-                    <>
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="biografia_curta"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Biografia curta (para exibição em listagens)*</FormLabel>
-                              <FormControl>
-                                <Textarea 
-                                  placeholder="Breve descrição de sua prática profissional (máx. 150 caracteres)" 
-                                  {...field} 
-                                  className="h-20"
-                                  maxLength={150}
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Usado em cartões de listagem. Máximo 150 caracteres.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="biografia_longa"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Biografia completa (para sua página de perfil)*</FormLabel>
-                              <FormControl>
-                                <Textarea 
-                                  placeholder="Descrição detalhada de sua formação, experiência e abordagem terapêutica" 
-                                  {...field} 
-                                  className="min-h-[200px]"
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Será exibida na sua página de perfil completo.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="flex justify-between pt-4">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={prevStep}
-                          className="w-full md:w-auto"
-                        >
-                          Voltar
-                        </Button>
-                        <Button 
-                          type="button" 
-                          onClick={nextStep}
-                          className="w-full md:w-auto"
-                        >
-                          Continuar
-                        </Button>
-                      </div>
-                    </>
-                  )}
-
-                  {step === 4 && (
-                    <>
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="areas_especializacao"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Áreas de especialização*</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="Ex: Ansiedade, Depressão, Dependência Emocional" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Separe diferentes áreas por vírgulas.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="idiomas"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Idiomas*</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="Ex: Português, Inglês, Espanhol" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Separe diferentes idiomas por vírgulas.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="certificacoes"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Certificações</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="Ex: CFP, Certificação em TCC" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Separe diferentes certificações por vírgulas.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="flex justify-between pt-4">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={prevStep}
-                          className="w-full md:w-auto"
-                        >
-                          Voltar
-                        </Button>
-                        <Button 
-                          type="button" 
-                          onClick={nextStep}
-                          className="w-full md:w-auto"
-                        >
-                          Continuar
-                        </Button>
-                      </div>
-                    </>
-                  )}
-
-                  {step === 5 && (
-                    <>
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="plano_escolhido"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Plano escolhido*</FormLabel>
-                              <FormControl>
-                                <RadioGroup 
-                                  onValueChange={field.onChange} 
-                                  defaultValue={field.value}
-                                  className="space-y-4"
-                                >
-                                  <FormItem className="flex items-start space-x-3 space-y-0 border rounded-md p-4">
-                                    <FormControl>
-                                      <RadioGroupItem value="basic" />
-                                    </FormControl>
-                                    <div className="space-y-1">
-                                      <FormLabel className="font-semibold text-lg">Básico - R$ 49,90/mês</FormLabel>
-                                      <p className="text-sm text-gray-500">
-                                        Ideal para terapeutas iniciantes
-                                      </p>
-                                    </div>
-                                  </FormItem>
-                                  <FormItem className="flex items-start space-x-3 space-y-0 border rounded-md p-4 bg-primary/5 border-primary/20">
-                                    <FormControl>
-                                      <RadioGroupItem value="professional" />
-                                    </FormControl>
-                                    <div className="space-y-1">
-                                      <div className="flex items-center">
-                                        <FormLabel className="font-semibold text-lg">Profissional - R$ 99,90/mês</FormLabel>
-                                        <span className="ml-2 bg-primary text-white text-xs px-2 py-0.5 rounded-full">Mais popular</span>
-                                      </div>
-                                      <p className="text-sm text-gray-500">
-                                        Para terapeutas estabelecidos
-                                      </p>
-                                    </div>
-                                  </FormItem>
-                                  <FormItem className="flex items-start space-x-3 space-y-0 border rounded-md p-4">
-                                    <FormControl>
-                                      <RadioGroupItem value="premium" />
-                                    </FormControl>
-                                    <div className="space-y-1">
-                                      <FormLabel className="font-semibold text-lg">Premium - R$ 149,90/mês</FormLabel>
-                                      <p className="text-sm text-gray-500">
-                                        Para práticas avançadas
-                                      </p>
-                                    </div>
-                                  </FormItem>
-                                </RadioGroup>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="flex justify-between pt-4">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={prevStep}
-                          className="w-full md:w-auto"
-                        >
-                          Voltar
-                        </Button>
-                        <Button 
-                          type="button" 
-                          onClick={nextStep}
-                          className="w-full md:w-auto"
-                        >
-                          Continuar
-                        </Button>
-                      </div>
-                    </>
-                  )}
-
-                  {step === 6 && (
-                    <>
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="foto_perfil"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Foto de perfil (URL)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="URL da sua foto de perfil" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Link para uma imagem profissional sua (opcional).
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="video_apresentacao"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Vídeo de apresentação (URL)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="Link do YouTube, Vimeo, etc." 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                URL para um vídeo breve de apresentação (opcional).
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="whatsapp"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>WhatsApp para contato (opcional)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="(00) 00000-0000" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Número que será exibido no botão de WhatsApp do seu perfil.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="equipe_criar_copy"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 border rounded-md p-4 bg-gray-50">
-                              <FormControl>
-                                <Checkbox 
-                                  checked={field.value} 
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                              <div className="space-y-1 leading-none">
-                                <FormLabel>
-                                  Gostaria que nossa equipe criasse o texto para seu perfil?
-                                </FormLabel>
-                                <FormDescription>
-                                  Nossa equipe de redatores criará um texto profissional baseado nas informações que você enviou.
-                                </FormDescription>
-                              </div>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="flex justify-between pt-6">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={prevStep}
-                          className="w-full md:w-auto"
-                        >
-                          Voltar
-                        </Button>
-                        <Button 
-                          type="submit" 
-                          className="w-full md:w-auto bg-primary"
-                        >
-                          <Save className="mr-2 h-4 w-4" /> Enviar cadastro
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </form>
-              </Form>
+                </React.Fragment>
+              ))}
             </div>
           </div>
-        </section>
-      ) : (
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {step === 1 && (
+                <>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="nome_completo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nome completo*</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Digite seu nome completo" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email profissional*</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="seu.email@exemplo.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="telefone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Telefone de contato*</FormLabel>
+                          <FormControl>
+                            <Input placeholder="(00) 00000-0000" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="pt-4">
+                    <Button 
+                      type="button" 
+                      onClick={nextStep} 
+                      className="w-full"
+                    >
+                      Continuar
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === 2 && (
+                <>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="especialidade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Especialidade*</FormLabel>
+                          <FormControl>
+                            <RadioGroup 
+                              onValueChange={field.onChange} 
+                              defaultValue={field.value}
+                              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="psicologia" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Psicologia</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="psicanalise" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Psicanálise</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="terapia_casal" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Terapia de Casal</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="coaching" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Coaching</FormLabel>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="formacao"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Formação acadêmica*</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: Psicologia pela USP" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="anos_experiencia"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Anos de experiência*</FormLabel>
+                          <FormControl>
+                            <Input type="number" min="0" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="button" 
+                      onClick={nextStep}
+                      className="w-full md:w-auto"
+                    >
+                      Continuar
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="biografia_curta"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Biografia curta (para exibição em listagens)*</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Breve descrição de sua prática profissional (máx. 150 caracteres)" 
+                              {...field} 
+                              className="h-20"
+                              maxLength={150}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Usado em cartões de listagem. Máximo 150 caracteres.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="biografia_longa"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Biografia completa (para sua página de perfil)*</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Descrição detalhada de sua formação, experiência e abordagem terapêutica" 
+                              {...field} 
+                              className="min-h-[150px]"
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Será exibida na sua página de perfil completo.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="button" 
+                      onClick={nextStep}
+                      className="w-full md:w-auto"
+                    >
+                      Continuar
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === 4 && (
+                <>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="areas_especializacao"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Áreas de especialização*</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ex: Ansiedade, Depressão, Dependência Emocional" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Separe diferentes áreas por vírgulas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="idiomas"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Idiomas*</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ex: Português, Inglês, Espanhol" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Separe diferentes idiomas por vírgulas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="certificacoes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Certificações</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ex: CFP, Certificação em TCC" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Separe diferentes certificações por vírgulas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="button" 
+                      onClick={nextStep}
+                      className="w-full md:w-auto"
+                    >
+                      Continuar
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === 5 && (
+                <>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="plano_escolhido"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Plano escolhido*</FormLabel>
+                          <FormControl>
+                            <RadioGroup 
+                              onValueChange={field.onChange} 
+                              defaultValue={field.value}
+                              className="space-y-4"
+                            >
+                              <FormItem className="flex items-start space-x-3 space-y-0 border rounded-md p-4">
+                                <FormControl>
+                                  <RadioGroupItem value="basic" />
+                                </FormControl>
+                                <div className="space-y-1">
+                                  <FormLabel className="font-semibold text-lg">Básico - R$ 49,90/mês</FormLabel>
+                                  <p className="text-sm text-gray-500">
+                                    Ideal para terapeutas iniciantes
+                                  </p>
+                                </div>
+                              </FormItem>
+                              <FormItem className="flex items-start space-x-3 space-y-0 border rounded-md p-4 bg-primary/5 border-primary/20">
+                                <FormControl>
+                                  <RadioGroupItem value="professional" />
+                                </FormControl>
+                                <div className="space-y-1">
+                                  <div className="flex items-center">
+                                    <FormLabel className="font-semibold text-lg">Profissional - R$ 99,90/mês</FormLabel>
+                                    <span className="ml-2 bg-primary text-white text-xs px-2 py-0.5 rounded-full">Mais popular</span>
+                                  </div>
+                                  <p className="text-sm text-gray-500">
+                                    Para terapeutas estabelecidos
+                                  </p>
+                                </div>
+                              </FormItem>
+                              <FormItem className="flex items-start space-x-3 space-y-0 border rounded-md p-4">
+                                <FormControl>
+                                  <RadioGroupItem value="premium" />
+                                </FormControl>
+                                <div className="space-y-1">
+                                  <FormLabel className="font-semibold text-lg">Premium - R$ 149,90/mês</FormLabel>
+                                  <p className="text-sm text-gray-500">
+                                    Para práticas avançadas
+                                  </p>
+                                </div>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="button" 
+                      onClick={nextStep}
+                      className="w-full md:w-auto"
+                    >
+                      Continuar
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === 6 && (
+                <>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="foto_perfil"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Foto de perfil (URL)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="URL da sua foto de perfil" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Link para uma imagem profissional sua (opcional).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="video_apresentacao"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vídeo de apresentação (URL)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Link do YouTube, Vimeo, etc." 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            URL para um vídeo breve de apresentação (opcional).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="whatsapp"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>WhatsApp para contato (opcional)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="(00) 00000-0000" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Número que será exibido no botão de WhatsApp do seu perfil.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="equipe_criar_copy"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 border rounded-md p-4 bg-gray-50">
+                          <FormControl>
+                            <Checkbox 
+                              checked={field.value} 
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Gostaria que nossa equipe criasse o texto para seu perfil?
+                            </FormLabel>
+                            <FormDescription>
+                              Nossa equipe de redatores criará um texto profissional baseado nas informações que você enviou.
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-6">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full md:w-auto bg-primary"
+                    >
+                      <Save className="mr-2 h-4 w-4" /> Enviar cadastro
+                    </Button>
+                  </div>
+                </>
+              )}
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      
+      {registrationSubmitted && (
         <section className="py-16 bg-gray-50">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="bg-white shadow-md rounded-lg p-8">
@@ -1022,7 +1029,7 @@ const ParaEspecialistas = () => {
             <Button 
               size="lg" 
               className="bg-primary hover:bg-primary/90"
-              onClick={() => document.getElementById('cadastro')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => openRegistrationDialog()}
             >
               Criar minha conta
             </Button>
