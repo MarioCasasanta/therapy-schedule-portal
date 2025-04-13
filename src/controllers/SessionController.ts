@@ -1,10 +1,10 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@/types/session";
+import { Session, SessionFormData } from "@/types/session";
 
 export class SessionController {
   // Funções do banco de dados para desenvolvimento
-  static async getSessions() {
+  static async getSessions(): Promise<Session[]> {
     try {
       // Usando a tabela 'sessoes' que está disponível no Supabase
       const { data, error } = await supabase.from("sessoes").select("*");
@@ -19,7 +19,7 @@ export class SessionController {
     }
   }
 
-  static async getSessionById(id: string) {
+  static async getSessionById(id: string): Promise<Session | null> {
     try {
       // Usando a tabela 'sessoes'
       const { data, error } = await supabase
@@ -38,7 +38,7 @@ export class SessionController {
     }
   }
 
-  static async createSession(sessionData: any) {
+  static async createSession(sessionData: SessionFormData): Promise<Session | null> {
     try {
       // Usando a tabela 'sessoes'
       const { data, error } = await supabase
@@ -56,7 +56,7 @@ export class SessionController {
     }
   }
 
-  static async updateSession(id: string, sessionData: any) {
+  static async updateSession(id: string, sessionData: Partial<SessionFormData>): Promise<Session | null> {
     try {
       // Usando a tabela 'sessoes'
       const { data, error } = await supabase
@@ -75,7 +75,7 @@ export class SessionController {
     }
   }
 
-  static async deleteSession(id: string) {
+  static async deleteSession(id: string): Promise<boolean> {
     try {
       // Usando a tabela 'sessoes'
       const { error } = await supabase
@@ -173,7 +173,7 @@ export class SessionController {
     }
   }
 
-  static async getClientSessionCount(clientId: string) {
+  static async getClientSessionCount(clientId: string): Promise<number> {
     try {
       const { count, error } = await supabase
         .from("sessoes")
@@ -188,7 +188,7 @@ export class SessionController {
     }
   }
 
-  static async getSpecialistSessionCount(specialistId: string) {
+  static async getSpecialistSessionCount(specialistId: string): Promise<number> {
     try {
       const { count, error } = await supabase
         .from("sessoes")
@@ -203,7 +203,7 @@ export class SessionController {
     }
   }
 
-  static async listSessions() {
+  static async listSessions(): Promise<Session[]> {
     try {
       const { data, error } = await supabase
         .from("sessoes")
@@ -220,27 +220,25 @@ export class SessionController {
           id: "1",
           data_hora: new Date().toISOString(),
           tipo_sessao: "individual",
-          clientName: "João Silva",
           status: "scheduled"
-        },
+        } as Session,
         {
           id: "2",
           data_hora: new Date(Date.now() + 86400000).toISOString(), // Amanhã
           tipo_sessao: "casal",
-          clientName: "Maria e Pedro",
           status: "scheduled"
-        }
+        } as Session
       ];
     }
   }
 
-  static async sendSessionInvite(sessionId: string) {
+  static async sendSessionInvite(sessionId: string): Promise<boolean> {
     // Função fictícia que normalmente enviaria um convite
     console.log(`Convite enviado para a sessão ${sessionId}`);
     return true;
   }
 
-  static async getSessionsByClient(clientId: string) {
+  static async getSessionsByClient(clientId: string): Promise<Session[]> {
     try {
       const { data, error } = await supabase
         .from("sessoes")
@@ -252,7 +250,7 @@ export class SessionController {
         throw error;
       }
 
-      return data || [];
+      return data as Session[] || [];
     } catch (error) {
       console.error('Error in getSessionsByClient:', error);
       return [];
