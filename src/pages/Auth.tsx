@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart } from "lucide-react";
+import { Heart, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
@@ -162,12 +161,16 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-sage-50 p-4">
-      <Link to="/" className="mb-8 flex items-center text-2xl font-playfair font-semibold text-sage-600">
-        <Heart className="h-8 w-8 text-pink-500 mr-2 fill-pink-500" />
-        Além do Apego
-      </Link>
-      
+    <div className="min-h-screen flex flex-col items-center justify-center bg-sage-50 p-4 relative">
+      <Button 
+        variant="ghost" 
+        className="absolute top-4 left-4"
+        onClick={() => navigate("/")}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Voltar para Início
+      </Button>
+
       {checkingUser ? (
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
           <p className="text-center">Verificando seu cadastro...</p>
