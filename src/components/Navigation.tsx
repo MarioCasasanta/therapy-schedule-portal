@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Menu, X, Calendar, Heart, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -32,11 +33,15 @@ const Navigation = () => {
             </Link>
             
             {loading ? (
-              <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-gray-200">
+                  <span className="sr-only">Carregando</span>
+                </AvatarFallback>
+              </Avatar>
             ) : user ? (
               <Link to={profile?.role === 'admin' ? '/dashboard' : '/client-dashboard'} className="flex items-center gap-2 text-sage-600 hover:text-sage-800">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={profile?.avatar_url} fallback="/placeholder.svg" />
+                  <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} />
                   <AvatarFallback className="bg-sage-100 text-sage-600">
                     {profile?.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>

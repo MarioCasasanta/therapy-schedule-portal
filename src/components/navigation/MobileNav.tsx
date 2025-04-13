@@ -41,7 +41,11 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
         
         {loading ? (
           <div className="px-3 py-2">
-            <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-gray-200">
+                <span className="sr-only">Carregando</span>
+              </AvatarFallback>
+            </Avatar>
           </div>
         ) : user ? (
           <Link
@@ -50,7 +54,7 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
             onClick={() => setIsOpen(false)}
           >
             <Avatar className="h-8 w-8">
-              <AvatarImage src={profile?.avatar_url} fallback="/placeholder.svg" />
+              <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} />
               <AvatarFallback className="bg-sage-100 text-sage-600">
                 {profile?.full_name?.charAt(0) || 'U'}
               </AvatarFallback>
