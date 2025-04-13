@@ -42,6 +42,14 @@ import AdminBlogOverview from "@/pages/admin/AdminBlogOverview";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 
+// Client Routes
+import ClientPayments from "@/pages/client/ClientPayments";
+import ClientNotifications from "@/pages/client/ClientNotifications";
+import ClientInvoices from "@/pages/client/ClientInvoices";
+import ClientHelp from "@/pages/client/ClientHelp";
+import ClientSettings from "@/pages/client/ClientSettings";
+import ClientSessionDetail from "@/pages/client/SessionDetail";
+
 function App() {
   return (
     <Router>
@@ -99,8 +107,14 @@ function App() {
         <Route path="/client-dashboard" element={<ClientDashboard />} />
         <Route path="/client-dashboard/sessions" element={<ClientSessions />} />
         <Route path="/client-dashboard/sessions/feedback" element={<SessionFeedback />} />
+        <Route path="/client-dashboard/sessions/:id" element={<ClientSessionDetail />} />
         <Route path="/client-dashboard/schedule" element={<ClientSchedule />} />
         <Route path="/client-dashboard/profile/edit" element={<ClientProfile />} />
+        <Route path="/client-dashboard/payments" element={<ClientPayments />} />
+        <Route path="/client-dashboard/notifications" element={<ClientNotifications />} />
+        <Route path="/client-dashboard/invoices" element={<ClientInvoices />} />
+        <Route path="/client-dashboard/help" element={<ClientHelp />} />
+        <Route path="/client-dashboard/settings" element={<ClientSettings />} />
         
         {/* 404 Route */}
         <Route path="*" element={<NotFound />} />

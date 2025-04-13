@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -47,9 +46,7 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
   const { toast } = useToast();
   const { state } = useSidebar();
 
-  // Define menu items based on role
   const getMenuItems = () => {
-    // Base items for admin
     const adminBaseItems: MenuItem[] = [
       { icon: LayoutDashboard, label: "Visão Geral", path: "/admin" },
       { icon: Calendar, label: "Sessões", path: "/admin/sessions" },
@@ -58,7 +55,6 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
       { icon: UserCircle, label: "Meu Perfil", path: "/admin/profile" },
     ];
     
-    // Base items for specialist
     const specialistBaseItems: MenuItem[] = [
       { icon: LayoutDashboard, label: "Visão Geral", path: "/dashboard" },
       { icon: Calendar, label: "Sessões", path: "/specialist-sessions" },
@@ -67,7 +63,6 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
       { icon: UserCircle, label: "Meu Perfil", path: "/specialist-profile" },
     ];
     
-    // Admin-specific items
     const adminItems: MenuItem[] = [
       { icon: Users, label: "Clientes", path: "/admin/clients", position: 1 },
       { icon: UserCog, label: "Especialistas", path: "/admin/specialists", position: 2 },
@@ -78,7 +73,6 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
       { icon: BarChart, label: "Relatórios", path: "/admin/reports", position: 8 },
     ];
     
-    // Specialist-specific items
     const specialistItems: MenuItem[] = [
       { icon: Users, label: "Meus Clientes", path: "/specialist-clients", position: 1 },
       { icon: CreditCard, label: "Financeiro", path: "/specialist-payments", position: 4 },
@@ -87,14 +81,12 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
     ];
 
     if (userRole === "admin") {
-      // Combine base items with admin items
       return [...adminBaseItems, ...adminItems].sort((a, b) => {
         const posA = a.position || 999;
         const posB = b.position || 999;
         return posA - posB;
       });
     } else {
-      // For specialists, combine base items with specialist items
       return [...specialistBaseItems, ...specialistItems].sort((a, b) => {
         const posA = a.position || 999;
         const posB = b.position || 999;
@@ -104,6 +96,10 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
   };
 
   const menuItems = getMenuItems();
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const handleGoToHome = () => {
     window.location.href = "/";
@@ -133,6 +129,15 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
           <SidebarTrigger />
         </div>
         <div className="p-2">
+          <SidebarMenuButton
+            variant="outline"
+            className="w-full justify-start mb-2"
+            onClick={handleGoBack}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span>Voltar</span>
+          </SidebarMenuButton>
+          
           <SidebarMenuButton
             variant="outline"
             className="w-full justify-start"

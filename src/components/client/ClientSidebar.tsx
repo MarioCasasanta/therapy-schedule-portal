@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,6 +29,10 @@ export function ClientSidebar({ className }: SidebarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   const handleLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -54,7 +57,16 @@ export function ClientSidebar({ className }: SidebarProps) {
         <div className="px-3 py-2">
           <Button
             variant="ghost"
-            className="w-full justify-start mb-6"
+            className="w-full justify-start mb-2"
+            onClick={handleGoBack}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className="w-full justify-start mb-4"
             onClick={() => window.location.href = '/'}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
