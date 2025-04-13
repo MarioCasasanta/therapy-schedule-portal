@@ -29,6 +29,7 @@ export const AuthComponent = ({
 }: AuthComponentProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
 
@@ -64,6 +65,11 @@ export const AuthComponent = ({
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              full_name: name,
+            },
+          },
         });
 
         if (error) throw error;
@@ -97,6 +103,18 @@ export const AuthComponent = ({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleAuth} className="space-y-4">
+          {!isLogin && (
+            <div className="space-y-2">
+              <Input
+                type="text"
+                placeholder="Nome completo"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required={!isLogin}
+                className="w-full"
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <Input
               type="email"

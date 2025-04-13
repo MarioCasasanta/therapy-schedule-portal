@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
@@ -135,7 +136,8 @@ const Auth = () => {
           password,
           options: {
             data: {
-              role: userType  // This will be used by the trigger function
+              role: userType,  // This will be used by the trigger function
+              full_name: name,
             }
           }
         });
@@ -226,6 +228,21 @@ const Auth = () => {
           </Tabs>
           
           <form onSubmit={handleAuth} className="space-y-4">
+            {!isLogin && (
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  Nome completo
+                </label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 block w-full"
+                  required={!isLogin}
+                />
+              </div>
+            )}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
