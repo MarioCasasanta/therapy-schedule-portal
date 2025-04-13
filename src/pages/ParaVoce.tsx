@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, Shield, Heart, Clock, CalendarDays, Star, Brain, TestTube, BarChart, Lock, BookOpen } from "lucide-react";
+import { Check, Shield, Heart, Clock, CalendarDays, Star, Brain, TestTube, BarChart, Lock, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
