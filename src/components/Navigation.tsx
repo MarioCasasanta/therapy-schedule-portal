@@ -1,8 +1,6 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, X, Calendar, Heart, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
-import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -38,9 +36,9 @@ const Navigation = () => {
             ) : user ? (
               <Link to={profile?.role === 'admin' ? '/dashboard' : '/client-dashboard'} className="flex items-center gap-2 text-sage-600 hover:text-sage-800">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarImage src={profile?.avatar_url} fallback="/placeholder.svg" />
                   <AvatarFallback className="bg-sage-100 text-sage-600">
-                    <UserCheck className="h-4 w-4 text-primary" />
+                    {profile?.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-primary font-medium hidden sm:inline-block">

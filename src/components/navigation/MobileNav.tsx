@@ -50,9 +50,9 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
             onClick={() => setIsOpen(false)}
           >
             <Avatar className="h-8 w-8">
-              <AvatarImage src={profile?.avatar_url} />
+              <AvatarImage src={profile?.avatar_url} fallback="/placeholder.svg" />
               <AvatarFallback className="bg-sage-100 text-sage-600">
-                <UserCheck className="h-4 w-4 text-primary" />
+                {profile?.full_name?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
             <span className="font-medium">
