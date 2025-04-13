@@ -52,7 +52,7 @@ export function ClientSidebar({ className }: SidebarProps) {
   };
 
   return (
-    <div className={cn("pb-12 border-r bg-white", className)}>
+    <div className={cn("pb-12 border-r bg-white w-[70%]", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <Button
