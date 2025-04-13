@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Heart } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const especialistaFormSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -18,13 +19,25 @@ const especialistaFormSchema = z.object({
   confirmPassword: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
   nomeCompleto: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
   especializacao: z.string().min(3, "A especialização deve ter pelo menos 3 caracteres"),
-  biografia: z.string().min(10, "A biografia deve ter pelo menos 10 caracteres"),
+  biografia: z.string().max(300, "A biografia curta deve ter no máximo 300 caracteres").optional(),
+  biografiaLonga: z.string().max(1000, "A biografia longa deve ter no máximo 1000 caracteres").optional(),
+  responderDepois: z.boolean().default(false),
   telefone: z.string().optional(),
 })
 .refine((data) => data.password === data.confirmPassword, {
   message: "As senhas não coincidem",
   path: ["confirmPassword"],
-});
+})
+.refine(
+  (data) => {
+    if (data.responderDepois) return true;
+    return data.biografia !== undefined;
+  },
+  {
+    message: "Por favor, preencha a biografia curta ou marque a opção para responder depois",
+    path: ["biografia"],
+  }
+);
 
 const RegistroEspecialista = () => {
   const [loading, setLoading] = useState(false);
@@ -40,9 +53,15 @@ const RegistroEspecialista = () => {
       nomeCompleto: "",
       especializacao: "",
       biografia: "",
+      biografiaLonga: "",
+      responderDepois: false,
       telefone: "",
     },
   });
+
+  const responderDepois = form.watch("responderDepois");
+  const biografiaValue = form.watch("biografia") || "";
+  const biografiaLongaValue = form.watch("biografiaLonga") || "";
 
   const handleSubmit = async (values: z.infer<typeof especialistaFormSchema>) => {
     setLoading(true);
@@ -57,7 +76,9 @@ const RegistroEspecialista = () => {
             role: "especialista",
             full_name: values.nomeCompleto,
             especializacao: values.especializacao,
-            biografia: values.biografia,
+            biografia: values.biografia || "",
+            biografiaLonga: values.biografiaLonga || "",
+            responderDepois: values.responderDepois,
             telefone: values.telefone,
           }
         }
@@ -187,17 +208,78 @@ const RegistroEspecialista = () => {
             
             <FormField
               control={form.control}
+              name="responderDepois"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Responder às biografias depois do cadastro inicial
+                    </FormLabel>
+                    <FormDescription>
+                      Você poderá completar suas biografias após confirmar seu email
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="biografia"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Biografia Profissional</FormLabel>
+                  <FormLabel>Biografia Curta</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Conte sobre sua formação, experiência e abordagem terapêutica..." 
-                      className="min-h-[120px]" 
-                      {...field} 
-                    />
+                    <div className="relative">
+                      <Textarea 
+                        placeholder="Uma breve descrição da sua formação e especialidade..." 
+                        className="min-h-[100px]" 
+                        disabled={responderDepois}
+                        maxLength={300}
+                        {...field} 
+                      />
+                      <div className="text-xs text-gray-500 text-right mt-1">
+                        {biografiaValue.length}/300 caracteres
+                      </div>
+                    </div>
                   </FormControl>
+                  <FormDescription>
+                    Uma breve descrição profissional (máx. 300 caracteres)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="biografiaLonga"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Biografia Completa</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Textarea 
+                        placeholder="Conte sobre sua formação, experiência e abordagem terapêutica..." 
+                        className="min-h-[150px]" 
+                        disabled={responderDepois}
+                        maxLength={1000}
+                        {...field} 
+                      />
+                      <div className="text-xs text-gray-500 text-right mt-1">
+                        {biografiaLongaValue.length}/1000 caracteres
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Biografia profissional detalhada (máx. 1000 caracteres)
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
