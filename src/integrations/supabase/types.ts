@@ -1589,6 +1589,75 @@ export type Database = {
           },
         ]
       }
+      specialist_registrations: {
+        Row: {
+          anos_experiencia: string
+          areas_especializacao: string | null
+          biografia_curta: string | null
+          biografia_longa: string | null
+          certificacoes: string | null
+          created_at: string | null
+          email: string
+          equipe_criar_copy: boolean | null
+          especialidade: string
+          formacao: string
+          foto_perfil: string | null
+          id: string
+          idiomas: string | null
+          nome_completo: string
+          plano_escolhido: string
+          preencher_depois: boolean | null
+          status: string | null
+          telefone: string
+          video_apresentacao: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          anos_experiencia: string
+          areas_especializacao?: string | null
+          biografia_curta?: string | null
+          biografia_longa?: string | null
+          certificacoes?: string | null
+          created_at?: string | null
+          email: string
+          equipe_criar_copy?: boolean | null
+          especialidade: string
+          formacao: string
+          foto_perfil?: string | null
+          id?: string
+          idiomas?: string | null
+          nome_completo: string
+          plano_escolhido: string
+          preencher_depois?: boolean | null
+          status?: string | null
+          telefone: string
+          video_apresentacao?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          anos_experiencia?: string
+          areas_especializacao?: string | null
+          biografia_curta?: string | null
+          biografia_longa?: string | null
+          certificacoes?: string | null
+          created_at?: string | null
+          email?: string
+          equipe_criar_copy?: boolean | null
+          especialidade?: string
+          formacao?: string
+          foto_perfil?: string | null
+          id?: string
+          idiomas?: string | null
+          nome_completo?: string
+          plano_escolhido?: string
+          preencher_depois?: boolean | null
+          status?: string | null
+          telefone?: string
+          video_apresentacao?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       specialists: {
         Row: {
           bio: string | null
