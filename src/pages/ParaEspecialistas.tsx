@@ -19,7 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 
 const allFeatures = [
   { 
@@ -473,11 +473,12 @@ const ParaEspecialistas = () => {
         </div>
       </section>
       
-      {/* Registration Dialog (Pop-up) */}
       <Dialog open={registrationDialogOpen} onOpenChange={setRegistrationDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-playfair font-semibold text-center">Cadastre-se como especialista</DialogTitle>
+            <DialogTitle className="text-2xl font-playfair font-semibold text-center">
+              Cadastre-se como especialista
+            </DialogTitle>
             <DialogDescription className="text-center">
               Preencha o formulário abaixo para iniciar seu processo de cadastro
             </DialogDescription>
@@ -869,3 +870,46 @@ const ParaEspecialistas = () => {
                                 <FormControl>
                                   <RadioGroupItem value="premium" />
                                 </FormControl>
+                                <div className="space-y-1">
+                                  <FormLabel className="font-semibold text-lg">Premium - R$ 149,90/mês</FormLabel>
+                                  <p className="text-sm text-gray-500">
+                                    Para práticas avançadas
+                                  </p>
+                                </div>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full md:w-auto"
+                    >
+                      Enviar Cadastro
+                    </Button>
+                  </div>
+                </>
+              )}
+            </form>
+          </Form>
+          <DialogClose />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default ParaEspecialistas;
