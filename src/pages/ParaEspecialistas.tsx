@@ -21,6 +21,27 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 
+type FormData = {
+  nome_completo: string;
+  email: string;
+  telefone: string;
+  especialidade: string;
+  formacao: string;
+  anos_experiencia: string;
+  biografia_curta: string;
+  biografia_longa: string;
+  areas_especializacao: string;
+  idiomas: string;
+  foto_perfil: string;
+  video_apresentacao: string;
+  whatsapp: string;
+  plano_escolhido: string;
+  equipe_criar_copy: boolean;
+  especialidades: { nome: string }[];
+  certificacoes: { nome: string }[];
+  preencher_depois?: boolean;
+};
+
 const allFeatures = [
   { 
     name: "Perfil completo na plataforma", 
@@ -188,7 +209,7 @@ const ParaEspecialistas = () => {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm({
+  const form = useForm<FormData>({
     defaultValues: {
       nome_completo: "",
       email: "",
@@ -200,7 +221,6 @@ const ParaEspecialistas = () => {
       biografia_longa: "",
       areas_especializacao: "",
       idiomas: "",
-      certificacoes: "",
       foto_perfil: "",
       video_apresentacao: "",
       whatsapp: "",
@@ -208,6 +228,7 @@ const ParaEspecialistas = () => {
       equipe_criar_copy: false,
       especialidades: [{ nome: '' }],
       certificacoes: [{ nome: '' }],
+      preencher_depois: false
     }
   });
 

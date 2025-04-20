@@ -1,10 +1,18 @@
 
 import { useState } from "react";
-import { Menu, X, Calendar, Heart, UserCheck } from "lucide-react";
+import { Menu, X, Calendar, Heart, UserCheck, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { MobileNav } from "./navigation/MobileNav";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,12 +30,26 @@ const Navigation = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/para-voce" className="text-sage-600 hover:text-sage-800 transition-colors">
-              Para Você
-            </Link>
-            <Link to="/para-especialistas" className="text-sage-600 hover:text-sage-800 transition-colors">
-              Para Especialistas
-            </Link>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="grid gap-3 p-4 w-[400px]">
+                      <Link to="/para-voce" className="block p-3 space-y-1 hover:bg-gray-50 rounded-md">
+                        <div className="font-medium">Para Você</div>
+                        <p className="text-sm text-gray-500">Encontre o apoio que você precisa</p>
+                      </Link>
+                      <Link to="/para-especialistas" className="block p-3 space-y-1 hover:bg-gray-50 rounded-md">
+                        <div className="font-medium">Para Especialistas</div>
+                        <p className="text-sm text-gray-500">Faça parte da nossa rede de profissionais</p>
+                      </Link>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
             <Link to="/blog" className="text-sage-600 hover:text-sage-800 transition-colors">
               Blog
             </Link>

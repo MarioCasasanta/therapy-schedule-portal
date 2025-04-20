@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Calendar, UserCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +16,7 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
   return (
     <div className="md:hidden bg-white border-b border-gray-100">
       <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className="px-3 py-2 text-sm font-medium text-gray-500">Serviços</div>
         <Link
           to="/para-voce"
           className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
@@ -30,13 +30,6 @@ export const MobileNav = ({ isOpen, setIsOpen }: MobileNavProps) => {
           onClick={() => setIsOpen(false)}
         >
           Para Especialistas
-        </Link>
-        <Link
-          to="/blog"
-          className="block px-3 py-2 text-sage-600 hover:text-sage-800 transition-colors"
-          onClick={() => setIsOpen(false)}
-        >
-          Blog
         </Link>
         
         {loading ? (
