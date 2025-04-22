@@ -1,11 +1,10 @@
-import React, { useState, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { 
   X, Award, Star, Phone, Calendar, 
   Video, Book, Users, Check, BarChart, 
-  Clock, UserPlus, Save, Upload, Plus
+  Clock, UserPlus, Save
 } from "lucide-react";
 import { 
   Card, CardContent, CardDescription, CardFooter, 
@@ -17,30 +16,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-
-type FormData = {
-  nome_completo: string;
-  email: string;
-  telefone: string;
-  especialidade: string;
-  formacao: string;
-  anos_experiencia: string;
-  biografia_curta: string;
-  biografia_longa: string;
-  areas_especializacao: string;
-  idiomas: string;
-  foto_perfil: string;
-  video_apresentacao: string;
-  whatsapp: string;
-  plano_escolhido: string;
-  equipe_criar_copy: boolean;
-  especialidades: { nome: string }[];
-  certificacoes: { nome: string }[];
-  preencher_depois?: boolean;
-};
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const allFeatures = [
   { 
@@ -206,10 +185,7 @@ const ParaEspecialistas = () => {
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("basic");
   
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const form = useForm<FormData>({
+  const form = useForm({
     defaultValues: {
       nome_completo: "",
       email: "",
@@ -221,69 +197,24 @@ const ParaEspecialistas = () => {
       biografia_longa: "",
       areas_especializacao: "",
       idiomas: "",
+      certificacoes: "",
       foto_perfil: "",
       video_apresentacao: "",
       whatsapp: "",
       plano_escolhido: "basic",
-      equipe_criar_copy: false,
-      especialidades: [{ nome: '' }],
-      certificacoes: [{ nome: '' }],
-      preencher_depois: false
+      equipe_criar_copy: false
     }
   });
-
-  const { fields: especialidadesFields, append: appendEspecialidade } = useFieldArray({
-    control: form.control,
-    name: 'especialidades',
-  });
-
-  const { fields: certificacoesFields, append: appendCertificacao } = useFieldArray({
-    control: form.control,
-    name: 'certificacoes',
-  });
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const filePath = `public/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('specialist_avatars')
-          .upload(filePath, file);
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('specialist_avatars')
-          .getPublicUrl(filePath);
-
-        form.setValue('foto_perfil', publicUrl);
-        setProfileImage(file);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Erro ao fazer upload",
-          description: "Não foi possível fazer upload da imagem.",
-        });
-      }
-    }
-  };
 
   const onSubmit = async (data) => {
     try {
-      const { error } = await supabase
-        .from('specialist_registrations')
-        .insert([{
+      // Create table if it doesn't exist yet
+      const { error } = await supabase.from("specialist_registrations").insert([
+        {
           ...data,
-          especialidades: data.especialidades.map(e => e.nome),
-          certificacoes: data.certificacoes.map(c => c.nome),
-          status: 'pending'
-        }]);
+          registration_status: "pending"
+        }
+      ]);
 
       if (error) throw error;
 
@@ -308,7 +239,7 @@ const ParaEspecialistas = () => {
       1: ["nome_completo", "email", "telefone"],
       2: ["especialidade", "formacao", "anos_experiencia"],
       3: ["biografia_curta", "biografia_longa"],
-      4: ["especialidades", "idiomas", "certificacoes"],
+      4: ["areas_especializacao", "idiomas", "certificacoes"],
       5: ["plano_escolhido"]
     };
 
@@ -494,12 +425,11 @@ const ParaEspecialistas = () => {
         </div>
       </section>
       
+      {/* Registration Dialog (Pop-up) */}
       <Dialog open={registrationDialogOpen} onOpenChange={setRegistrationDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-playfair font-semibold text-center">
-              Cadastre-se como especialista
-            </DialogTitle>
+            <DialogTitle className="text-2xl font-playfair font-semibold text-center">Cadastre-se como especialista</DialogTitle>
             <DialogDescription className="text-center">
               Preencha o formulário abaixo para iniciar seu processo de cadastro
             </DialogDescription>
@@ -764,68 +694,63 @@ const ParaEspecialistas = () => {
               {step === 4 && (
                 <>
                   <div className="space-y-4">
-                    {especialidadesFields.map((field, index) => (
-                      <FormField
-                        key={field.id}
-                        control={form.control}
-                        name={`especialidades.${index}.nome`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{index === 0 ? 'Especialidades*' : ''}</FormLabel>
-                            <div className="flex items-center space-x-2">
-                              <FormControl>
-                                <Input 
-                                  placeholder="Adicione uma especialidade" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              {index === especialidadesFields.length - 1 && (
-                                <Button 
-                                  type="button" 
-                                  variant="outline" 
-                                  size="icon" 
-                                  onClick={() => appendEspecialidade({ nome: '' })}
-                                >
-                                  <Plus className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                    {certificacoesFields.map((field, index) => (
-                      <FormField
-                        key={field.id}
-                        control={form.control}
-                        name={`certificacoes.${index}.nome`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{index === 0 ? 'Certificações' : ''}</FormLabel>
-                            <div className="flex items-center space-x-2">
-                              <FormControl>
-                                <Input 
-                                  placeholder="Adicione uma certificação" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              {index === certificacoesFields.length - 1 && (
-                                <Button 
-                                  type="button" 
-                                  variant="outline" 
-                                  size="icon" 
-                                  onClick={() => appendCertificacao({ nome: '' })}
-                                >
-                                  <Plus className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ))}
+                    <FormField
+                      control={form.control}
+                      name="areas_especializacao"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Áreas de especialização*</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ex: Ansiedade, Depressão, Dependência Emocional" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Separe diferentes áreas por vírgulas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="idiomas"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Idiomas*</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ex: Português, Inglês, Espanhol" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Separe diferentes idiomas por vírgulas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="certificacoes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Certificações</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ex: CFP, Certificação em TCC" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Separe diferentes certificações por vírgulas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                   <div className="flex justify-between pt-4">
                     <Button 
@@ -905,7 +830,6 @@ const ParaEspecialistas = () => {
                       )}
                     />
                   </div>
-                  
                   <div className="flex justify-between pt-4">
                     <Button 
                       type="button" 
@@ -916,19 +840,229 @@ const ParaEspecialistas = () => {
                       Voltar
                     </Button>
                     <Button 
-                      type="submit" 
+                      type="button" 
+                      onClick={nextStep}
                       className="w-full md:w-auto"
                     >
-                      Enviar Cadastro
+                      Continuar
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === 6 && (
+                <>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="foto_perfil"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Foto de perfil (URL)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="URL da sua foto de perfil" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Link para uma imagem profissional sua (opcional).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="video_apresentacao"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vídeo de apresentação (URL)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Link do YouTube, Vimeo, etc." 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            URL para um vídeo breve de apresentação (opcional).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="whatsapp"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>WhatsApp para contato (opcional)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="(00) 00000-0000" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Número que será exibido no botão de WhatsApp do seu perfil.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="equipe_criar_copy"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 border rounded-md p-4 bg-gray-50">
+                          <FormControl>
+                            <Checkbox 
+                              checked={field.value} 
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Gostaria que nossa equipe criasse o texto para seu perfil?
+                            </FormLabel>
+                            <FormDescription>
+                              Nossa equipe de redatores criará um texto profissional baseado nas informações que você enviou.
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-6">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full md:w-auto bg-primary"
+                    >
+                      <Save className="mr-2 h-4 w-4" /> Enviar cadastro
                     </Button>
                   </div>
                 </>
               )}
             </form>
           </Form>
-          <DialogClose />
         </DialogContent>
       </Dialog>
+      
+      {registrationSubmitted && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="bg-white shadow-md rounded-lg p-8">
+              <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <Check className="h-10 w-10 text-green-600" />
+              </div>
+              <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-4">
+                Cadastro enviado com sucesso!
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                Obrigado pelo seu interesse em se juntar à plataforma Além do Apego. Nossa equipe analisará suas informações e entrará em contato em breve pelo email fornecido.
+              </p>
+              <Button 
+                size="lg" 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Voltar ao topo
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+      
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-4">
+              O que dizem nossos especialistas
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Veja como nossa plataforma tem ajudado terapeutas a crescerem
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-gray-50 p-8 rounded-xl">
+              <p className="text-gray-700 italic mb-6">
+                "A plataforma simplificou meu processo de agendamento e me ajudou a me conectar com mais clientes. Minha agenda está sempre cheia agora."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
+                  DR
+                </div>
+                <div className="ml-4">
+                  <p className="font-semibold">Dra. Roberta Almeida</p>
+                  <p className="text-sm text-gray-500">Psicoterapeuta, Rio de Janeiro</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-8 rounded-xl">
+              <p className="text-gray-700 italic mb-6">
+                "O sistema de pagamentos integrado me poupa tempo e esforço. Os relatórios me ajudam a entender melhor o crescimento da minha prática."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
+                  FM
+                </div>
+                <div className="ml-4">
+                  <p className="font-semibold">Dr. Felipe Mendes</p>
+                  <p className="text-sm text-gray-500">Psicanalista, São Paulo</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-8 rounded-xl">
+              <p className="text-gray-700 italic mb-6">
+                "Desde que me juntei à plataforma, pude me concentrar mais na terapia e menos na administração. Vale cada centavo do investimento."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
+                  CL
+                </div>
+                <div className="ml-4">
+                  <p className="font-semibold">Dra. Carolina Lima</p>
+                  <p className="text-sm text-gray-500">Psicóloga, Belo Horizonte</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section className="py-16 bg-primary/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-playfair font-semibold text-gray-900 mb-6">
+            Pronto para transformar sua prática terapêutica?
+          </h2>
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-8">
+            Junte-se a centenas de terapeutas que estão expandindo seus horizontes com a Além do Apego
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => openRegistrationDialog()}
+            >
+              Criar minha conta
+            </Button>
+            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
+              Saiba mais
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      <Footer />
     </div>
   );
 };

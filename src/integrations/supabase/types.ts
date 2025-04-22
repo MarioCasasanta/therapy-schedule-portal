@@ -411,44 +411,6 @@ export type Database = {
         }
         Relationships: []
       }
-      conquistas: {
-        Row: {
-          data_conquista: string
-          descricao: string
-          fase_relacionada: number
-          icone_url: string | null
-          id: string
-          nome: string
-          user_id: string
-        }
-        Insert: {
-          data_conquista?: string
-          descricao: string
-          fase_relacionada: number
-          icone_url?: string | null
-          id?: string
-          nome: string
-          user_id: string
-        }
-        Update: {
-          data_conquista?: string
-          descricao?: string
-          fase_relacionada?: number
-          icone_url?: string | null
-          id?: string
-          nome?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conquistas_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       contact_submissions: {
         Row: {
           created_at: string
@@ -539,44 +501,6 @@ export type Database = {
         }
         Relationships: []
       }
-      crencas_dinheiro: {
-        Row: {
-          created_at: string
-          id: string
-          interpretacao_ia: string | null
-          pergunta: string
-          resposta: string
-          sugestao_ia: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          interpretacao_ia?: string | null
-          pergunta: string
-          resposta: string
-          sugestao_ia?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          interpretacao_ia?: string | null
-          pergunta?: string
-          resposta?: string
-          sugestao_ia?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "crencas_dinheiro_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       daily_audios: {
         Row: {
           audio_url: string
@@ -600,53 +524,6 @@ export type Database = {
           title?: string
         }
         Relationships: []
-      }
-      despesas: {
-        Row: {
-          categoria: string
-          created_at: string
-          data_gasto: string
-          descricao: string | null
-          feedback_ia: string | null
-          id: string
-          input_tipo: string | null
-          sentimento: string | null
-          user_id: string
-          valor: number
-        }
-        Insert: {
-          categoria: string
-          created_at?: string
-          data_gasto: string
-          descricao?: string | null
-          feedback_ia?: string | null
-          id?: string
-          input_tipo?: string | null
-          sentimento?: string | null
-          user_id: string
-          valor: number
-        }
-        Update: {
-          categoria?: string
-          created_at?: string
-          data_gasto?: string
-          descricao?: string | null
-          feedback_ia?: string | null
-          id?: string
-          input_tipo?: string | null
-          sentimento?: string | null
-          user_id?: string
-          valor?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "despesas_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       documents: {
         Row: {
@@ -823,47 +700,6 @@ export type Database = {
           },
         ]
       }
-      eventos_calendario: {
-        Row: {
-          created_at: string
-          data_evento: string
-          descricao: string | null
-          id: string
-          sincronizado_google: boolean | null
-          tipo_evento: string
-          titulo: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          data_evento: string
-          descricao?: string | null
-          id?: string
-          sincronizado_google?: boolean | null
-          tipo_evento: string
-          titulo: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          data_evento?: string
-          descricao?: string | null
-          id?: string
-          sincronizado_google?: boolean | null
-          tipo_evento?: string
-          titulo?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "eventos_calendario_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       events: {
         Row: {
           created_at: string
@@ -905,41 +741,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
-      fases_progresso: {
-        Row: {
-          data_conclusao: string | null
-          data_inicio: string
-          fase: number
-          id: string
-          status: string
-          user_id: string
-        }
-        Insert: {
-          data_conclusao?: string | null
-          data_inicio?: string
-          fase: number
-          id?: string
-          status: string
-          user_id: string
-        }
-        Update: {
-          data_conclusao?: string | null
-          data_inicio?: string
-          fase?: number
-          id?: string
-          status?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fases_progresso_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       financial_reports: {
         Row: {
@@ -1135,60 +936,6 @@ export type Database = {
           tem_ajuda?: boolean | null
           tem_apoio?: boolean | null
           user_id?: string
-        }
-        Relationships: []
-      }
-      lesson_content: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          lesson_id: number
-          module_id: number
-          updated_at: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          lesson_id: number
-          module_id: number
-          updated_at?: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          lesson_id?: number
-          module_id?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      lesson_quizzes: {
-        Row: {
-          created_at: string
-          id: string
-          lesson_id: number
-          module_id: number
-          questions: Json
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          lesson_id: number
-          module_id: number
-          questions: Json
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          lesson_id?: number
-          module_id?: number
-          questions?: Json
-          updated_at?: string
         }
         Relationships: []
       }
@@ -1422,30 +1169,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pontuacoes: {
-        Row: {
-          data: string
-          id: string
-          tipo_acao: string
-          user_id: string
-          valor: number
-        }
-        Insert: {
-          data?: string
-          id?: string
-          tipo_acao: string
-          user_id: string
-          valor: number
-        }
-        Update: {
-          data?: string
-          id?: string
-          tipo_acao?: string
-          user_id?: string
-          valor?: number
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1641,118 +1364,6 @@ export type Database = {
           },
         ]
       }
-      renda: {
-        Row: {
-          created_at: string
-          data: string | null
-          descricao: string
-          id: string
-          sugestao_ia: string | null
-          tipo: string
-          user_id: string
-          valor_estimado: number
-          viabilidade: string | null
-        }
-        Insert: {
-          created_at?: string
-          data?: string | null
-          descricao: string
-          id?: string
-          sugestao_ia?: string | null
-          tipo: string
-          user_id: string
-          valor_estimado: number
-          viabilidade?: string | null
-        }
-        Update: {
-          created_at?: string
-          data?: string | null
-          descricao?: string
-          id?: string
-          sugestao_ia?: string | null
-          tipo?: string
-          user_id?: string
-          valor_estimado?: number
-          viabilidade?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "renda_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      reserva_financeira: {
-        Row: {
-          created_at: string
-          descricao_meta: string | null
-          id: string
-          nivel_protecao: string
-          user_id: string
-          valor_atual: number
-          valor_objetivo: number
-        }
-        Insert: {
-          created_at?: string
-          descricao_meta?: string | null
-          id?: string
-          nivel_protecao: string
-          user_id: string
-          valor_atual: number
-          valor_objetivo: number
-        }
-        Update: {
-          created_at?: string
-          descricao_meta?: string | null
-          id?: string
-          nivel_protecao?: string
-          user_id?: string
-          valor_atual?: number
-          valor_objetivo?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reserva_financeira_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      rewards: {
-        Row: {
-          category: string
-          created_at: string
-          description: string | null
-          icon_name: string | null
-          id: string
-          name: string
-          points_required: number
-        }
-        Insert: {
-          category: string
-          created_at?: string
-          description?: string | null
-          icon_name?: string | null
-          id?: string
-          name: string
-          points_required: number
-        }
-        Update: {
-          category?: string
-          created_at?: string
-          description?: string | null
-          icon_name?: string | null
-          id?: string
-          name?: string
-          points_required?: number
-        }
-        Relationships: []
-      }
       sessoes: {
         Row: {
           cliente_id: string | null
@@ -1925,88 +1536,46 @@ export type Database = {
       specialist_details: {
         Row: {
           areas_of_expertise: string[] | null
-          booking_system: boolean | null
           certifications: string[] | null
-          color_preference: string | null
-          competitor_sites: string | null
-          content_sections: Json | null
           created_at: string | null
           education: string | null
-          existing_site: boolean | null
-          existing_site_url: string | null
           id: string
-          include_tests: boolean | null
           languages: string[] | null
           long_description: string | null
-          other_test_description: string | null
-          preferred_style: string | null
           rating: number | null
-          services: string | null
           sessions_completed: number | null
           short_description: string | null
-          site_goals: string | null
           specialist_id: string
-          target_audience: string | null
-          techniques_list: string | null
-          test_types: Json | null
           thumbnail_url: string | null
           updated_at: string | null
         }
         Insert: {
           areas_of_expertise?: string[] | null
-          booking_system?: boolean | null
           certifications?: string[] | null
-          color_preference?: string | null
-          competitor_sites?: string | null
-          content_sections?: Json | null
           created_at?: string | null
           education?: string | null
-          existing_site?: boolean | null
-          existing_site_url?: string | null
           id?: string
-          include_tests?: boolean | null
           languages?: string[] | null
           long_description?: string | null
-          other_test_description?: string | null
-          preferred_style?: string | null
           rating?: number | null
-          services?: string | null
           sessions_completed?: number | null
           short_description?: string | null
-          site_goals?: string | null
           specialist_id: string
-          target_audience?: string | null
-          techniques_list?: string | null
-          test_types?: Json | null
           thumbnail_url?: string | null
           updated_at?: string | null
         }
         Update: {
           areas_of_expertise?: string[] | null
-          booking_system?: boolean | null
           certifications?: string[] | null
-          color_preference?: string | null
-          competitor_sites?: string | null
-          content_sections?: Json | null
           created_at?: string | null
           education?: string | null
-          existing_site?: boolean | null
-          existing_site_url?: string | null
           id?: string
-          include_tests?: boolean | null
           languages?: string[] | null
           long_description?: string | null
-          other_test_description?: string | null
-          preferred_style?: string | null
           rating?: number | null
-          services?: string | null
           sessions_completed?: number | null
           short_description?: string | null
-          site_goals?: string | null
           specialist_id?: string
-          target_audience?: string | null
-          techniques_list?: string | null
-          test_types?: Json | null
           thumbnail_url?: string | null
           updated_at?: string | null
         }
@@ -2019,75 +1588,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      specialist_registrations: {
-        Row: {
-          anos_experiencia: string
-          areas_especializacao: string | null
-          biografia_curta: string | null
-          biografia_longa: string | null
-          certificacoes: string | null
-          created_at: string | null
-          email: string
-          equipe_criar_copy: boolean | null
-          especialidade: string
-          formacao: string
-          foto_perfil: string | null
-          id: string
-          idiomas: string | null
-          nome_completo: string
-          plano_escolhido: string
-          preencher_depois: boolean | null
-          status: string | null
-          telefone: string
-          video_apresentacao: string | null
-          whatsapp: string | null
-        }
-        Insert: {
-          anos_experiencia: string
-          areas_especializacao?: string | null
-          biografia_curta?: string | null
-          biografia_longa?: string | null
-          certificacoes?: string | null
-          created_at?: string | null
-          email: string
-          equipe_criar_copy?: boolean | null
-          especialidade: string
-          formacao: string
-          foto_perfil?: string | null
-          id?: string
-          idiomas?: string | null
-          nome_completo: string
-          plano_escolhido: string
-          preencher_depois?: boolean | null
-          status?: string | null
-          telefone: string
-          video_apresentacao?: string | null
-          whatsapp?: string | null
-        }
-        Update: {
-          anos_experiencia?: string
-          areas_especializacao?: string | null
-          biografia_curta?: string | null
-          biografia_longa?: string | null
-          certificacoes?: string | null
-          created_at?: string | null
-          email?: string
-          equipe_criar_copy?: boolean | null
-          especialidade?: string
-          formacao?: string
-          foto_perfil?: string | null
-          id?: string
-          idiomas?: string | null
-          nome_completo?: string
-          plano_escolhido?: string
-          preencher_depois?: boolean | null
-          status?: string | null
-          telefone?: string
-          video_apresentacao?: string | null
-          whatsapp?: string | null
-        }
-        Relationships: []
       }
       specialists: {
         Row: {
@@ -2384,70 +1884,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_quiz_attempts: {
-        Row: {
-          answers: Json
-          completed_at: string
-          id: string
-          quiz_id: string
-          score: number
-          user_id: string
-        }
-        Insert: {
-          answers: Json
-          completed_at?: string
-          id?: string
-          quiz_id: string
-          score: number
-          user_id: string
-        }
-        Update: {
-          answers?: Json
-          completed_at?: string
-          id?: string
-          quiz_id?: string
-          score?: number
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_quiz_attempts_quiz_id_fkey"
-            columns: ["quiz_id"]
-            isOneToOne: false
-            referencedRelation: "lesson_quizzes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_rewards: {
-        Row: {
-          earned_at: string
-          id: string
-          reward_id: string
-          user_id: string
-        }
-        Insert: {
-          earned_at?: string
-          id?: string
-          reward_id: string
-          user_id: string
-        }
-        Update: {
-          earned_at?: string
-          id?: string
-          reward_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_rewards_reward_id_fkey"
-            columns: ["reward_id"]
-            isOneToOne: false
-            referencedRelation: "rewards"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -2504,15 +1940,6 @@ export type Database = {
       }
     }
     Views: {
-      ranking_pontuacao: {
-        Row: {
-          full_name: string | null
-          total_pontos: number | null
-          ultima_pontuacao: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
       session_statistics: {
         Row: {
           cliente_id: string | null
