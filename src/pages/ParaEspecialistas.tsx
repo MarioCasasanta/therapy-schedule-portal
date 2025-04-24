@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -203,11 +204,10 @@ const ParaEspecialistas = () => {
       whatsapp: "",
       plano_escolhido: "basic",
       equipe_criar_copy: false,
-      // Removido o campo preencher_depois que estava causando o erro
     }
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: any) => {
     try {
       // Create table if it doesn't exist yet
       const { error } = await supabase.from("specialist_registrations").insert([
@@ -244,7 +244,7 @@ const ParaEspecialistas = () => {
       5: ["plano_escolhido"]
     };
 
-    const fields = currentStepFields[step];
+    const fields = currentStepFields[step as keyof typeof currentStepFields];
     const isValid = fields.every(field => {
       const value = form.getValues(field);
       return value !== undefined && value !== "";
@@ -255,7 +255,7 @@ const ParaEspecialistas = () => {
     } else {
       fields.forEach(field => {
         if (!form.getValues(field)) {
-          form.setError(field, {
+          form.setError(field as any, {
             type: "required",
             message: "Este campo é obrigatório"
           });
@@ -276,8 +276,6 @@ const ParaEspecialistas = () => {
   };
 
   return (
-    
-
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
@@ -368,7 +366,7 @@ const ParaEspecialistas = () => {
                 <CardContent>
                   <ul className="space-y-3">
                     {getSortedFeatures(plan.planType).map((feature, i) => {
-                      const available = feature.available[plan.planType];
+                      const available = feature.available[plan.planType as keyof typeof feature.available];
                       
                       let icon;
                       
@@ -460,7 +458,6 @@ const ParaEspecialistas = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {step === 1 && (
-                
                 <>
                   <div className="space-y-4">
                     <FormField
@@ -516,7 +513,6 @@ const ParaEspecialistas = () => {
               )}
 
               {step === 2 && (
-                
                 <>
                   <div className="space-y-4">
                     <FormField
@@ -653,13 +649,18 @@ const ParaEspecialistas = () => {
                         </FormItem>
                       )}
                     />
-                    {/* Correção: Adicionado campo "preencher_depois" que não estava na definição do form */}
-                    {/* Correção: Alterado para usar boolean em vez de string */}
+                    {/* Checkbox para preencher biografia depois */}
                     <div className="flex flex-row items-start space-x-3 space-y-0 border rounded-md p-4 bg-gray-50">
-                      <Checkbox id="preencher_depois" />
+                      <Checkbox 
+                        id="equipe_criar_copy"
+                        checked={form.watch("equipe_criar_copy")}
+                        onCheckedChange={(checked) => {
+                          form.setValue("equipe_criar_copy", checked === true);
+                        }}
+                      />
                       <div className="space-y-1 leading-none">
                         <label
-                          htmlFor="preencher_depois"
+                          htmlFor="equipe_criar_copy"
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           Preencher biografia posteriormente
@@ -879,4 +880,62 @@ const ParaEspecialistas = () => {
                           <FormLabel>Vídeo de apresentação (URL)</FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="Link do YouTube, Vimeo,
+                              placeholder="Link do YouTube, Vimeo, etc." 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Link para um vídeo curto de apresentação (opcional).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="whatsapp"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>WhatsApp profissional</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="(00) 00000-0000" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Número para contato via WhatsApp (opcional).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-between pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={prevStep}
+                      className="w-full md:w-auto"
+                    >
+                      Voltar
+                    </Button>
+                    <Button 
+                      type="submit"
+                      className="w-full md:w-auto"
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Enviar cadastro
+                    </Button>
+                  </div>
+                </>
+              )}
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default ParaEspecialistas;

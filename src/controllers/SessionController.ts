@@ -173,8 +173,7 @@ export class SessionController {
     }
   }
 
-  // A linha 195 era a causa do erro "Type instantiation is excessively deep and possibly infinite"
-  // Resolução: Modificar a função para usar count: "exact" com head: true
+  // Corrigido para usar count: "exact" e head: true para resolver o erro TS2589
   static async getClientSessionCount(clientId: string): Promise<number> {
     try {
       const { count, error } = await supabase
