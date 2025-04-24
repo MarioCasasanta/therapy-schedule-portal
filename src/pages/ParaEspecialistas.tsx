@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -21,6 +20,8 @@ import { useForm } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const allFeatures = [
   { 
@@ -179,6 +180,28 @@ const steps = [
   }
 ];
 
+const formSchema = z.object({
+  nome_completo: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
+  email: z.string().email("Email inválido"),
+  telefone: z.string().min(8, "Telefone inválido"),
+  especialidade: z.string(),
+  formacao: z.string(),
+  anos_experiencia: z.string(),
+  biografia_curta: z.string(),
+  biografia_longa: z.string(),
+  areas_especializacao: z.string(),
+  idiomas: z.string(),
+  certificacoes: z.string().optional().default(""),
+  foto_perfil: z.string().optional().default(""),
+  video_apresentacao: z.string().optional().default(""),
+  whatsapp: z.string().optional().default(""),
+  plano_escolhido: z.string(),
+  equipe_criar_copy: z.boolean().default(false),
+  preencher_depois: z.boolean().default(false),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
 const ParaEspecialistas = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
@@ -186,7 +209,8 @@ const ParaEspecialistas = () => {
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("basic");
   
-  const form = useForm({
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       nome_completo: "",
       email: "",
@@ -204,12 +228,12 @@ const ParaEspecialistas = () => {
       whatsapp: "",
       plano_escolhido: "basic",
       equipe_criar_copy: false,
+      preencher_depois: false,
     }
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FormValues) => {
     try {
-      // Create table if it doesn't exist yet
       const { error } = await supabase.from("specialist_registrations").insert([
         {
           ...data,
@@ -236,7 +260,7 @@ const ParaEspecialistas = () => {
   };
 
   const nextStep = () => {
-    const currentStepFields = {
+    const currentStepFields: Record<number, Array<keyof FormValues>> = {
       1: ["nome_completo", "email", "telefone"],
       2: ["especialidade", "formacao", "anos_experiencia"],
       3: ["biografia_curta", "biografia_longa"],
@@ -244,7 +268,7 @@ const ParaEspecialistas = () => {
       5: ["plano_escolhido"]
     };
 
-    const fields = currentStepFields[step as keyof typeof currentStepFields];
+    const fields = currentStepFields[step];
     const isValid = fields.every(field => {
       const value = form.getValues(field);
       return value !== undefined && value !== "";
@@ -255,7 +279,7 @@ const ParaEspecialistas = () => {
     } else {
       fields.forEach(field => {
         if (!form.getValues(field)) {
-          form.setError(field as any, {
+          form.setError(field, {
             type: "required",
             message: "Este campo é obrigatório"
           });
@@ -649,27 +673,26 @@ const ParaEspecialistas = () => {
                         </FormItem>
                       )}
                     />
-                    {/* Checkbox para preencher biografia depois */}
-                    <div className="flex flex-row items-start space-x-3 space-y-0 border rounded-md p-4 bg-gray-50">
-                      <Checkbox 
-                        id="equipe_criar_copy"
-                        checked={form.watch("equipe_criar_copy")}
-                        onCheckedChange={(checked) => {
-                          form.setValue("equipe_criar_copy", checked === true);
-                        }}
-                      />
-                      <div className="space-y-1 leading-none">
-                        <label
-                          htmlFor="equipe_criar_copy"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Preencher biografia posteriormente
-                        </label>
-                        <p className="text-sm text-muted-foreground">
-                          Você pode adicionar ou editar sua biografia mais tarde no seu perfil.
-                        </p>
-                      </div>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="preencher_depois"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 border rounded-md p-4 bg-gray-50">
+                          <FormControl>
+                            <Checkbox 
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Preencher biografia posteriormente</FormLabel>
+                            <FormDescription>
+                              Você pode adicionar ou editar sua biografia mais tarde no seu perfil.
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                   <div className="flex justify-between pt-4">
                     <Button 
