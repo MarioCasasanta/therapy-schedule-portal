@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Session, SessionFormData } from "@/types/session";
 
@@ -175,10 +174,12 @@ export class SessionController {
 
   static async getClientSessionCount(clientId: string): Promise<number> {
     try {
-      const { count, error } = await supabase
+      // Usamos count diretamente em vez de select com count
+      const { error, count } = await supabase
         .from("sessoes")
-        .select("*", { count: "exact", head: true })
-        .eq("cliente_id", clientId);
+        .select("*", { count: "exact" })
+        .eq("cliente_id", clientId)
+        .limit(0); // Limita a zero para não retornar dados, apenas contar
         
       if (error) throw error;
       return count || 0;
@@ -190,10 +191,12 @@ export class SessionController {
 
   static async getSpecialistSessionCount(specialistId: string): Promise<number> {
     try {
-      const { count, error } = await supabase
+      // Usamos count diretamente em vez de select com count
+      const { error, count } = await supabase
         .from("sessoes")
-        .select("*", { count: "exact", head: true })
-        .eq("specialist_id", specialistId);
+        .select("*", { count: "exact" })
+        .eq("specialist_id", specialistId)
+        .limit(0); // Limita a zero para não retornar dados, apenas contar
         
       if (error) throw error;
       return count || 0;

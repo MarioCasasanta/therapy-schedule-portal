@@ -236,7 +236,7 @@ const ParaEspecialistas = () => {
     try {
       const { error } = await supabase.from("specialist_registrations").insert({
         ...data,
-        registration_status: "pending"
+        status: "pending"
       });
 
       if (error) throw error;
