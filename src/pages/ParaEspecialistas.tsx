@@ -234,12 +234,10 @@ const ParaEspecialistas = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const { error } = await supabase.from("specialist_registrations").insert([
-        {
-          ...data,
-          registration_status: "pending"
-        }
-      ]);
+      const { error } = await supabase.from("specialist_registrations").insert({
+        ...data,
+        registration_status: "pending"
+      });
 
       if (error) throw error;
 

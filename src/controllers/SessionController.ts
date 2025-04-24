@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Session, SessionFormData } from "@/types/session";
 
@@ -42,7 +43,7 @@ export class SessionController {
       // Usando a tabela 'sessoes'
       const { data, error } = await supabase
         .from("sessoes")
-        .insert([sessionData])
+        .insert(sessionData)
         .select();
       if (error) {
         console.error("Erro ao criar sessão:", error);
@@ -172,13 +173,11 @@ export class SessionController {
     }
   }
 
-  // Corrected to avoid TypeScript "excessively deep" error by explicitly typing the return
   static async getClientSessionCount(clientId: string): Promise<number> {
     try {
-      // Use count() instead of select with count: "exact" to avoid TypeScript recursion issue
       const { count, error } = await supabase
         .from("sessoes")
-        .select("id", { count: "exact" })
+        .select("*", { count: "exact", head: true })
         .eq("cliente_id", clientId);
         
       if (error) throw error;
@@ -191,10 +190,9 @@ export class SessionController {
 
   static async getSpecialistSessionCount(specialistId: string): Promise<number> {
     try {
-      // Use count() instead of select with count: "exact" to avoid TypeScript recursion issue
       const { count, error } = await supabase
         .from("sessoes")
-        .select("id", { count: "exact" })
+        .select("*", { count: "exact", head: true })
         .eq("specialist_id", specialistId);
         
       if (error) throw error;
