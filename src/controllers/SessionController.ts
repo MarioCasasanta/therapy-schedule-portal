@@ -175,9 +175,10 @@ export class SessionController {
 
   static async getClientSessionCount(clientId: string): Promise<number> {
     try {
+      // Corrigido para usar count corretamente na API do Supabase
       const { count, error } = await supabase
         .from("sessoes")
-        .select("*", { count: "exact" })
+        .select("*", { count: "exact", head: true })
         .eq("cliente_id", clientId);
         
       if (error) throw error;
@@ -190,9 +191,10 @@ export class SessionController {
 
   static async getSpecialistSessionCount(specialistId: string): Promise<number> {
     try {
+      // Corrigido para usar count corretamente na API do Supabase
       const { count, error } = await supabase
         .from("sessoes")
-        .select("*", { count: "exact" })
+        .select("*", { count: "exact", head: true })
         .eq("specialist_id", specialistId);
         
       if (error) throw error;
