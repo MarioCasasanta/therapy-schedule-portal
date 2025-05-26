@@ -200,6 +200,105 @@ export type Database = {
         }
         Relationships: []
       }
+      briefing_submissions: {
+        Row: {
+          additional_notes: string | null
+          biography: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          email: string
+          facebook: string | null
+          full_name: string
+          has_logo: string | null
+          id: string
+          inspiration_sites: string[] | null
+          instagram: string | null
+          linkedin: string | null
+          location: string | null
+          phone: string
+          preferred_colors: string | null
+          professional_name: string | null
+          services: string | null
+          session_values: string | null
+          specializations: string | null
+          target_audience: string | null
+          wants_about_section: string | null
+          wants_ai_description: string | null
+          wants_contact_form: string | null
+          wants_contact_section: string | null
+          wants_differentials_section: string | null
+          wants_hero_section: string | null
+          wants_services_section: string | null
+          wants_testimonials_section: string | null
+          wants_whatsapp_button: string | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          biography?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          email: string
+          facebook?: string | null
+          full_name: string
+          has_logo?: string | null
+          id?: string
+          inspiration_sites?: string[] | null
+          instagram?: string | null
+          linkedin?: string | null
+          location?: string | null
+          phone: string
+          preferred_colors?: string | null
+          professional_name?: string | null
+          services?: string | null
+          session_values?: string | null
+          specializations?: string | null
+          target_audience?: string | null
+          wants_about_section?: string | null
+          wants_ai_description?: string | null
+          wants_contact_form?: string | null
+          wants_contact_section?: string | null
+          wants_differentials_section?: string | null
+          wants_hero_section?: string | null
+          wants_services_section?: string | null
+          wants_testimonials_section?: string | null
+          wants_whatsapp_button?: string | null
+        }
+        Update: {
+          additional_notes?: string | null
+          biography?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          email?: string
+          facebook?: string | null
+          full_name?: string
+          has_logo?: string | null
+          id?: string
+          inspiration_sites?: string[] | null
+          instagram?: string | null
+          linkedin?: string | null
+          location?: string | null
+          phone?: string
+          preferred_colors?: string | null
+          professional_name?: string | null
+          services?: string | null
+          session_values?: string | null
+          specializations?: string | null
+          target_audience?: string | null
+          wants_about_section?: string | null
+          wants_ai_description?: string | null
+          wants_contact_form?: string | null
+          wants_contact_section?: string | null
+          wants_differentials_section?: string | null
+          wants_hero_section?: string | null
+          wants_services_section?: string | null
+          wants_testimonials_section?: string | null
+          wants_whatsapp_button?: string | null
+        }
+        Relationships: []
+      }
       captura: {
         Row: {
           autoriza_notificacoes: boolean | null

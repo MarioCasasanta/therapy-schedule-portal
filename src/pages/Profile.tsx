@@ -47,6 +47,7 @@ const Profile = () => {
         full_name: formData.full_name,
         telefone: formData.telefone,
         data_nascimento: formData.data_nascimento,
+        avatar_url: formData.avatar_url,
       })
       .eq("id", profile.id);
 

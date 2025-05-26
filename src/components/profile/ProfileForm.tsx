@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Camera } from "lucide-react";
 
 interface ProfileFormProps {
   profile: any;
@@ -17,11 +18,14 @@ interface ProfileFormProps {
 export const ProfileForm = ({ profile, onSubmit, onCancel }: ProfileFormProps) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || "",
     telefone: profile?.telefone || "",
     data_nascimento: profile?.data_nascimento ? format(new Date(profile.data_nascimento), 'yyyy-MM-dd') : "",
-    email: profile?.email || ""
+    email: profile?.email || "",
+    avatar_url: profile?.avatar_url || ""
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,15 +36,69 @@ export const ProfileForm = ({ profile, onSubmit, onCancel }: ProfileFormProps) =
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Verificar se é uma imagem
+      if (!file.type.startsWith('image/')) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Por favor, selecione apenas arquivos de imagem.",
+        });
+        return;
+      }
+
+      // Verificar tamanho do arquivo (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "A imagem deve ter no máximo 5MB.",
+        });
+        return;
+      }
+
+      setSelectedFile(file);
+      
+      // Criar preview da imagem
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await onSubmit(formData);
-      setIsEditing(false);
-      toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso.",
-      });
+      let updatedFormData = { ...formData };
+
+      // Se há uma nova imagem selecionada, convertê-la para base64
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          updatedFormData.avatar_url = e.target?.result as string;
+          
+          await onSubmit(updatedFormData);
+          setIsEditing(false);
+          setSelectedFile(null);
+          setPreviewUrl(null);
+          toast({
+            title: "Perfil atualizado",
+            description: "Suas informações foram atualizadas com sucesso.",
+          });
+        };
+        reader.readAsDataURL(selectedFile);
+      } else {
+        await onSubmit(updatedFormData);
+        setIsEditing(false);
+        toast({
+          title: "Perfil atualizado",
+          description: "Suas informações foram atualizadas com sucesso.",
+        });
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -48,6 +106,20 @@ export const ProfileForm = ({ profile, onSubmit, onCancel }: ProfileFormProps) =
         description: error.message,
       });
     }
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setFormData({
+      full_name: profile?.full_name || "",
+      telefone: profile?.telefone || "",
+      data_nascimento: profile?.data_nascimento ? format(new Date(profile.data_nascimento), 'yyyy-MM-dd') : "",
+      email: profile?.email || "",
+      avatar_url: profile?.avatar_url || ""
+    });
+    onCancel();
   };
 
   return (
@@ -97,6 +169,32 @@ export const ProfileForm = ({ profile, onSubmit, onCancel }: ProfileFormProps) =
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="relative">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={previewUrl || profile?.avatar_url} />
+                      <AvatarFallback>{profile?.full_name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <label 
+                      htmlFor="avatar-upload" 
+                      className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer hover:bg-primary/90 transition-colors"
+                    >
+                      <Camera className="h-3 w-3" />
+                    </label>
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <p>Clique no ícone da câmera para alterar a foto</p>
+                    <p className="text-xs">Máximo 5MB - JPG, PNG, GIF</p>
+                  </div>
+                </div>
+
                 <div>
                   <Label htmlFor="full_name">Nome Completo</Label>
                   <Input
@@ -142,16 +240,7 @@ export const ProfileForm = ({ profile, onSubmit, onCancel }: ProfileFormProps) =
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => {
-                      setIsEditing(false);
-                      setFormData({
-                        full_name: profile?.full_name || "",
-                        telefone: profile?.telefone || "",
-                        data_nascimento: profile?.data_nascimento ? format(new Date(profile.data_nascimento), 'yyyy-MM-dd') : "",
-                        email: profile?.email || ""
-                      });
-                      onCancel();
-                    }}
+                    onClick={cancelEdit}
                   >
                     Cancelar
                   </Button>
