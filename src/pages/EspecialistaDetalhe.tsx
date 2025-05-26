@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Star, ArrowLeft, CalendarDays, Clock, MapPin, User, Mail, Phone, GraduationCap, Languages } from "lucide-react";
@@ -21,6 +20,7 @@ interface SpecialistDetail {
   languages?: string[];
   certifications?: string[];
   rating?: number;
+  [key: string]: any; // Allow additional properties
 }
 
 interface Especialista {
@@ -67,7 +67,7 @@ const EspecialistaDetalhe = () => {
             experience_years: data.experience_years,
             email: data.email,
             phone: data.phone,
-            details: data.details
+            details: data.details || {}
           });
         }
       } catch (error) {
