@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Session, SessionFormData } from "@/types/session";
 
@@ -177,7 +176,7 @@ export class SessionController {
     try {
       const { count, error } = await supabase
         .from("sessoes")
-        .select("*", { count: 'exact', head: true })
+        .select("id", { count: 'exact' })
         .eq("cliente_id", clientId);
         
       if (error) throw error;
@@ -192,7 +191,7 @@ export class SessionController {
     try {
       const { count, error } = await supabase
         .from("sessoes")
-        .select("*", { count: 'exact', head: true })
+        .select("id", { count: 'exact' })
         .eq("specialist_id", specialistId);
         
       if (error) throw error;
