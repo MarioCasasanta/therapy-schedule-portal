@@ -21,12 +21,12 @@ export default function AdminSpecialistList() {
   useEffect(() => {
     const fetchSpecialists = async () => {
       try {
-        console.log("Buscando especialistas do banco de dados...");
+        console.log("🔍 Buscando especialistas do banco de dados...");
         const data = await SessionController.getAllSpecialists();
-        console.log("Especialistas encontrados:", data);
+        console.log("✅ Especialistas encontrados:", data.length);
         setSpecialists(data);
       } catch (error) {
-        console.error("Erro ao carregar especialistas:", error);
+        console.error("❌ Erro ao carregar especialistas:", error);
       } finally {
         setLoading(false);
       }

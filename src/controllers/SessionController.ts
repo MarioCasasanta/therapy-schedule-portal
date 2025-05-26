@@ -40,6 +40,8 @@ export class SessionController {
   // Direct database operations without circular dependencies
   static async getSpecialistDetails(id: string) {
     try {
+      console.log("🔍 Buscando detalhes do especialista:", id);
+      
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -47,7 +49,12 @@ export class SessionController {
         .eq("role", "especialista")
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Erro ao buscar especialista:", error);
+        throw error;
+      }
+
+      console.log("✅ Especialista encontrado:", data);
 
       return {
         id: data.id,
@@ -55,7 +62,7 @@ export class SessionController {
         specialty: "Psicologia",
         bio: "Especialista em terapia",
         email: data.email || "email@example.com",
-        phone: "123456789",
+        phone: data.phone || "123456789",
         rating: 4.8,
         experience_years: 5,
         details: {
@@ -70,45 +77,51 @@ export class SessionController {
         },
       };
     } catch (error) {
-      console.error("Erro ao buscar detalhes do especialista:", error);
+      console.error("❌ Erro ao buscar detalhes do especialista:", error);
       throw error;
     }
   }
 
   static async getAllSpecialists() {
     try {
+      console.log("🔍 Buscando todos os especialistas...");
+      
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("role", "especialista");
       
       if (error) {
-        console.error("Erro ao buscar especialistas:", error);
+        console.error("❌ Erro ao buscar especialistas:", error);
         return [];
       }
       
+      console.log("✅ Especialistas encontrados:", data?.length || 0);
       return data || [];
     } catch (error) {
-      console.error("Erro ao buscar especialistas:", error);
+      console.error("❌ Erro ao buscar especialistas:", error);
       return [];
     }
   }
 
   static async getAllClients() {
     try {
+      console.log("🔍 Buscando todos os clientes...");
+      
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .or("role.eq.cliente,role.eq.client,tipo_usuario.eq.cliente");
       
       if (error) {
-        console.error("Erro ao buscar clientes:", error);
+        console.error("❌ Erro ao buscar clientes:", error);
         return [];
       }
       
+      console.log("✅ Clientes encontrados:", data?.length || 0);
       return data || [];
     } catch (error) {
-      console.error("Erro ao buscar clientes:", error);
+      console.error("❌ Erro ao buscar clientes:", error);
       return [];
     }
   }
@@ -123,7 +136,7 @@ export class SessionController {
       if (error) throw error;
       return count || 0;
     } catch (error) {
-      console.error("Erro ao contar sessões do especialista:", error);
+      console.error("❌ Erro ao contar sessões do especialista:", error);
       return 0;
     }
   }
@@ -138,7 +151,7 @@ export class SessionController {
       if (error) throw error;
       return count || 0;
     } catch (error) {
-      console.error("Erro ao contar sessões do cliente:", error);
+      console.error("❌ Erro ao contar sessões do cliente:", error);
       return 0;
     }
   }

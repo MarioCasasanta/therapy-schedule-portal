@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BlogController } from "@/controllers/BlogController";
@@ -5,7 +6,6 @@ import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface BlogPost {
   id: string;
@@ -40,38 +40,20 @@ const Blog = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        console.log("🔍 Carregando posts do blog...");
         const postsData = await BlogController.getPublishedPosts();
+        console.log("✅ Posts carregados:", postsData.length);
         setPosts(postsData);
+        setFeaturedPosts(postsData.slice(0, 5)); // Use the same posts for featured
       } catch (error) {
-        console.error("Erro ao buscar posts do blog:", error);
+        console.error("❌ Erro ao buscar posts do blog:", error);
       } finally {
         setIsLoading(false);
-      }
-    };
-
-    const fetchFeaturedPosts = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('blog_posts')
-          .select('id, title, slug, excerpt, created_at, content, author_id, updated_at')
-          .eq('published', true)
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        if (error) {
-          throw error;
-        }
-
-        setFeaturedPosts(data || []);
-      } catch (error) {
-        console.error("Erro ao buscar posts em destaque:", error);
-      } finally {
         setIsFeaturedLoading(false);
       }
     };
 
     fetchPosts();
-    fetchFeaturedPosts();
   }, []);
 
   // Extract featured posts
