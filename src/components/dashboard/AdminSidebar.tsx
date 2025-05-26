@@ -13,9 +13,7 @@ import {
   FileText,
   UserCog,
   TestTube,
-  PencilRuler,
-  BookOpen,
-  List
+  PencilRuler
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -68,13 +66,11 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
     const adminItems: MenuItem[] = [
       { icon: Users, label: "Clientes", path: "/admin/clients", position: 1 },
       { icon: UserCog, label: "Especialistas", path: "/admin/specialists", position: 2 },
-      { icon: List, label: "Lista de Especialistas", path: "/admin/specialists/list", position: 3 },
       { icon: CreditCard, label: "Financeiro", path: "/admin/payments", position: 4 },
       { icon: FileText, label: "Blog", path: "/admin/blog-posts", position: 5 },
       { icon: TestTube, label: "Testes", path: "/admin/tests", position: 6 },
       { icon: PencilRuler, label: "Editor de Site", path: "/admin/site-editor", position: 7 },
       { icon: BarChart, label: "Relatórios", path: "/admin/reports", position: 8 },
-      { icon: BookOpen, label: "Documentação", path: "/docs/chatgpt-integration", position: 9 },
     ];
     
     const specialistItems: MenuItem[] = [

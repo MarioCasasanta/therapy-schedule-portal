@@ -33,14 +33,7 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li><Link to="/auth" className="text-sage-300 hover:text-white">Área do Cliente</Link></li>
               <li><Link to="/auth" className="text-sage-300 hover:text-white">Área do Especialista</Link></li>
-              <li>
-                <Link 
-                  to="/admin-login" 
-                  className="text-sage-300 hover:text-white transition-colors"
-                >
-                  Área do Funcionário
-                </Link>
-              </li>
+              <li><Link to="/admin-login" className="text-sage-300 hover:text-white">Área do Funcionário</Link></li>
             </ul>
           </div>
           

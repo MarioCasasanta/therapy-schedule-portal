@@ -37,7 +37,6 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import BlogPosts from "@/pages/admin/BlogPosts";
 import BlogPostEditor from "@/pages/admin/BlogPostEditor";
 import AdminBlogOverview from "@/pages/admin/AdminBlogOverview";
-import ListSpecialists from "@/pages/admin/ListSpecialists";
 
 // Blog Public Routes
 import Blog from "@/pages/Blog";
@@ -78,7 +77,6 @@ function App() {
         <Route path="/admin/clients" element={<GerenciarClientes />} />
         <Route path="/admin/clients/:id" element={<ClientDetail />} />
         <Route path="/admin/specialists" element={<DashboardSpecialists />} />
-        <Route path="/admin/specialists/list" element={<ListSpecialists />} />
         <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/sessions" element={<Sessions />} />
         <Route path="/admin/sessions/new" element={<NewSession />} />

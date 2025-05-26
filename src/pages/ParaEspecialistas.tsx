@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -235,31 +234,10 @@ const ParaEspecialistas = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      // Preparar dados para inserção conforme a estrutura da tabela specialist_registrations
-      const insertData = {
-        nome_completo: data.nome_completo,
-        email: data.email,
-        telefone: data.telefone,
-        especialidade: data.especialidade,
-        formacao: data.formacao,
-        anos_experiencia: data.anos_experiencia,
-        biografia_curta: data.biografia_curta,
-        biografia_longa: data.biografia_longa,
-        areas_especializacao: data.areas_especializacao,
-        idiomas: data.idiomas,
-        certificacoes: data.certificacoes,
-        foto_perfil: data.foto_perfil,
-        video_apresentacao: data.video_apresentacao,
-        whatsapp: data.whatsapp,
-        plano_escolhido: data.plano_escolhido,
-        equipe_criar_copy: data.equipe_criar_copy,
-        preencher_depois: data.preencher_depois,
+      const { error } = await supabase.from("specialist_registrations").insert({
+        ...data,
         status: "pending"
-      };
-
-      const { error } = await supabase
-        .from("specialist_registrations")
-        .insert(insertData);
+      });
 
       if (error) throw error;
 

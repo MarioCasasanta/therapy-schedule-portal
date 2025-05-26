@@ -39,13 +39,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "access_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       analise_influencia: {
@@ -384,13 +377,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "checklist_items_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       client_plan_benefits: {
@@ -560,13 +546,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "conquistas_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       contact_submissions: {
@@ -695,13 +674,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "crencas_dinheiro_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       daily_audios: {
@@ -773,13 +745,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "despesas_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       documents: {
@@ -821,13 +786,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "documents_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       emotional_diary: {
@@ -865,13 +823,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "emotional_diary_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -969,13 +920,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "event_registrations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       eventos_calendario: {
@@ -1016,13 +960,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "eventos_calendario_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1100,13 +1037,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fases_progresso_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1229,13 +1159,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1566,13 +1489,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pagamentos_cliente_id_fkey"
-            columns: ["cliente_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
-          {
             foreignKeyName: "pagamentos_sessao_id_fkey"
             columns: ["sessao_id"]
             isOneToOne: false
@@ -1737,13 +1653,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "protocolo_respostas_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       questionnaire_responses: {
@@ -1781,13 +1690,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "questionnaire_responses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1836,13 +1738,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "relacionamento_casal_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       renda: {
@@ -1887,13 +1782,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "renda_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       reserva_financeira: {
@@ -1931,13 +1819,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reserva_financeira_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -2040,13 +1921,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "sessoes_cliente_id_fkey"
-            columns: ["cliente_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       sitemap_entries: {
@@ -2144,13 +2018,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "smart_goals_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -2434,13 +2301,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "teste_autismo_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -2770,13 +2630,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sessoes_cliente_id_fkey"
-            columns: ["cliente_id"]
-            isOneToOne: false
-            referencedRelation: "ranking_pontuacao"
-            referencedColumns: ["user_id"]
           },
         ]
       }

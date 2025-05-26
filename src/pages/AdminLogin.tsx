@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { Heart } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
@@ -19,8 +20,6 @@ const AdminLogin = () => {
   useEffect(() => {
     const checkSession = async () => {
       setCheckingUser(true);
-      console.log("🔍 Verificando sessão existente...");
-      
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
@@ -35,8 +34,6 @@ const AdminLogin = () => {
         return;
       }
 
-      console.log("✅ Usuário encontrado:", session.user.email);
-
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("role")
@@ -49,13 +46,9 @@ const AdminLogin = () => {
         return;
       }
 
-      console.log("📋 Role do usuário:", profile.role);
-
       if (profile.role === "admin") {
-        console.log("🔐 Redirecionando admin para dashboard...");
         navigate("/admin", { replace: true });
       } else {
-        console.log("⚠️ Usuário não é admin, mostrando mensagem...");
         toast({
           variant: "destructive",
           title: "Acesso negado",
@@ -74,44 +67,30 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
 
-    console.log("🔐 Tentando fazer login com:", email);
-
     try {
       const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (loginError) {
-        console.error("❌ Erro no login:", loginError);
-        throw loginError;
-      }
+      if (loginError) throw loginError;
 
       if (session) {
-        console.log("✅ Login realizado com sucesso:", session.user.email);
-        
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", session.user.id)
           .single();
             
-        if (profileError) {
-          console.error("❌ Erro ao buscar perfil:", profileError);
-          throw profileError;
-        }
-        
-        console.log("📋 Role verificado:", profile.role);
+        if (profileError) throw profileError;
         
         if (profile.role === "admin") {
           toast({
             title: "Login realizado com sucesso!",
             description: "Bem-vindo ao painel administrativo.",
           });
-          console.log("🎯 Redirecionando para /admin...");
           navigate("/admin", { replace: true });
         } else {
-          console.log("⚠️ Usuário não é admin");
           toast({
             variant: "destructive",
             title: "Acesso negado",
