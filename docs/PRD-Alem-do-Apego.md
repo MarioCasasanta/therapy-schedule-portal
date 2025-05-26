@@ -64,6 +64,402 @@ Ser a principal plataforma de terapia digital no Brasil, reconhecida pela excel�
 - Notificações
 - Conteúdo Educacional
 
+#### 2.3 MAPEAMENTO COMPLETO DE TELAS E COMPONENTES
+
+##### 2.3.1 ÁREA PÚBLICA (Landing Pages)
+
+**Página Principal (Index.tsx)**
+- **Funcionalidades:**
+  - Hero section com CTA principal
+  - Seções de serviços oferecidos
+  - Depoimentos de clientes
+  - FAQ interativo
+  - Formulário de contato
+  - Blog posts em destaque
+
+- **Componentes Utilizados:**
+  - `HeroSection.tsx` - Seção principal com chamada para ação
+  - `ServicesSection.tsx` - Grid de serviços oferecidos
+  - `TestimonialsSection.tsx` - Carousel de depoimentos
+  - `FAQSection.tsx` - Accordion de perguntas frequentes
+  - `ContactSection.tsx` - Formulário de contato
+  - `FeaturedBlogCarousel.tsx` - Posts em destaque
+  - `Navigation.tsx` - Menu de navegação responsivo
+  - `Footer.tsx` - Rodapé com links e informações
+
+**Para Especialistas (ParaEspecialistas.tsx)**
+- **Funcionalidades:**
+  - Informações sobre como se tornar especialista
+  - Planos e preços para terapeutas
+  - Formulário de registro
+  - Benefícios da plataforma
+
+- **Componentes Utilizados:**
+  - `Navigation.tsx`
+  - `Card` (Shadcn/UI) - Cards de planos
+  - `Button` (Shadcn/UI) - CTAs
+  - `Badge` (Shadcn/UI) - Tags de benefícios
+
+**Para Você (ParaVoce.tsx)**
+- **Funcionalidades:**
+  - Apresentação dos serviços para clientes
+  - Tipos de terapia disponíveis
+  - Como funciona a plataforma
+  - Testes psicológicos gratuitos
+
+- **Componentes Utilizados:**
+  - `Navigation.tsx`
+  - `Tabs` (Shadcn/UI) - Navegação entre tipos de terapia
+  - `Card` (Shadcn/UI) - Apresentação de serviços
+  - `Progress` (Shadcn/UI) - Indicador de progresso
+
+**Lista de Especialistas (Especialistas.tsx)**
+- **Funcionalidades:**
+  - Grid de especialistas disponíveis
+  - Filtros por especialidade
+  - Sistema de busca
+  - Visualização de perfis
+  - Sistema de rating
+
+- **Componentes Utilizados:**
+  - `Navigation.tsx`
+  - `Avatar` (Shadcn/UI) - Fotos dos especialistas
+  - `Badge` (Shadcn/UI) - Especialidades
+  - `Star` (Lucide React) - Sistema de avaliação
+  - `Input` (Shadcn/UI) - Campo de busca
+  - `Select` (Shadcn/UI) - Filtros
+
+**Detalhes do Especialista (EspecialistaDetalhe.tsx)**
+- **Funcionalidades:**
+  - Perfil completo do especialista
+  - Agendamento de sessões
+  - Visualização de disponibilidade
+  - Informações detalhadas
+  - Sistema de tabs
+
+- **Componentes Utilizados:**
+  - `Navigation.tsx`
+  - `Avatar` (Shadcn/UI) - Foto do especialista
+  - `Tabs` (Shadcn/UI) - "Sobre" e "Agendar"
+  - `WeeklyCalendar` - Calendário personalizado
+  - `Card` (Shadcn/UI) - Informações do perfil
+  - `Badge` (Shadcn/UI) - Especializações
+  - `Button` (Shadcn/UI) - Ações
+
+##### 2.3.2 SISTEMA DE AUTENTICAÇÃO
+
+**Autenticação (Auth.tsx)**
+- **Funcionalidades:**
+  - Login com email/senha
+  - Registro de novos usuários
+  - Recuperação de senha
+  - Validação de formulários
+  - Redirecionamento baseado em role
+
+- **Componentes Utilizados:**
+  - `AuthComponent.tsx` - Formulário principal
+  - `Input` (Shadcn/UI) - Campos de entrada
+  - `Button` (Shadcn/UI) - Botões de ação
+  - `Alert` (Shadcn/UI) - Mensagens de erro/sucesso
+  - `Tabs` (Shadcn/UI) - Alternância Login/Registro
+
+**Login Administrativo (AdminLogin.tsx)**
+- **Funcionalidades:**
+  - Acesso restrito para administradores
+  - Validação de credenciais
+  - Redirecionamento seguro
+
+- **Componentes Utilizados:**
+  - `Card` (Shadcn/UI) - Container do formulário
+  - `Input` (Shadcn/UI) - Campos de login
+  - `Button` (Shadcn/UI) - Botão de acesso
+
+##### 2.3.3 ÁREA DO CLIENTE
+
+**Dashboard Principal (ClientDashboard.tsx)**
+- **Funcionalidades:**
+  - Visão geral das sessões
+  - Próximos agendamentos
+  - Progresso terapêutico
+  - Acesso rápido a ferramentas
+  - Notificações importantes
+
+- **Componentes Utilizados:**
+  - `ClientSidebar.tsx` - Menu lateral do cliente
+  - `Card` (Shadcn/UI) - Widgets de informação
+  - `Progress` (Shadcn/UI) - Barras de progresso
+  - `Calendar` (Shadcn/UI) - Mini calendário
+  - `Badge` (Shadcn/UI) - Status das sessões
+
+**Agendamento (ClientSchedule.tsx)**
+- **Funcionalidades:**
+  - Seleção de especialista
+  - Calendário de disponibilidade
+  - Confirmação de agendamento
+  - Escolha de tipo de sessão
+  - Integração com pagamentos
+
+- **Componentes Utilizados:**
+  - `WeeklyCalendar` - Calendário principal
+  - `Select` (Shadcn/UI) - Seleção de especialista
+  - `RadioGroup` (Shadcn/UI) - Tipos de sessão
+  - `Dialog` (Shadcn/UI) - Modal de confirmação
+  - `Button` (Shadcn/UI) - Ações
+
+**Minhas Sessões (ClientSessions.tsx)**
+- **Funcionalidades:**
+  - Histórico completo de sessões
+  - Filtros por período/status
+  - Detalhes de cada sessão
+  - Feedback pós-sessão
+  - Cancelamento/reagendamento
+
+- **Componentes Utilizados:**
+  - `SessionCard.tsx` - Card individual de sessão
+  - `SessionHistory.tsx` - Lista histórica
+  - `Tabs` (Shadcn/UI) - Navegação temporal
+  - `Badge` (Shadcn/UI) - Status das sessões
+  - `Button` (Shadcn/UI) - Ações disponíveis
+
+**Perfil do Cliente (client/Profile.tsx)**
+- **Funcionalidades:**
+  - Edição de dados pessoais
+  - Upload de avatar
+  - Preferências de notificação
+  - Configurações de conta
+  - Histórico de atividades
+
+- **Componentes Utilizados:**
+  - `ProfileForm.tsx` - Formulário de perfil
+  - `Avatar` (Shadcn/UI) - Foto do usuário
+  - `Input` (Shadcn/UI) - Campos de dados
+  - `Switch` (Shadcn/UI) - Preferências
+  - `Separator` (Shadcn/UI) - Divisões visuais
+
+**Pagamentos (ClientPayments.tsx)**
+- **Funcionalidades:**
+  - Histórico de pagamentos
+  - Métodos de pagamento salvos
+  - Faturas pendentes
+  - Download de recibos
+  - Configuração de cobrança
+
+- **Componentes Utilizados:**
+  - `Card` (Shadcn/UI) - Cards de pagamento
+  - `Table` (Shadcn/UI) - Tabela de transações
+  - `Badge` (Shadcn/UI) - Status de pagamento
+  - `Button` (Shadcn/UI) - Ações de pagamento
+  - `Dialog` (Shadcn/UI) - Modais de confirmação
+
+**Notificações (ClientNotifications.tsx)**
+- **Funcionalidades:**
+  - Centro de notificações
+  - Filtros por tipo
+  - Marcar como lida
+  - Configurações de alerta
+  - Histórico completo
+
+- **Componentes Utilizados:**
+  - `NotificationCenter.tsx` - Lista principal
+  - `Card` (Shadcn/UI) - Cards de notificação
+  - `Badge` (Shadcn/UI) - Tipos e status
+  - `Switch` (Shadcn/UI) - Configurações
+  - `Tabs` (Shadcn/UI) - Categorização
+
+**Configurações (ClientSettings.tsx)**
+- **Funcionalidades:**
+  - Preferências gerais
+  - Configurações de privacidade
+  - Métodos de pagamento
+  - Notificações
+  - Exclusão de conta
+
+- **Componentes Utilizados:**
+  - `Tabs` (Shadcn/UI) - Seções de configuração
+  - `Switch` (Shadcn/UI) - Toggles de preferência
+  - `PaymentMethodsSection.tsx` - Gestão de pagamentos
+  - `NotificationsSection.tsx` - Config. de alertas
+  - `Button` (Shadcn/UI) - Ações
+
+##### 2.3.4 ÁREA ADMINISTRATIVA
+
+**Dashboard Admin (AdminDashboard.tsx)**
+- **Funcionalidades:**
+  - Métricas em tempo real
+  - Gráficos de performance
+  - Resumo financeiro
+  - Alertas do sistema
+  - Acesso rápido a funcionalidades
+
+- **Componentes Utilizados:**
+  - `AdminSidebar.tsx` - Menu lateral admin
+  - `AnalyticsDashboard.tsx` - Métricas visuais
+  - `Card` (Shadcn/UI) - Widgets de dados
+  - `Chart` (Recharts) - Gráficos diversos
+  - `Badge` (Shadcn/UI) - Indicadores
+
+**Gestão de Sessões (dashboard/Sessions.tsx)**
+- **Funcionalidades:**
+  - Lista completa de sessões
+  - Filtros avançados
+  - Edição em massa
+  - Relatórios detalhados
+  - Exportação de dados
+
+- **Componentes Utilizados:**
+  - `SessionManager.tsx` - Gerenciador principal
+  - `Table` (Shadcn/UI) - Tabela de dados
+  - `Select` (Shadcn/UI) - Filtros
+  - `Dialog` (Shadcn/UI) - Modais de edição
+  - `Button` (Shadcn/UI) - Ações em lote
+
+**Gestão de Clientes (dashboard/Clients.tsx)**
+- **Funcionalidades:**
+  - Lista de clientes
+  - Perfis detalhados
+  - Histórico de atividades
+  - Sistema de convites
+  - Comunicação direta
+
+- **Componentes Utilizados:**
+  - `AdminClientList.tsx` - Lista principal
+  - `ListaClientes.tsx` - Componente secundário
+  - `Avatar` (Shadcn/UI) - Fotos dos clientes
+  - `Badge` (Shadcn/UI) - Status e tipos
+  - `Input` (Shadcn/UI) - Busca e filtros
+
+**Gestão de Especialistas (dashboard/Specialists.tsx)**
+- **Funcionalidades:**
+  - Lista de especialistas
+  - Aprovação de cadastros
+  - Edição de perfis
+  - Gestão de disponibilidade
+  - Relatórios de performance
+
+- **Componentes Utilizados:**
+  - `AdminSpecialistList.tsx` - Lista principal
+  - `SpecialistClientList.tsx` - Clientes por especialista
+  - `Table` (Shadcn/UI) - Dados tabulares
+  - `Dialog` (Shadcn/UI) - Edição de perfis
+  - `Switch` (Shadcn/UI) - Status ativo/inativo
+
+**Relatórios (dashboard/Reports.tsx)**
+- **Funcionalidades:**
+  - Relatórios financeiros
+  - Métricas de uso
+  - Análise de performance
+  - Exportação de dados
+  - Dashboards personalizados
+
+- **Componentes Utilizados:**
+  - `Chart` (Recharts) - Gráficos diversos
+  - `Card` (Shadcn/UI) - Métricas resumidas
+  - `Select` (Shadcn/UI) - Filtros de período
+  - `Button` (Shadcn/UI) - Exportação
+  - `Tabs` (Shadcn/UI) - Tipos de relatório
+
+##### 2.3.5 COMPONENTES ESPECIALIZADOS
+
+**Calendário Semanal (WeeklyCalendar.tsx)**
+- **Funcionalidades:**
+  - Visualização semanal
+  - Seleção de horários
+  - Slots disponíveis
+  - Integração com disponibilidade
+  - Interface responsiva
+
+- **Tecnologias:**
+  - React Hooks (useState, useEffect)
+  - Date-fns para manipulação de datas
+  - TailwindCSS para styling
+  - Componentes Shadcn/UI
+
+**Gerenciador de Sessões (SessionManager.tsx)**
+- **Funcionalidades:**
+  - CRUD completo de sessões
+  - Filtros avançados
+  - Ações em lote
+  - Validações de negócio
+  - Sincronização em tempo real
+
+**Centro de Notificações (NotificationCenter.tsx)**
+- **Funcionalidades:**
+  - Exibição em tempo real
+  - Filtros por tipo
+  - Marcar como lida
+  - Ações contextuais
+  - Persistência de estado
+
+##### 2.3.6 FUNCIONALIDADES TRANSVERSAIS
+
+**Sistema de Navegação**
+- **Componentes:**
+  - `Navigation.tsx` - Menu principal público
+  - `DesktopNav.tsx` - Navegação desktop
+  - `MobileNav.tsx` - Menu mobile responsivo
+  - `UserMenu.tsx` - Menu do usuário logado
+
+**Autenticação e Autorização**
+- **Hooks:**
+  - `useAuth.tsx` - Estado global de autenticação
+- **Componentes:**
+  - `AuthComponent.tsx` - Formulários de auth
+- **Controle:**
+  - Role-based access control
+  - Redirecionamento automático
+  - Proteção de rotas
+
+**Formulários e Validação**
+- **Bibliotecas:**
+  - React Hook Form
+  - Zod para validação
+- **Componentes:**
+  - `Form` (Shadcn/UI) - Wrapper de formulários
+  - `Input`, `Select`, `Textarea` (Shadcn/UI)
+  - Validação em tempo real
+
+**Sistema de Layout**
+- **Componentes:**
+  - `PageLayout.tsx` - Layout base das páginas
+  - `Sidebar` (Shadcn/UI) - Menus laterais
+  - `Card` (Shadcn/UI) - Containers de conteúdo
+
+#### 2.4 INTEGRAÇÃO DE COMPONENTES POR FUNCIONALIDADE
+
+##### 2.4.1 Fluxo de Agendamento
+```
+Cliente → EspecialistaDetalhe → WeeklyCalendar → SessionForm → PaymentGateway → Confirmation
+```
+
+**Componentes Envolvidos:**
+- `EspecialistaDetalhe.tsx` (Seleção)
+- `WeeklyCalendar.tsx` (Data/Hora)
+- `SessionForm.tsx` (Detalhes)
+- Stripe Integration (Pagamento)
+- `NotificationCenter.tsx` (Confirmação)
+
+##### 2.4.2 Fluxo de Gestão Administrativa
+```
+Admin → Dashboard → SessionManager → ClientDetail → Actions
+```
+
+**Componentes Envolvidos:**
+- `AdminDashboard.tsx` (Visão geral)
+- `SessionManager.tsx` (Gestão)
+- `ClientDetail.tsx` (Detalhes)
+- `AdminClientList.tsx` (Listagem)
+
+##### 2.4.3 Fluxo de Autenticação
+```
+Login → Auth → RoleCheck → Dashboard Redirect
+```
+
+**Componentes Envolvidos:**
+- `Auth.tsx` (Interface)
+- `AuthComponent.tsx` (Lógica)
+- `useAuth.tsx` (Estado)
+- Route Protection (Redirecionamento)
+
 ---
 
 ### 3. PERFIS DE USUÁRIO
@@ -701,4 +1097,3 @@ O roadmap estabelecido permite crescimento sustentável, enquanto as métricas d
 **Última atualização:** [Data atual]
 **Responsável:** Equipe de Produto "Além do Apego"
 **Status:** APROVADO PARA IMPLEMENTAÇÃO
-
