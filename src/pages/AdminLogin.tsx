@@ -5,7 +5,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form } from "@/components/ui/form";
 import { Heart } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
@@ -19,42 +18,73 @@ const AdminLogin = () => {
 
   useEffect(() => {
     const checkSession = async () => {
+      console.log("🔍 Verificando sessão existente...");
       setCheckingUser(true);
-      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
 
-      if (error) {
-        console.error("❌ Erro ao obter sessão:", error);
-        setCheckingUser(false);
-        return;
-      }
+        if (error) {
+          console.error("❌ Erro ao obter sessão:", error);
+          setCheckingUser(false);
+          return;
+        }
 
-      if (!session?.user) {
-        console.log("❌ Nenhum usuário autenticado.");
-        setCheckingUser(false);
-        return;
-      }
+        if (!session?.user) {
+          console.log("❌ Nenhum usuário autenticado.");
+          setCheckingUser(false);
+          return;
+        }
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", session.user.id)
-        .single();
+        console.log("✅ Usuário autenticado encontrado:", session.user.email);
 
-      if (profileError || !profile) {
-        console.error("❌ Erro ao buscar perfil do usuário:", profileError);
-        setCheckingUser(false);
-        return;
-      }
+        // Buscar perfil do usuário
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
 
-      if (profile.role === "admin") {
-        navigate("/admin", { replace: true });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Acesso negado",
-          description: "Você não tem permissão para acessar esta área.",
-        });
-        navigate("/auth", { replace: true });
+        if (profileError) {
+          console.error("❌ Erro ao buscar perfil do usuário:", profileError);
+          console.log("🔧 Tentando criar perfil padrão...");
+          
+          // Tentar criar perfil se não existir
+          const { error: insertError } = await supabase
+            .from("profiles")
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              role: "admin" // Default para admin login
+            });
+            
+          if (insertError) {
+            console.error("❌ Erro ao criar perfil:", insertError);
+            setCheckingUser(false);
+            return;
+          }
+          
+          console.log("✅ Perfil admin criado com sucesso");
+          navigate("/admin", { replace: true });
+          return;
+        }
+
+        console.log("✅ Perfil encontrado:", profile);
+
+        if (profile?.role === "admin") {
+          console.log("✅ Usuário é admin, redirecionando...");
+          navigate("/admin", { replace: true });
+        } else {
+          console.warn("⚠️ Usuário não é admin:", profile?.role);
+          toast({
+            variant: "destructive",
+            title: "Acesso negado",
+            description: "Você não tem permissão para acessar esta área.",
+          });
+          await supabase.auth.signOut();
+        }
+      } catch (error) {
+        console.error("❌ Erro inesperado:", error);
       }
       
       setCheckingUser(false);
@@ -66,6 +96,8 @@ const AdminLogin = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
+    console.log("🔐 Tentando fazer login com:", email);
 
     try {
       const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
@@ -73,24 +105,50 @@ const AdminLogin = () => {
         password,
       });
 
-      if (loginError) throw loginError;
+      if (loginError) {
+        console.error("❌ Erro no login:", loginError);
+        throw loginError;
+      }
 
       if (session) {
-        const { data: profile, error: profileError } = await supabase
+        console.log("✅ Login realizado com sucesso");
+        
+        // Buscar ou criar perfil
+        let { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", session.user.id)
           .single();
             
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.log("🔧 Perfil não encontrado, criando perfil admin...");
+          
+          const { error: insertError } = await supabase
+            .from("profiles")
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              role: "admin"
+            });
+            
+          if (insertError) {
+            console.error("❌ Erro ao criar perfil:", insertError);
+            throw insertError;
+          }
+          
+          profile = { role: "admin" };
+        }
         
-        if (profile.role === "admin") {
+        console.log("✅ Perfil verificado:", profile);
+        
+        if (profile?.role === "admin") {
           toast({
             title: "Login realizado com sucesso!",
             description: "Bem-vindo ao painel administrativo.",
           });
           navigate("/admin", { replace: true });
         } else {
+          console.warn("⚠️ Usuário não é admin:", profile?.role);
           toast({
             variant: "destructive",
             title: "Acesso negado",
@@ -100,7 +158,7 @@ const AdminLogin = () => {
         }
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
+      console.error("❌ Auth error:", error);
       toast({
         variant: "destructive",
         title: "Erro na autenticação",

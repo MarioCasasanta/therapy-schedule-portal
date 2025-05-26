@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 export class BlogController {
   static async getAllPosts(includeUnpublished = false) {
     try {
+      console.log("🔍 Buscando posts do blog...", { includeUnpublished });
+      
       let query = supabase
         .from("blog_posts")
-        .select(`
-          *
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (!includeUnpublished) {
@@ -18,16 +18,14 @@ export class BlogController {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Erro ao buscar posts do blog:", error);
+        console.error("❌ Erro ao buscar posts do blog:", error);
         throw error;
       }
 
-      return data.map((post: any) => ({
-        ...post,
-        author_name: "Autor" // Simplified since relation query was causing issues
-      }));
+      console.log("✅ Posts encontrados:", data?.length || 0);
+      return data || [];
     } catch (error) {
-      console.error("Erro ao buscar posts do blog:", error);
+      console.error("❌ Erro ao buscar posts do blog:", error);
       return [];
     }
   }
@@ -38,46 +36,46 @@ export class BlogController {
 
   static async getPostById(id: string) {
     try {
+      console.log("🔍 Buscando post por ID:", id);
+      
       const { data, error } = await supabase
         .from("blog_posts")
-        .select(`*`)
+        .select("*")
         .eq("id", id)
         .single();
 
       if (error) {
-        console.error("Erro ao buscar post do blog:", error);
+        console.error("❌ Erro ao buscar post do blog:", error);
         return null;
       }
 
-      return {
-        ...data,
-        author_name: "Autor" // Simplified since relation query was causing issues
-      };
+      console.log("✅ Post encontrado:", data?.title);
+      return data;
     } catch (error) {
-      console.error("Erro ao buscar post do blog:", error);
+      console.error("❌ Erro ao buscar post do blog:", error);
       return null;
     }
   }
 
   static async getPostBySlug(slug: string) {
     try {
+      console.log("🔍 Buscando post por slug:", slug);
+      
       const { data, error } = await supabase
         .from("blog_posts")
-        .select(`*`)
+        .select("*")
         .eq("slug", slug)
         .single();
 
       if (error) {
-        console.error("Erro ao buscar post pelo slug:", error);
+        console.error("❌ Erro ao buscar post pelo slug:", error);
         return null;
       }
 
-      return {
-        ...data,
-        author_name: "Autor" // Simplified since relation query was causing issues
-      };
+      console.log("✅ Post encontrado por slug:", data?.title);
+      return data;
     } catch (error) {
-      console.error("Erro ao buscar post pelo slug:", error);
+      console.error("❌ Erro ao buscar post pelo slug:", error);
       return null;
     }
   }
