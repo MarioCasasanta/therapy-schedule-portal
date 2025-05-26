@@ -47,26 +47,7 @@ const AdminLogin = () => {
 
         if (profileError) {
           console.error("❌ AdminLogin: Erro ao buscar perfil do usuário:", profileError);
-          
-          // Se não encontrou o perfil, criar um perfil admin
-          console.log("🔧 AdminLogin: Criando perfil admin para usuário logado...");
-          
-          const { error: insertError } = await supabase
-            .from("profiles")
-            .insert({
-              id: session.user.id,
-              email: session.user.email,
-              role: "admin"
-            });
-            
-          if (insertError) {
-            console.error("❌ AdminLogin: Erro ao criar perfil:", insertError);
-            setCheckingUser(false);
-            return;
-          }
-          
-          console.log("✅ AdminLogin: Perfil admin criado com sucesso");
-          navigate("/admin", { replace: true });
+          setCheckingUser(false);
           return;
         }
 
@@ -77,12 +58,45 @@ const AdminLogin = () => {
           navigate("/admin", { replace: true });
         } else {
           console.warn("⚠️ AdminLogin: Usuário não é admin:", profile?.role);
-          toast({
-            variant: "destructive",
-            title: "Acesso negado",
-            description: "Você não tem permissão para acessar esta área.",
-          });
-          await supabase.auth.signOut();
+          
+          // Verificar se existem outros admins no sistema
+          const { count: adminCount } = await supabase
+            .from("profiles")
+            .select("*", { count: 'exact', head: true })
+            .eq("role", "admin");
+
+          if (adminCount === 0) {
+            // Se não há admins, promover este usuário
+            console.log("🔧 AdminLogin: Nenhum admin encontrado, promovendo usuário atual...");
+            
+            const { error: updateError } = await supabase
+              .from("profiles")
+              .update({ role: "admin" })
+              .eq("id", session.user.id);
+              
+            if (updateError) {
+              console.error("❌ AdminLogin: Erro ao promover usuário:", updateError);
+              toast({
+                variant: "destructive",
+                title: "Erro ao configurar permissões",
+                description: updateError.message,
+              });
+            } else {
+              console.log("✅ AdminLogin: Usuário promovido a admin com sucesso");
+              toast({
+                title: "Bem-vindo!",
+                description: "Você foi configurado como administrador do sistema.",
+              });
+              navigate("/admin", { replace: true });
+            }
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Acesso negado",
+              description: "Você não tem permissão para acessar esta área.",
+            });
+            await supabase.auth.signOut();
+          }
         }
       } catch (error) {
         console.error("❌ AdminLogin: Erro inesperado:", error);
@@ -148,13 +162,41 @@ const AdminLogin = () => {
           });
           navigate("/admin", { replace: true });
         } else {
-          console.warn("⚠️ AdminLogin: Usuário não é admin:", profile?.role);
-          toast({
-            variant: "destructive",
-            title: "Acesso negado",
-            description: "Você não tem permissão para acessar esta área.",
-          });
-          await supabase.auth.signOut();
+          // Verificar se existem outros admins no sistema
+          const { count: adminCount } = await supabase
+            .from("profiles")
+            .select("*", { count: 'exact', head: true })
+            .eq("role", "admin");
+
+          if (adminCount === 0) {
+            // Se não há admins, promover este usuário
+            console.log("🔧 AdminLogin: Nenhum admin encontrado, promovendo usuário atual...");
+            
+            const { error: updateError } = await supabase
+              .from("profiles")
+              .update({ role: "admin" })
+              .eq("id", session.user.id);
+              
+            if (updateError) {
+              console.error("❌ AdminLogin: Erro ao promover usuário:", updateError);
+              throw updateError;
+            }
+            
+            console.log("✅ AdminLogin: Usuário promovido a admin com sucesso");
+            toast({
+              title: "Bem-vindo!",
+              description: "Você foi configurado como administrador do sistema.",
+            });
+            navigate("/admin", { replace: true });
+          } else {
+            console.warn("⚠️ AdminLogin: Usuário não é admin:", profile?.role);
+            toast({
+              variant: "destructive",
+              title: "Acesso negado",
+              description: "Você não tem permissão para acessar esta área.",
+            });
+            await supabase.auth.signOut();
+          }
         }
       }
     } catch (error: any) {
