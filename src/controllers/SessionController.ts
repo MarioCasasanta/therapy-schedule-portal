@@ -37,51 +37,7 @@ export class SessionController {
     return SessionService.getSessionsByClient(clientId);
   }
 
-  // Direct database operations without circular dependencies
-  static async getSpecialistDetails(id: string) {
-    try {
-      console.log("🔍 Buscando detalhes do especialista:", id);
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", id)
-        .eq("role", "especialista")
-        .single();
-
-      if (error) {
-        console.error("❌ Erro ao buscar especialista:", error);
-        throw error;
-      }
-
-      console.log("✅ Especialista encontrado:", data);
-
-      return {
-        id: data.id,
-        full_name: data.full_name || "Desconhecido",
-        specialty: "Psicologia",
-        bio: "Especialista em terapia",
-        email: data.email || "email@example.com",
-        phone: data.phone || "123456789",
-        rating: 4.8,
-        experience_years: 5,
-        details: {
-          thumbnail_url: "https://via.placeholder.com/150",
-          short_description: "Terapeuta experiente",
-          long_description: "Especialista com vários anos de experiência",
-          education: "Universidade de São Paulo",
-          areas_of_expertise: ["Terapia de casal", "Ansiedade", "Depressão"],
-          languages: ["Português", "Inglês"],
-          certifications: ["Psicologia Clínica"],
-          sessions_completed: 100,
-        },
-      };
-    } catch (error) {
-      console.error("❌ Erro ao buscar detalhes do especialista:", error);
-      throw error;
-    }
-  }
-
+  // Direct database operations
   static async getAllSpecialists() {
     try {
       console.log("🔍 Buscando todos os especialistas...");

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { SessionController } from "@/controllers/SessionController";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Phone, Calendar, User } from "lucide-react";
@@ -22,9 +22,19 @@ export default function AdminSpecialistList() {
     const fetchSpecialists = async () => {
       try {
         console.log("🔍 Buscando especialistas do banco de dados...");
-        const data = await SessionController.getAllSpecialists();
-        console.log("✅ Especialistas encontrados:", data.length);
-        setSpecialists(data);
+        
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("role", "especialista");
+        
+        if (error) {
+          console.error("❌ Erro ao buscar especialistas:", error);
+          return;
+        }
+        
+        console.log("✅ Especialistas encontrados:", data?.length || 0);
+        setSpecialists(data || []);
       } catch (error) {
         console.error("❌ Erro ao carregar especialistas:", error);
       } finally {
