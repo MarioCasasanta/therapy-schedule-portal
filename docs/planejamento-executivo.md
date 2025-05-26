@@ -19,6 +19,216 @@
 
 ---
 
+## 🗄️ SCHEMA DO BANCO DE DADOS
+
+### Tabelas Principais
+
+#### **profiles** (Perfis de Usuários)
+```sql
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
+  email TEXT,
+  full_name TEXT,
+  phone TEXT,
+  avatar_url TEXT,
+  role TEXT DEFAULT 'cliente',
+  status TEXT DEFAULT 'active',
+  notes TEXT,
+  preferences JSONB DEFAULT '{}',
+  data_nascimento DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **sessoes** (Sessões/Agendamentos)
+```sql
+CREATE TABLE sessoes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cliente_id UUID REFERENCES profiles(id),
+  data_hora TIMESTAMPTZ NOT NULL,
+  tipo_sessao VARCHAR NOT NULL,
+  status VARCHAR DEFAULT 'agendado',
+  valor NUMERIC DEFAULT 0.0,
+  status_pagamento TEXT DEFAULT 'pendente',
+  notas TEXT,
+  post_session_notes TEXT,
+  feedback TEXT,
+  google_event_id TEXT,
+  guest_email TEXT,
+  invitation_status TEXT DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **availability** (Disponibilidade)
+```sql
+CREATE TABLE availability (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  day_of_week INTEGER NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  is_available BOOLEAN DEFAULT true,
+  interval_minutes INTEGER DEFAULT 60,
+  max_concurrent_sessions INTEGER DEFAULT 1,
+  exceptions JSONB DEFAULT '[]',
+  user_id UUID,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **pagamentos** (Pagamentos)
+```sql
+CREATE TABLE pagamentos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cliente_id UUID REFERENCES profiles(id),
+  sessao_id UUID REFERENCES sessoes(id),
+  valor NUMERIC NOT NULL,
+  status VARCHAR DEFAULT 'pendente',
+  metodo_pagamento VARCHAR,
+  data_pagamento TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **invoices** (Faturas)
+```sql
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id),
+  session_id UUID REFERENCES sessoes(id),
+  invoice_number TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  status TEXT DEFAULT 'pending',
+  due_date TIMESTAMPTZ NOT NULL,
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **notifications** (Notificações)
+```sql
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  type TEXT DEFAULT 'session_reminder',
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  read BOOLEAN DEFAULT false,
+  related_session_id UUID REFERENCES sessoes(id),
+  scheduled_for TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **blog_posts** (Posts do Blog)
+```sql
+CREATE TABLE blog_posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  author_id UUID NOT NULL,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  excerpt TEXT NOT NULL,
+  content TEXT NOT NULL,
+  published BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **system_config** (Configurações do Sistema)
+```sql
+CREATE TABLE system_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key TEXT NOT NULL,
+  value JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **access_logs** (Logs de Acesso)
+```sql
+CREATE TABLE access_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID,
+  page_accessed TEXT NOT NULL,
+  component_accessed TEXT,
+  accessed_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Tabelas de Apoio
+
+#### **specialists** (Especialistas)
+```sql
+CREATE TABLE specialists (
+  id UUID PRIMARY KEY REFERENCES profiles(id),
+  bio TEXT,
+  specialty TEXT,
+  rating NUMERIC,
+  experience_years INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **specialist_details** (Detalhes dos Especialistas)
+```sql
+CREATE TABLE specialist_details (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  specialist_id UUID NOT NULL,
+  rating NUMERIC DEFAULT 0,
+  sessions_completed INTEGER DEFAULT 0,
+  short_description TEXT,
+  long_description TEXT,
+  education TEXT,
+  certifications TEXT[],
+  languages TEXT[],
+  areas_of_expertise TEXT[],
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### **events** (Eventos)
+```sql
+CREATE TABLE events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  start_time TIMESTAMPTZ NOT NULL,
+  end_time TIMESTAMPTZ NOT NULL,
+  location TEXT,
+  max_participants INTEGER,
+  is_free BOOLEAN DEFAULT true,
+  google_calendar_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Views
+
+#### **session_statistics** (Estatísticas de Sessões)
+```sql
+CREATE VIEW session_statistics AS
+SELECT
+  cliente_id,
+  COUNT(*) as total_sessions,
+  COUNT(*) FILTER (WHERE data_hora > CURRENT_TIMESTAMP) as upcoming_sessions,
+  COUNT(*) FILTER (WHERE data_hora < CURRENT_TIMESTAMP) as past_sessions,
+  COUNT(*) FILTER (WHERE status_pagamento = 'pago') as paid_sessions,
+  COUNT(*) FILTER (WHERE status_pagamento = 'pendente') as pending_sessions,
+  SUM(valor) FILTER (WHERE status_pagamento = 'pago') as total_paid,
+  SUM(valor) FILTER (WHERE status_pagamento = 'pendente') as total_pending
+FROM sessoes
+GROUP BY cliente_id;
+```
+
+---
+
 ## 📱 MAPEAMENTO COMPLETO DE TELAS
 
 ### 1. PÁGINAS PÚBLICAS (Não Autenticadas)
@@ -26,6 +236,7 @@
 #### 1.1 **Página Inicial** (`/`)
 - **Arquivo:** `src/pages/Index.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** Nenhum (página estática)
 - **Funcionalidades:**
   - Hero section com CTA principal
   - Apresentação dos serviços (Psicanálise, Constelação, PNL)
@@ -41,6 +252,7 @@
 #### 1.2 **Autenticação** (`/auth`)
 - **Arquivo:** `src/pages/Auth.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `AuthController` (a implementar)
 - **Funcionalidades:**
   - Login de usuários existentes
   - Cadastro de novos usuários
@@ -52,6 +264,7 @@
 #### 1.3 **Login Admin** (`/admin-login`)
 - **Arquivo:** `src/pages/AdminLogin.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `AuthController`, `UserController` (a implementar)
 - **Funcionalidades:**
   - Login exclusivo para administradores
   - Verificação automática de perfil
@@ -63,6 +276,7 @@
 #### 1.4 **Lista de Especialistas** (`/especialistas`)
 - **Arquivo:** `src/pages/Especialistas.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SpecialistController` (a implementar)
 - **Funcionalidades:**
   - Grid de especialistas disponíveis
   - Filtros por especialidade e localização
@@ -74,6 +288,7 @@
 #### 1.5 **Perfil do Especialista** (`/especialistas/:id`)
 - **Arquivo:** `src/pages/EspecialistaDetalhe.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SpecialistController` (a implementar)
 - **Funcionalidades:**
   - Perfil completo do especialista
   - Formação e certificações
@@ -85,6 +300,7 @@
 #### 1.6 **Blog** (`/blog`, `/blog/:slug`)
 - **Arquivos:** `src/pages/Blog.tsx`, `src/pages/BlogPost.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `BlogController` ✅ Implementado
 - **Funcionalidades:**
   - Listagem de posts publicados
   - Visualização individual de posts
@@ -98,6 +314,7 @@
 - **Para Especialistas** (`/para-especialistas`) - `src/pages/ParaEspecialistas.tsx` ✅
 - **Trabalhe Conosco** (`/trabalhe-conosco`) - `src/pages/HR.tsx` ✅
 - **Cadastro Especialista** (`/cadastro-especialista`) - `src/pages/RegistroEspecialista.tsx` ✅
+- **Controllers:** `SpecialistController` (a implementar)
 
 ---
 
@@ -106,6 +323,7 @@
 #### 2.1 **Dashboard Admin** (`/admin`)
 - **Arquivo:** `src/pages/admin/AdminDashboard.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `ReportController`, `UserController` (a implementar)
 - **Funcionalidades:**
   - Métricas gerais do sistema
   - Gráficos de performance
@@ -117,6 +335,7 @@
 #### 2.2 **Gestão de Clientes** (`/admin/clients`)
 - **Arquivo:** `src/pages/dashboard/GerenciarClientes.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `ClientController`, `UserController` (a implementar)
 - **Funcionalidades:**
   - Listagem completa de clientes
   - Filtros avançados e busca
@@ -128,6 +347,7 @@
 #### 2.3 **Detalhes do Cliente** (`/admin/clients/:id`)
 - **Arquivo:** `src/pages/dashboard/ClientDetail.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `ClientController`, `SessionController` ✅
 - **Funcionalidades:**
   - Perfil completo do cliente
   - Histórico de sessões
@@ -139,6 +359,7 @@
 #### 2.4 **Gestão de Especialistas** (`/admin/specialists`)
 - **Arquivo:** `src/pages/dashboard/Specialists.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SpecialistController` (a implementar)
 - **Funcionalidades:**
   - Lista de especialistas cadastrados
   - Aprovação de novos cadastros
@@ -150,6 +371,7 @@
 #### 2.5 **Gestão de Sessões** (`/admin/sessions`)
 - **Arquivo:** `src/pages/dashboard/Sessions.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅ Implementado
 - **Funcionalidades:**
   - Visualização de todas as sessões
   - Filtros por status e período
@@ -161,6 +383,7 @@
 #### 2.6 **Nova Sessão** (`/admin/sessions/new`)
 - **Arquivo:** `src/pages/dashboard/sessions/NewSession.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅, `ClientController`, `SpecialistController` (a implementar)
 - **Funcionalidades:**
   - Formulário de agendamento
   - Seleção de especialista e cliente
@@ -172,6 +395,7 @@
 #### 2.7 **Detalhes da Sessão** (`/admin/sessions/:id`)
 - **Arquivo:** `src/pages/dashboard/sessions/SessionDetails.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅ Implementado
 - **Funcionalidades:**
   - Informações completas da sessão
   - Edição de dados
@@ -183,6 +407,7 @@
 #### 2.8 **Relatórios** (`/admin/reports`)
 - **Arquivo:** `src/pages/dashboard/Reports.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `ReportController` (a implementar)
 - **Funcionalidades:**
   - Relatórios financeiros
   - Gráficos de receita
@@ -194,6 +419,7 @@
 #### 2.9 **Pagamentos** (`/admin/payments`)
 - **Arquivo:** `src/pages/dashboard/Payments.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `PaymentController`, `InvoiceController` (a implementar)
 - **Funcionalidades:**
   - Gestão de transações
   - Integração com Stripe
@@ -205,6 +431,7 @@
 #### 2.10 **Configurações Admin** (`/admin/settings`)
 - **Arquivo:** `src/pages/dashboard/Settings.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SystemConfigController` ✅ Implementado
 - **Funcionalidades:**
   - Configurações do sistema
   - Métodos de pagamento
@@ -216,6 +443,7 @@
 #### 2.11 **Disponibilidade** (`/admin/availability`)
 - **Arquivo:** `src/pages/dashboard/Availability.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `AvailabilityController` ✅ Implementado
 - **Funcionalidades:**
   - Gestão de horários disponíveis
   - Configuração de intervalos
@@ -227,6 +455,7 @@
 #### 2.12 **Notificações Admin** (`/admin/notifications`)
 - **Arquivo:** `src/pages/dashboard/notifications/index.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `NotificationController` (a implementar)
 - **Funcionalidades:**
   - Central de notificações
   - Configuração de alertas
@@ -238,6 +467,7 @@
 #### 2.13 **Perfil Admin** (`/admin/profile`)
 - **Arquivo:** `src/pages/admin/Profile.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `UserController` (a implementar)
 - **Funcionalidades:**
   - Edição de perfil administrativo
   - Configurações pessoais
@@ -250,6 +480,7 @@
 - **Posts** (`/admin/blog-posts`) - `src/pages/admin/BlogPosts.tsx` ✅
 - **Editor** (`/admin/blog-posts/new`, `/admin/blog-posts/edit/:id`) - `src/pages/admin/BlogPostEditor.tsx` ✅
 - **Overview** (`/admin/blog-overview`) - `src/pages/admin/AdminBlogOverview.tsx` ✅
+- **Controllers:** `BlogController` ✅ Implementado
 
 ---
 
@@ -258,6 +489,7 @@
 #### 3.1 **Dashboard Especialista** (`/dashboard`)
 - **Arquivo:** `src/pages/Dashboard.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅, `ClientController` (a implementar)
 - **Funcionalidades:**
   - Visão geral das atividades
   - Próximas sessões
@@ -269,6 +501,7 @@
 #### 3.2 **Clientes do Especialista** (`/specialist-clients`)
 - **Arquivo:** `src/pages/dashboard/SpecialistClients.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `ClientController`, `SessionController` ✅
 - **Funcionalidades:**
   - Lista de clientes atendidos
   - Histórico por cliente
@@ -287,6 +520,7 @@
 - **Notificações** (`/specialist-notifications`) - Reutiliza `notifications/index.tsx`
 - **Perfil** (`/specialist-profile`) - Reutiliza `Profile.tsx`
 - **Configurações** (`/specialist-settings`) - Reutiliza `Settings.tsx`
+- **Controllers:** Mesmos controllers das páginas admin correspondentes
 
 ---
 
@@ -295,6 +529,7 @@
 #### 4.1 **Dashboard Cliente** (`/client-dashboard`)
 - **Arquivo:** `src/pages/ClientDashboard.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅, `InvoiceController` (a implementar)
 - **Funcionalidades:**
   - Visão geral das sessões
   - Próximos agendamentos
@@ -306,6 +541,7 @@
 #### 4.2 **Sessões do Cliente** (`/client-dashboard/sessions`)
 - **Arquivo:** `src/pages/client/ClientSessions.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅ Implementado
 - **Funcionalidades:**
   - Histórico completo de sessões
   - Detalhes de cada atendimento
@@ -317,6 +553,7 @@
 #### 4.3 **Detalhes da Sessão** (`/client-dashboard/sessions/:id`)
 - **Arquivo:** `src/pages/client/SessionDetail.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅ Implementado
 - **Funcionalidades:**
   - Informações detalhadas da sessão
   - Notas do especialista
@@ -328,6 +565,7 @@
 #### 4.4 **Feedback** (`/client-dashboard/sessions/feedback`)
 - **Arquivo:** `src/pages/client/sessions/SessionFeedback.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅ Implementado
 - **Funcionalidades:**
   - Formulário de avaliação
   - Sistema de estrelas
@@ -339,6 +577,7 @@
 #### 4.5 **Agendamento** (`/client-dashboard/schedule`)
 - **Arquivo:** `src/pages/client/ClientSchedule.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `SessionController` ✅, `AvailabilityController` ✅, `SpecialistController` (a implementar)
 - **Funcionalidades:**
   - Calendário de horários disponíveis
   - Seleção de especialista
@@ -350,6 +589,7 @@
 #### 4.6 **Perfil Cliente** (`/client-dashboard/profile/edit`)
 - **Arquivo:** `src/pages/client/Profile.tsx`
 - **Status:** ✅ Implementado
+- **Controllers:** `UserController` (a implementar)
 - **Funcionalidades:**
   - Edição de dados pessoais
   - Upload de foto de perfil
@@ -361,11 +601,13 @@
 #### 4.7 **Área Financeira**
 - **Pagamentos** (`/client-dashboard/payments`) - `src/pages/client/ClientPayments.tsx` ✅
 - **Faturas** (`/client-dashboard/invoices`) - `src/pages/client/ClientInvoices.tsx` ✅
+- **Controllers:** `PaymentController`, `InvoiceController` (a implementar)
 
 #### 4.8 **Suporte e Configurações**
 - **Ajuda** (`/client-dashboard/help`) - `src/pages/client/ClientHelp.tsx` ✅
 - **Configurações** (`/client-dashboard/settings`) - `src/pages/client/ClientSettings.tsx` ✅
 - **Notificações** (`/client-dashboard/notifications`) - `src/pages/client/ClientNotifications.tsx` ✅
+- **Controllers:** `NotificationController`, `SystemConfigController` ✅
 
 ---
 
