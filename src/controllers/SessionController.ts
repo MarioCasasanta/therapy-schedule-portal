@@ -132,38 +132,6 @@ export class SessionController {
     }
   }
 
-  static async getClientSessionCount(clientId: string): Promise<number> {
-    try {
-      const { error, count } = await supabase
-        .from("sessoes")
-        .select("*", { count: "exact" })
-        .eq("cliente_id", clientId)
-        .limit(0);
-        
-      if (error) throw error;
-      return count || 0;
-    } catch (error) {
-      console.error("❌ Erro ao contar sessões do cliente:", error);
-      return 0;
-    }
-  }
-
-  static async getSpecialistSessionCount(specialistId: string): Promise<number> {
-    try {
-      const { error, count } = await supabase
-        .from("sessoes")
-        .select("*", { count: "exact" })
-        .eq("specialist_id", specialistId)
-        .limit(0);
-        
-      if (error) throw error;
-      return count || 0;
-    } catch (error) {
-      console.error("❌ Erro ao contar sessões do especialista:", error);
-      return 0;
-    }
-  }
-
   static async getSessionsByClient(clientId: string): Promise<Session[]> {
     try {
       const { data, error } = await supabase

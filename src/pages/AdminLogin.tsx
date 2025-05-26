@@ -18,7 +18,7 @@ const AdminLogin = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      console.log("🔍 Verificando sessão existente...");
+      console.log("🔍 Verificando sessão existente no AdminLogin...");
       setCheckingUser(true);
       
       try {
@@ -47,15 +47,14 @@ const AdminLogin = () => {
 
         if (profileError) {
           console.error("❌ Erro ao buscar perfil do usuário:", profileError);
-          console.log("🔧 Tentando criar perfil padrão...");
+          console.log("🔧 Tentando criar perfil admin...");
           
-          // Tentar criar perfil se não existir
           const { error: insertError } = await supabase
             .from("profiles")
             .insert({
               id: session.user.id,
               email: session.user.email,
-              role: "admin" // Default para admin login
+              role: "admin"
             });
             
           if (insertError) {
@@ -72,7 +71,7 @@ const AdminLogin = () => {
         console.log("✅ Perfil encontrado:", profile);
 
         if (profile?.role === "admin") {
-          console.log("✅ Usuário é admin, redirecionando...");
+          console.log("✅ Usuário é admin, redirecionando para /admin...");
           navigate("/admin", { replace: true });
         } else {
           console.warn("⚠️ Usuário não é admin:", profile?.role);
@@ -97,7 +96,7 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     
-    console.log("🔐 Tentando fazer login com:", email);
+    console.log("🔐 Tentando fazer login admin com:", email);
 
     try {
       const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
@@ -113,7 +112,6 @@ const AdminLogin = () => {
       if (session) {
         console.log("✅ Login realizado com sucesso");
         
-        // Buscar ou criar perfil
         let { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("role")
