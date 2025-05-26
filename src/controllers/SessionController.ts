@@ -172,20 +172,62 @@ export class SessionController {
 
   static async getSpecialistDetails(specialistId: string) {
     try {
-      const { data, error } = await supabase
+      console.log("🔍 Buscando detalhes completos do especialista:", specialistId);
+      
+      // Buscar dados do perfil do especialista
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", specialistId)
+        .eq("role", "especialista")
+        .single();
+
+      if (profileError) {
+        console.error('❌ Erro ao buscar perfil do especialista:', profileError);
+        throw profileError;
+      }
+
+      // Buscar dados detalhados do especialista
+      const { data: detailsData, error: detailsError } = await supabase
         .from("specialist_details")
         .select("*")
         .eq("specialist_id", specialistId)
         .single();
 
-      if (error) {
-        console.error('❌ Error fetching specialist details:', error);
-        return null;
+      if (detailsError && detailsError.code !== 'PGRST116') { // PGRST116 = no rows found
+        console.error('❌ Erro ao buscar detalhes do especialista:', detailsError);
+        throw detailsError;
       }
 
-      return data;
+      // Buscar dados da tabela specialists
+      const { data: specialistData, error: specialistError } = await supabase
+        .from("specialists")
+        .select("*")
+        .eq("id", specialistId)
+        .single();
+
+      if (specialistError && specialistError.code !== 'PGRST116') {
+        console.error('❌ Erro ao buscar dados do specialist:', specialistError);
+      }
+
+      // Combinar todos os dados
+      const combinedData = {
+        id: specialistId,
+        full_name: profileData?.full_name,
+        email: profileData?.email,
+        phone: profileData?.phone,
+        avatar_url: profileData?.avatar_url,
+        bio: specialistData?.bio,
+        specialty: specialistData?.specialty,
+        rating: detailsData?.rating || specialistData?.rating || 4.8,
+        experience_years: specialistData?.experience_years || 5,
+        details: detailsData || {}
+      };
+
+      console.log("✅ Dados completos do especialista encontrados:", combinedData);
+      return combinedData;
     } catch (error) {
-      console.error('❌ Error in getSpecialistDetails:', error);
+      console.error('❌ Erro em getSpecialistDetails:', error);
       return null;
     }
   }

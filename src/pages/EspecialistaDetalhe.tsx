@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Star, ArrowLeft, CalendarDays, Clock, MapPin, User, Mail, Phone, GraduationCap, Languages } from "lucide-react";
@@ -19,6 +20,7 @@ interface SpecialistDetail {
   areas_of_expertise?: string[];
   languages?: string[];
   certifications?: string[];
+  rating?: number;
 }
 
 interface Especialista {
@@ -52,20 +54,22 @@ const EspecialistaDetalhe = () => {
         setLoading(true);
         const data = await SessionController.getSpecialistDetails(id);
 
-        setEspecialista({
-          id: data.id,
-          full_name: data.full_name,
-          avatar_url: data.details?.thumbnail_url, 
-          description: data.details?.short_description || data.bio,
-          bio: data.bio,
-          specialty: data.specialty,
-          session_price: 150, // Valor padrão, idealmente viria do banco
-          rating: data.rating,
-          experience_years: data.experience_years,
-          email: data.email,
-          phone: data.phone,
-          details: data.details
-        });
+        if (data) {
+          setEspecialista({
+            id: data.id,
+            full_name: data.full_name,
+            avatar_url: data.details?.thumbnail_url || data.avatar_url, 
+            description: data.details?.short_description || data.bio,
+            bio: data.bio,
+            specialty: data.specialty,
+            session_price: 150, // Valor padrão, idealmente viria do banco
+            rating: data.rating,
+            experience_years: data.experience_years,
+            email: data.email,
+            phone: data.phone,
+            details: data.details
+          });
+        }
       } catch (error) {
         console.error("Erro ao buscar dados do especialista:", error);
       } finally {
@@ -312,4 +316,3 @@ const EspecialistaDetalhe = () => {
 };
 
 export default EspecialistaDetalhe;
-
