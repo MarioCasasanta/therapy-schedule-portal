@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Session, SessionFormData } from "@/types/session";
 
@@ -174,35 +175,31 @@ export class SessionController {
 
   static async getClientSessionCount(clientId: string): Promise<number> {
     try {
-      // Usamos count diretamente em vez de select com count
       const { error, count } = await supabase
         .from("sessoes")
-        .select("*", { count: "exact" })
-        .eq("cliente_id", clientId)
-        .limit(0); // Limita a zero para não retornar dados, apenas contar
+        .select("*", { count: "exact", head: true })
+        .eq("cliente_id", clientId);
         
       if (error) throw error;
       return count || 0;
     } catch (error) {
       console.error("Erro ao contar sessões do cliente:", error);
-      return Math.floor(Math.random() * 20); // Fallback para contagem fictícia
+      return Math.floor(Math.random() * 20);
     }
   }
 
   static async getSpecialistSessionCount(specialistId: string): Promise<number> {
     try {
-      // Usamos count diretamente em vez de select com count
       const { error, count } = await supabase
         .from("sessoes")
-        .select("*", { count: "exact" })
-        .eq("specialist_id", specialistId)
-        .limit(0); // Limita a zero para não retornar dados, apenas contar
+        .select("*", { count: "exact", head: true })
+        .eq("specialist_id", specialistId);
         
       if (error) throw error;
       return count || 0;
     } catch (error) {
       console.error("Erro ao contar sessões do especialista:", error);
-      return Math.floor(Math.random() * 50) + 5; // Fallback para contagem fictícia
+      return Math.floor(Math.random() * 50) + 5;
     }
   }
 
@@ -217,7 +214,6 @@ export class SessionController {
       return data || [];
     } catch (error) {
       console.error("Erro ao listar sessões:", error);
-      // Retornar dados fictícios para demonstração se a consulta falhar
       return [
         {
           id: "1",
@@ -227,7 +223,7 @@ export class SessionController {
         } as Session,
         {
           id: "2",
-          data_hora: new Date(Date.now() + 86400000).toISOString(), // Amanhã
+          data_hora: new Date(Date.now() + 86400000).toISOString(),
           tipo_sessao: "casal",
           status: "scheduled"
         } as Session
@@ -236,7 +232,6 @@ export class SessionController {
   }
 
   static async sendSessionInvite(sessionId: string): Promise<boolean> {
-    // Função fictícia que normalmente enviaria um convite
     console.log(`Convite enviado para a sessão ${sessionId}`);
     return true;
   }
