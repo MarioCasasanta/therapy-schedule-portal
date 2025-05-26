@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,11 +62,20 @@ const AdminDashboard = () => {
           return;
         }
 
+        console.log("📋 Role verificado:", profile.role);
+
+        // Corrigir a lógica de redirecionamento - admin deve ficar aqui
         if (profile.role !== 'admin') {
           console.warn("⚠️ Usuário não é admin. Redirecionando...");
-          navigate("/client-dashboard", { replace: true });
+          if (profile.role === 'especialista') {
+            navigate("/dashboard", { replace: true });
+          } else {
+            navigate("/client-dashboard", { replace: true });
+          }
           return;
         }
+
+        console.log("✅ Admin confirmado, permanecendo no painel administrativo");
 
         if (!isAuthenticated) {
           await logAccess(session.user.id);
@@ -77,7 +87,7 @@ const AdminDashboard = () => {
             const { count: specialistsCount } = await supabase
               .from('profiles')
               .select('*', { count: 'exact', head: true })
-              .eq('role', 'admin');
+              .eq('role', 'especialista');
 
             const { count: clientsCount } = await supabase
               .from('profiles')

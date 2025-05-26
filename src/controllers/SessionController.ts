@@ -49,7 +49,7 @@ export class SessionController {
 
       if (error) throw error;
 
-      return {
+      const result = {
         id: data.id,
         full_name: data.full_name || "Desconhecido",
         specialty: "Psicologia",
@@ -58,7 +58,19 @@ export class SessionController {
         phone: "123456789",
         rating: 4.8,
         experience_years: 5,
+        details: {
+          thumbnail_url: "https://via.placeholder.com/150",
+          short_description: "Terapeuta experiente",
+          long_description: "Especialista com vários anos de experiência",
+          education: "Universidade de São Paulo",
+          areas_of_expertise: ["Terapia de casal", "Ansiedade", "Depressão"],
+          languages: ["Português", "Inglês"],
+          certifications: ["Psicologia Clínica"],
+          sessions_completed: 100,
+        },
       };
+
+      return result;
     } catch (error) {
       console.error("Erro ao buscar detalhes do especialista:", error);
       throw error;
