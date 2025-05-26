@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -13,7 +14,8 @@ import {
   FileText,
   UserCog,
   TestTube,
-  PencilRuler
+  PencilRuler,
+  BookOpen
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -71,6 +73,7 @@ export function AdminSidebar({ currentPath, userRole = "admin" }: AdminSidebarPr
       { icon: TestTube, label: "Testes", path: "/admin/tests", position: 6 },
       { icon: PencilRuler, label: "Editor de Site", path: "/admin/site-editor", position: 7 },
       { icon: BarChart, label: "Relatórios", path: "/admin/reports", position: 8 },
+      { icon: BookOpen, label: "Documentação", path: "/docs/chatgpt-integration", position: 9 },
     ];
     
     const specialistItems: MenuItem[] = [
