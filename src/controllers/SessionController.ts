@@ -183,7 +183,7 @@ export class SessionController {
       return data?.length || 0;
     } catch (error) {
       console.error("Erro ao contar sessões do cliente:", error);
-      return Math.floor(Math.random() * 20);
+      return 0;
     }
   }
 
@@ -198,7 +198,7 @@ export class SessionController {
       return data?.length || 0;
     } catch (error) {
       console.error("Erro ao contar sessões do especialista:", error);
-      return Math.floor(Math.random() * 50) + 5;
+      return 0;
     }
   }
 
@@ -213,20 +213,7 @@ export class SessionController {
       return data || [];
     } catch (error) {
       console.error("Erro ao listar sessões:", error);
-      return [
-        {
-          id: "1",
-          data_hora: new Date().toISOString(),
-          tipo_sessao: "individual",
-          status: "scheduled"
-        } as Session,
-        {
-          id: "2",
-          data_hora: new Date(Date.now() + 86400000).toISOString(),
-          tipo_sessao: "casal",
-          status: "scheduled"
-        } as Session
-      ];
+      return [];
     }
   }
 
