@@ -5,14 +5,16 @@
 
 ## 🎯 METODOLOGIA DE DESENVOLVIMENTO
 
-### Estratégia de Execução em 3 Fases:
+### Estratégia de Execução em 4 Fases:
 1. **TELAS** - Criar todas as estruturas de páginas primeiro
 2. **COMPONENTES** - Desenvolver componentes reutilizáveis
-3. **FUNCIONALIDADES** - Implementar a lógica de negócio
+3. **CONTROLLERS** - Implementar lógica de dados e operações CRUD
+4. **FUNCIONALIDADES** - Integrar tudo para implementar a lógica de negócio
 
 ### Objetivo:
 - Desenvolvimento linear sem loops
 - Reutilização máxima de componentes
+- Separação clara de responsabilidades
 - Estrutura escalável e maintível
 
 ---
@@ -423,6 +425,210 @@
 
 ---
 
+## 🎛️ CONTROLLERS (LÓGICA DE DADOS)
+
+### 1. CONTROLLERS EXISTENTES
+
+#### 1.1 **SessionController** ✅
+- **Arquivo:** `src/controllers/SessionController.ts`
+- **Status:** ✅ Implementado (235 linhas - precisa refatoração)
+- **Operações:**
+  - `getSessions()` - Listar todas as sessões
+  - `getSessionById(id)` - Buscar sessão por ID
+  - `createSession(data)` - Criar nova sessão
+  - `updateSession(id, data)` - Atualizar sessão
+  - `deleteSession(id)` - Excluir sessão
+  - `getAllClients()` - Listar clientes
+  - `getAllSpecialists()` - Listar especialistas
+  - `getSessionsByClient(clientId)` - Sessões por cliente
+  - `getSpecialistSessionCount(specialistId)` - Contagem de sessões
+  - `getSpecialistDetails(specialistId)` - Detalhes completos
+
+#### 1.2 **BlogController** ✅
+- **Arquivo:** `src/controllers/BlogController.ts`
+- **Status:** ✅ Implementado
+- **Operações:**
+  - `getAllPosts(includeUnpublished)` - Listar posts
+  - `getPublishedPosts()` - Posts publicados
+  - `getPostById(id)` - Buscar por ID
+  - `getPostBySlug(slug)` - Buscar por slug
+
+#### 1.3 **AvailabilityController** ✅
+- **Arquivo:** `src/controllers/AvailabilityController.ts`
+- **Status:** ✅ Implementado
+- **Operações:**
+  - `list()` - Listar disponibilidades
+  - `update(availability)` - Atualizar disponibilidade
+  - `getByDayOfWeek(dayOfWeek)` - Buscar por dia da semana
+
+#### 1.4 **SystemConfigController** ✅
+- **Arquivo:** `src/controllers/SystemConfigController.ts`
+- **Status:** ✅ Implementado
+- **Operações:**
+  - `get(key)` - Buscar configuração por chave
+  - `update(key, value)` - Atualizar configuração
+
+### 2. CONTROLLERS NECESSÁRIOS (A IMPLEMENTAR)
+
+#### 2.1 **UserController** 
+- **Arquivo:** `src/controllers/UserController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getAllUsers()` - Listar todos os usuários
+  - `getUserById(id)` - Buscar usuário por ID
+  - `createUser(data)` - Criar novo usuário
+  - `updateUser(id, data)` - Atualizar usuário
+  - `deleteUser(id)` - Excluir usuário
+  - `getUsersByRole(role)` - Filtrar por papel
+  - `promoteToAdmin(id)` - Promover a admin
+  - `updateUserRole(id, role)` - Alterar papel
+  - `getUserProfile(id)` - Perfil completo
+  - `updateUserProfile(id, data)` - Atualizar perfil
+
+#### 2.2 **ClientController**
+- **Arquivo:** `src/controllers/ClientController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getAllClients()` - Listar clientes
+  - `getClientById(id)` - Buscar cliente por ID
+  - `createClient(data)` - Criar cliente
+  - `updateClient(id, data)` - Atualizar cliente
+  - `deleteClient(id)` - Excluir cliente
+  - `getClientSessions(id)` - Sessões do cliente
+  - `getClientStatistics(id)` - Estatísticas
+  - `getClientPayments(id)` - Histórico financeiro
+  - `searchClients(query)` - Busca de clientes
+  - `getActiveClients()` - Clientes ativos
+
+#### 2.3 **SpecialistController**
+- **Arquivo:** `src/controllers/SpecialistController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getAllSpecialists()` - Listar especialistas
+  - `getSpecialistById(id)` - Buscar por ID
+  - `createSpecialist(data)` - Criar especialista
+  - `updateSpecialist(id, data)` - Atualizar
+  - `deleteSpecialist(id)` - Excluir
+  - `approveSpecialist(id)` - Aprovar cadastro
+  - `rejectSpecialist(id)` - Rejeitar cadastro
+  - `getSpecialistClients(id)` - Clientes do especialista
+  - `getSpecialistAvailability(id)` - Disponibilidade
+  - `updateSpecialistRating(id, rating)` - Atualizar avaliação
+  - `searchSpecialists(query)` - Busca
+
+#### 2.4 **PaymentController**
+- **Arquivo:** `src/controllers/PaymentController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getAllPayments()` - Listar pagamentos
+  - `getPaymentById(id)` - Buscar por ID
+  - `createPayment(data)` - Criar pagamento
+  - `updatePaymentStatus(id, status)` - Atualizar status
+  - `processPayment(data)` - Processar pagamento
+  - `refundPayment(id)` - Estornar
+  - `getPaymentsByClient(clientId)` - Por cliente
+  - `getPaymentsBySession(sessionId)` - Por sessão
+  - `getPaymentStatistics()` - Estatísticas
+  - `getPendingPayments()` - Pendentes
+
+#### 2.5 **InvoiceController**
+- **Arquivo:** `src/controllers/InvoiceController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getAllInvoices()` - Listar faturas
+  - `getInvoiceById(id)` - Buscar por ID
+  - `createInvoice(data)` - Criar fatura
+  - `updateInvoice(id, data)` - Atualizar
+  - `markAsPaid(id)` - Marcar como paga
+  - `generateInvoiceNumber()` - Gerar número
+  - `getInvoicesByClient(clientId)` - Por cliente
+  - `getOverdueInvoices()` - Em atraso
+  - `sendInvoiceEmail(id)` - Enviar por email
+
+#### 2.6 **NotificationController**
+- **Arquivo:** `src/controllers/NotificationController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getAllNotifications()` - Listar notificações
+  - `getNotificationsByUser(userId)` - Por usuário
+  - `createNotification(data)` - Criar notificação
+  - `markAsRead(id)` - Marcar como lida
+  - `markAllAsRead(userId)` - Marcar todas como lidas
+  - `deleteNotification(id)` - Excluir
+  - `scheduleNotification(data)` - Agendar
+  - `sendEmailNotification(data)` - Enviar email
+  - `sendSMSNotification(data)` - Enviar SMS
+
+#### 2.7 **ReportController**
+- **Arquivo:** `src/controllers/ReportController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getFinancialReport(period)` - Relatório financeiro
+  - `getSessionsReport(period)` - Relatório de sessões
+  - `getUsersReport()` - Relatório de usuários
+  - `getPerformanceMetrics()` - Métricas de performance
+  - `exportReport(type, format)` - Exportar relatório
+  - `getRevenueAnalytics(period)` - Analytics de receita
+  - `getSpecialistPerformance(id)` - Performance do especialista
+  - `getClientAnalytics()` - Analytics de clientes
+
+#### 2.8 **EventController**
+- **Arquivo:** `src/controllers/EventController.ts`
+- **Status:** ❌ Não implementado
+- **Operações Necessárias:**
+  - `getAllEvents()` - Listar eventos
+  - `getEventById(id)` - Buscar por ID
+  - `createEvent(data)` - Criar evento
+  - `updateEvent(id, data)` - Atualizar
+  - `deleteEvent(id)` - Excluir
+  - `getEventsByUser(userId)` - Por usuário
+  - `syncWithGoogleCalendar(eventId)` - Sincronizar
+  - `getUpcomingEvents(userId)` - Próximos eventos
+
+#### 2.9 **AuthController**
+- **Arquivo:** `src/controllers/AuthController.ts`
+- **Status:** ❌ Não implementado (existe `useAuth` hook)
+- **Operações Necessárias:**
+  - `login(email, password)` - Fazer login
+  - `register(data)` - Registrar usuário
+  - `logout()` - Fazer logout
+  - `resetPassword(email)` - Resetar senha
+  - `updatePassword(oldPassword, newPassword)` - Atualizar senha
+  - `verifyEmail(token)` - Verificar email
+  - `refreshToken()` - Renovar token
+  - `validateSession()` - Validar sessão
+
+### 3. CONTROLLERS ESPECIALIZADOS (OPCIONAIS)
+
+#### 3.1 **CalendarController**
+- **Arquivo:** `src/controllers/CalendarController.ts`
+- **Operações:**
+  - `getAvailableSlots(specialistId, date)` - Horários disponíveis
+  - `blockTimeSlot(data)` - Bloquear horário
+  - `unblockTimeSlot(id)` - Desbloquear
+  - `syncWithExternalCalendar(data)` - Sincronizar
+  - `getCalendarEvents(userId, period)` - Eventos do calendário
+
+#### 3.2 **EmailController**
+- **Arquivo:** `src/controllers/EmailController.ts`
+- **Operações:**
+  - `sendWelcomeEmail(userId)` - Email de boas-vindas
+  - `sendSessionReminder(sessionId)` - Lembrete de sessão
+  - `sendInvoiceEmail(invoiceId)` - Enviar fatura
+  - `sendPasswordResetEmail(email)` - Reset de senha
+  - `sendNotificationEmail(data)` - Email de notificação
+
+#### 3.3 **FileController**
+- **Arquivo:** `src/controllers/FileController.ts`
+- **Operações:**
+  - `uploadFile(file, path)` - Upload de arquivo
+  - `deleteFile(path)` - Excluir arquivo
+  - `getFileUrl(path)` - URL do arquivo
+  - `listFiles(directory)` - Listar arquivos
+  - `generateThumbnail(imagePath)` - Gerar thumbnail
+
+---
+
 ## ⚙️ FUNCIONALIDADES POR IMPLEMENTAR
 
 ### FASE 1 - CORE (Em Desenvolvimento)
@@ -486,34 +692,34 @@
 3. ✅ Estrutura de páginas básicas
 4. ✅ Componentes de layout
 
-### SEMANA 3-4: FUNCIONALIDADES CORE
-1. [ ] Sistema de agendamento
-2. [ ] Gestão de usuários completa
-3. [ ] Dashboard básico
-4. [ ] Integração com banco de dados
+### SEMANA 3-4: CONTROLLERS E FUNCIONALIDADES CORE
+1. [ ] Implementar Controllers em falta
+2. [ ] Sistema de agendamento completo
+3. [ ] Gestão de usuários aprimorada
+4. [ ] Integração completa com banco de dados
 
 ### SEMANA 5-6: SISTEMA FINANCEIRO
-1. [ ] Integração Stripe
-2. [ ] Gestão de faturas
-3. [ ] Relatórios financeiros
-4. [ ] Controle de pagamentos
+1. [ ] PaymentController e InvoiceController
+2. [ ] Integração Stripe
+3. [ ] Gestão de faturas
+4. [ ] Relatórios financeiros
 
 ### SEMANA 7-8: NOTIFICAÇÕES E COMUNICAÇÃO
-1. [ ] Sistema de notificações
-2. [ ] Email automático
-3. [ ] Chat básico
-4. [ ] Sincronização de calendário
+1. [ ] NotificationController
+2. [ ] EmailController
+3. [ ] Sistema de notificações em tempo real
+4. [ ] Chat básico
 
 ### SEMANA 9-10: RELATÓRIOS E ANALYTICS
-1. [ ] Dashboard avançado
-2. [ ] Relatórios personalizados
+1. [ ] ReportController
+2. [ ] Dashboard avançado
 3. [ ] Métricas de uso
 4. [ ] Exportação de dados
 
 ### SEMANA 11-12: POLIMENTO E TESTES
-1. [ ] Testes de integração
-2. [ ] Otimização de performance
-3. [ ] UX/UI refinements
+1. [ ] Refatoração de Controllers longos
+2. [ ] Testes de integração
+3. [ ] Otimização de performance
 4. [ ] Deploy e monitoramento
 
 ---
@@ -521,18 +727,18 @@
 ## 🎯 PRÓXIMOS PASSOS
 
 ### IMEDIATO:
-1. **Validar estrutura atual** - Revisar todas as telas implementadas
-2. **Identificar gaps** - Componentes ou funcionalidades em falta
-3. **Priorizar desenvolvimento** - Focar no que é crítico primeiro
+1. **Refatorar SessionController** - Quebrar em controllers menores
+2. **Implementar Controllers básicos** - UserController, ClientController, SpecialistController
+3. **Validar integração** - Componentes + Controllers
 
 ### MÉDIO PRAZO:
-1. **Implementar funcionalidades core** - Sistema de agendamento completo
-2. **Integrar pagamentos** - Stripe e gestão financeira
-3. **Desenvolver notificações** - Sistema de comunicação
+1. **Controllers financeiros** - PaymentController, InvoiceController
+2. **Sistema de notificações** - NotificationController, EmailController
+3. **Relatórios e analytics** - ReportController
 
 ### LONGO PRAZO:
-1. **Recursos avançados** - Analytics, relatórios, automações
-2. **Otimizações** - Performance, SEO, UX
+1. **Controllers especializados** - CalendarController, FileController
+2. **Otimizações** - Performance, cache, indexação
 3. **Expansão** - Novos recursos e integrações
 
 ---
@@ -541,6 +747,7 @@
 
 ### TÉCNICAS:
 - [ ] 100% das telas implementadas
+- [ ] 100% dos Controllers implementados
 - [ ] 0 erros de build/runtime
 - [ ] Cobertura de testes > 80%
 - [ ] Performance score > 90
@@ -551,11 +758,11 @@
 - [ ] Notificações funcionando
 - [ ] Relatórios precisos
 
-### UX:
-- [ ] Navegação intuitiva
-- [ ] Responsividade completa
-- [ ] Acessibilidade WCAG
-- [ ] Feedback positivo dos usuários
+### ARQUITETURA:
+- [ ] Separação clara de responsabilidades
+- [ ] Controllers com responsabilidade única
+- [ ] Reutilização máxima de componentes
+- [ ] Código maintível e escalável
 
 ---
 
