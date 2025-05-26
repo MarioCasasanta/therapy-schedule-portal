@@ -62,13 +62,13 @@ export class SpecialistService {
 
   static async getSpecialistSessionCount(specialistId: string): Promise<number> {
     try {
-      const { data, error } = await supabase
+      const { count, error } = await supabase
         .from("sessoes")
-        .select("id")
+        .select("*", { count: 'exact', head: true })
         .eq("specialist_id", specialistId);
         
       if (error) throw error;
-      return data?.length || 0;
+      return count || 0;
     } catch (error) {
       console.error("Erro ao contar sessões do especialista:", error);
       return 0;

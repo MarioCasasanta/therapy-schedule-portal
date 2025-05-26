@@ -23,13 +23,13 @@ export class ClientService {
 
   static async getClientSessionCount(clientId: string): Promise<number> {
     try {
-      const { data, error } = await supabase
+      const { count, error } = await supabase
         .from("sessoes")
-        .select("id")
+        .select("*", { count: 'exact', head: true })
         .eq("cliente_id", clientId);
         
       if (error) throw error;
-      return data?.length || 0;
+      return count || 0;
     } catch (error) {
       console.error("Erro ao contar sessões do cliente:", error);
       return 0;
