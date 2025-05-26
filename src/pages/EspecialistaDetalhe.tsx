@@ -67,7 +67,7 @@ const EspecialistaDetalhe = () => {
             experience_years: data.experience_years,
             email: data.email,
             phone: data.phone,
-            details: data.details || {}
+            details: data.details || {} as SpecialistDetail
           });
         }
       } catch (error) {
