@@ -150,4 +150,43 @@ export class SessionController {
       return [];
     }
   }
+
+  static async getSpecialistSessionCount(specialistId: string): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .from("sessoes")
+        .select("id", { count: 'exact' })
+        .eq("cliente_id", specialistId);
+
+      if (error) {
+        console.error('❌ Error fetching specialist session count:', error);
+        return 0;
+      }
+
+      return data?.length || 0;
+    } catch (error) {
+      console.error('❌ Error in getSpecialistSessionCount:', error);
+      return 0;
+    }
+  }
+
+  static async getSpecialistDetails(specialistId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("specialist_details")
+        .select("*")
+        .eq("specialist_id", specialistId)
+        .single();
+
+      if (error) {
+        console.error('❌ Error fetching specialist details:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('❌ Error in getSpecialistDetails:', error);
+      return null;
+    }
+  }
 }

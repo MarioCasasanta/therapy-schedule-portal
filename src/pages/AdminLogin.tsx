@@ -18,25 +18,25 @@ const AdminLogin = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      console.log("🔍 Verificando sessão existente no AdminLogin...");
+      console.log("🔍 AdminLogin: Verificando sessão existente...");
       setCheckingUser(true);
       
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
 
         if (error) {
-          console.error("❌ Erro ao obter sessão:", error);
+          console.error("❌ AdminLogin: Erro ao obter sessão:", error);
           setCheckingUser(false);
           return;
         }
 
         if (!session?.user) {
-          console.log("❌ Nenhum usuário autenticado.");
+          console.log("❌ AdminLogin: Nenhum usuário autenticado.");
           setCheckingUser(false);
           return;
         }
 
-        console.log("✅ Usuário autenticado encontrado:", session.user.email);
+        console.log("✅ AdminLogin: Usuário autenticado encontrado:", session.user.email);
 
         // Buscar perfil do usuário
         const { data: profile, error: profileError } = await supabase
@@ -46,8 +46,10 @@ const AdminLogin = () => {
           .single();
 
         if (profileError) {
-          console.error("❌ Erro ao buscar perfil do usuário:", profileError);
-          console.log("🔧 Tentando criar perfil admin...");
+          console.error("❌ AdminLogin: Erro ao buscar perfil do usuário:", profileError);
+          
+          // Se não encontrou o perfil, criar um perfil admin
+          console.log("🔧 AdminLogin: Criando perfil admin para usuário logado...");
           
           const { error: insertError } = await supabase
             .from("profiles")
@@ -58,23 +60,23 @@ const AdminLogin = () => {
             });
             
           if (insertError) {
-            console.error("❌ Erro ao criar perfil:", insertError);
+            console.error("❌ AdminLogin: Erro ao criar perfil:", insertError);
             setCheckingUser(false);
             return;
           }
           
-          console.log("✅ Perfil admin criado com sucesso");
+          console.log("✅ AdminLogin: Perfil admin criado com sucesso");
           navigate("/admin", { replace: true });
           return;
         }
 
-        console.log("✅ Perfil encontrado:", profile);
+        console.log("✅ AdminLogin: Perfil encontrado:", profile);
 
         if (profile?.role === "admin") {
-          console.log("✅ Usuário é admin, redirecionando para /admin...");
+          console.log("✅ AdminLogin: Usuário é admin, redirecionando para /admin...");
           navigate("/admin", { replace: true });
         } else {
-          console.warn("⚠️ Usuário não é admin:", profile?.role);
+          console.warn("⚠️ AdminLogin: Usuário não é admin:", profile?.role);
           toast({
             variant: "destructive",
             title: "Acesso negado",
@@ -83,10 +85,10 @@ const AdminLogin = () => {
           await supabase.auth.signOut();
         }
       } catch (error) {
-        console.error("❌ Erro inesperado:", error);
+        console.error("❌ AdminLogin: Erro inesperado:", error);
+      } finally {
+        setCheckingUser(false);
       }
-      
-      setCheckingUser(false);
     };
 
     checkSession();
@@ -96,7 +98,7 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     
-    console.log("🔐 Tentando fazer login admin com:", email);
+    console.log("🔐 AdminLogin: Tentando fazer login admin com:", email);
 
     try {
       const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
@@ -105,12 +107,12 @@ const AdminLogin = () => {
       });
 
       if (loginError) {
-        console.error("❌ Erro no login:", loginError);
+        console.error("❌ AdminLogin: Erro no login:", loginError);
         throw loginError;
       }
 
       if (session) {
-        console.log("✅ Login realizado com sucesso");
+        console.log("✅ AdminLogin: Login realizado com sucesso");
         
         let { data: profile, error: profileError } = await supabase
           .from("profiles")
@@ -119,7 +121,7 @@ const AdminLogin = () => {
           .single();
             
         if (profileError) {
-          console.log("🔧 Perfil não encontrado, criando perfil admin...");
+          console.log("🔧 AdminLogin: Perfil não encontrado, criando perfil admin...");
           
           const { error: insertError } = await supabase
             .from("profiles")
@@ -130,14 +132,14 @@ const AdminLogin = () => {
             });
             
           if (insertError) {
-            console.error("❌ Erro ao criar perfil:", insertError);
+            console.error("❌ AdminLogin: Erro ao criar perfil:", insertError);
             throw insertError;
           }
           
           profile = { role: "admin" };
         }
         
-        console.log("✅ Perfil verificado:", profile);
+        console.log("✅ AdminLogin: Perfil verificado:", profile);
         
         if (profile?.role === "admin") {
           toast({
@@ -146,7 +148,7 @@ const AdminLogin = () => {
           });
           navigate("/admin", { replace: true });
         } else {
-          console.warn("⚠️ Usuário não é admin:", profile?.role);
+          console.warn("⚠️ AdminLogin: Usuário não é admin:", profile?.role);
           toast({
             variant: "destructive",
             title: "Acesso negado",
@@ -156,7 +158,7 @@ const AdminLogin = () => {
         }
       }
     } catch (error: any) {
-      console.error("❌ Auth error:", error);
+      console.error("❌ AdminLogin: Auth error:", error);
       toast({
         variant: "destructive",
         title: "Erro na autenticação",
