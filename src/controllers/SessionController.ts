@@ -44,12 +44,12 @@ export class SessionController {
         .from("profiles")
         .select("*")
         .eq("id", id)
-        .eq("role", "specialist")
+        .eq("role", "especialista")
         .single();
 
       if (error) throw error;
 
-      const result = {
+      return {
         id: data.id,
         full_name: data.full_name || "Desconhecido",
         specialty: "Psicologia",
@@ -69,8 +69,6 @@ export class SessionController {
           sessions_completed: 100,
         },
       };
-
-      return result;
     } catch (error) {
       console.error("Erro ao buscar detalhes do especialista:", error);
       throw error;
@@ -82,7 +80,7 @@ export class SessionController {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("role", "specialist");
+        .eq("role", "especialista");
       
       if (error) {
         console.error("Erro ao buscar especialistas:", error);
