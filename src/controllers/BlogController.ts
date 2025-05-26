@@ -8,7 +8,7 @@ export class BlogController {
       
       let query = supabase
         .from("blog_posts")
-        .select("*")
+        .select(`*`)
         .order("created_at", { ascending: false });
 
       if (!includeUnpublished) {
@@ -26,7 +26,7 @@ export class BlogController {
 
       return (data || []).map((post: any) => ({
         ...post,
-        author_name: "Autor"
+        author_name: "Autor" // Simplified since relation query was causing issues
       }));
     } catch (error) {
       console.error("❌ Erro ao buscar posts do blog:", error);
@@ -44,7 +44,7 @@ export class BlogController {
       
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("*")
+        .select(`*`)
         .eq("id", id)
         .single();
 
@@ -57,7 +57,7 @@ export class BlogController {
 
       return {
         ...data,
-        author_name: "Autor"
+        author_name: "Autor" // Simplified since relation query was causing issues
       };
     } catch (error) {
       console.error("❌ Erro ao buscar post do blog:", error);
@@ -71,7 +71,7 @@ export class BlogController {
       
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("*")
+        .select(`*`)
         .eq("slug", slug)
         .single();
 
@@ -84,7 +84,7 @@ export class BlogController {
 
       return {
         ...data,
-        author_name: "Autor"
+        author_name: "Autor" // Simplified since relation query was causing issues
       };
     } catch (error) {
       console.error("❌ Erro ao buscar post pelo slug:", error);
