@@ -37,6 +37,9 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import BlogPosts from "@/pages/admin/BlogPosts";
 import BlogPostEditor from "@/pages/admin/BlogPostEditor";
 import AdminBlogOverview from "@/pages/admin/AdminBlogOverview";
+import Tests from "@/pages/admin/Tests";
+import SiteEditor from "@/pages/admin/SiteEditor";
+import Plans from "@/pages/admin/Plans";
 
 // Blog Public Routes
 import Blog from "@/pages/Blog";
@@ -49,6 +52,10 @@ import ClientInvoices from "@/pages/client/ClientInvoices";
 import ClientHelp from "@/pages/client/ClientHelp";
 import ClientSettings from "@/pages/client/ClientSettings";
 import ClientSessionDetail from "@/pages/client/SessionDetail";
+import ClientProfileEdit from "@/pages/client/ClientProfile";
+
+// Specialist Routes
+import SpecialistDashboard from "@/pages/specialist/SpecialistDashboard";
 
 function App() {
   return (
@@ -90,8 +97,12 @@ function App() {
         <Route path="/admin/blog-overview" element={<AdminBlogOverview />} />
         <Route path="/admin/blog-posts/new" element={<BlogPostEditor />} />
         <Route path="/admin/blog-posts/edit/:id" element={<BlogPostEditor />} />
+        <Route path="/admin/tests" element={<Tests />} />
+        <Route path="/admin/site-editor" element={<SiteEditor />} />
+        <Route path="/admin/plans" element={<Plans />} />
         
         {/* Specialist Routes */}
+        <Route path="/specialist-dashboard" element={<SpecialistDashboard />} />
         <Route path="/specialist-clients" element={<SpecialistClients />} />
         <Route path="/specialist-settings" element={<Settings />} />
         <Route path="/specialist-sessions" element={<Sessions />} />
@@ -109,7 +120,8 @@ function App() {
         <Route path="/client-dashboard/sessions/feedback" element={<SessionFeedback />} />
         <Route path="/client-dashboard/sessions/:id" element={<ClientSessionDetail />} />
         <Route path="/client-dashboard/schedule" element={<ClientSchedule />} />
-        <Route path="/client-dashboard/profile/edit" element={<ClientProfile />} />
+        <Route path="/client-dashboard/profile" element={<ClientProfile />} />
+        <Route path="/client-dashboard/profile/edit" element={<ClientProfileEdit />} />
         <Route path="/client-dashboard/payments" element={<ClientPayments />} />
         <Route path="/client-dashboard/notifications" element={<ClientNotifications />} />
         <Route path="/client-dashboard/invoices" element={<ClientInvoices />} />
