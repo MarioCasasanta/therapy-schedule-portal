@@ -7,6 +7,7 @@ import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import FeaturedBlogCarousel from "@/components/FeaturedBlogCarousel";
 import FAQSection from "@/components/FAQSection";
+import DownloadSection from "@/components/DownloadSection";
 import { Footer } from "@/components/Footer";
 
 const Index = () => {
@@ -53,6 +54,7 @@ const Index = () => {
       <HeroSection />
       <ServicesSection />
       <FeaturedBlogCarousel />
+      <DownloadSection />
       <FAQSection />
       <Footer />
     </div>
