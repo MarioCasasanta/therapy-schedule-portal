@@ -1,255 +1,254 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { ClientSidebar } from "@/components/client/ClientSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Upload, User, Bell, Shield, CreditCard } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { User, Mail, Phone, Calendar, MapPin, Edit, Save, X } from "lucide-react";
 
-export default function ClientProfile() {
-  const [profile, setProfile] = useState({
-    name: "Ana Silva",
-    email: "ana.silva@email.com",
-    phone: "(11) 99999-9999",
-    birthDate: "1990-05-15",
-    emergencyContact: "João Silva - (11) 88888-8888",
-    bio: "Buscando autoconhecimento e crescimento pessoal através da terapia.",
-    avatar: "/placeholder.svg"
-  });
+const ClientProfile = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<any>({});
 
-  const [preferences, setPreferences] = useState({
-    emailNotifications: true,
-    smsNotifications: false,
-    reminderTime: 24,
-    sessionType: "online",
-    language: "pt-BR"
-  });
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+
+      const { data: userProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profileError || !userProfile) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar perfil",
+          description: "Não foi possível verificar suas informações.",
+        });
+        navigate("/");
+        return;
+      }
+
+      setProfile(userProfile);
+      setEditedProfile(userProfile);
+      setLoading(false);
+    };
+
+    checkUser();
+  }, [navigate, toast]);
+
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update(editedProfile)
+        .eq("id", profile.id);
+
+      if (error) throw error;
+
+      setProfile(editedProfile);
+      setEditing(false);
+      toast({
+        title: "Perfil atualizado",
+        description: "Suas informações foram salvas com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: error.message,
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <SidebarProvider>
+        <div className="flex h-screen w-full bg-gray-50">
+          <ClientSidebar />
+          <SidebarInset className="overflow-auto">
+            <div className="flex items-center justify-center h-full">
+              <p className="text-lg">Carregando...</p>
+            </div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    );
+  }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <ClientSidebar currentPath="/client-dashboard/profile" />
-      <div className="flex-1 overflow-auto">
-        <div className="p-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">Meu Perfil</h1>
-            <Button>
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Alterações
-            </Button>
-          </div>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gray-50">
+        <ClientSidebar />
+        <SidebarInset className="overflow-auto">
+          <div className="max-w-4xl mx-auto py-8 px-6">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">Meu Perfil</h1>
+              {!editing ? (
+                <Button onClick={() => setEditing(true)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar Perfil
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button onClick={handleSave}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Salvar
+                  </Button>
+                  <Button variant="outline" onClick={() => {
+                    setEditing(false);
+                    setEditedProfile(profile);
+                  }}>
+                    <X className="h-4 w-4 mr-2" />
+                    Cancelar
+                  </Button>
+                </div>
+              )}
+            </div>
 
-          <Tabs defaultValue="personal">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="personal">Dados Pessoais</TabsTrigger>
-              <TabsTrigger value="preferences">Preferências</TabsTrigger>
-              <TabsTrigger value="security">Segurança</TabsTrigger>
-              <TabsTrigger value="billing">Pagamento</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="personal" className="space-y-4">
+            <div className="grid gap-6">
+              {/* Informações Pessoais */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Informações Pessoais</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <User className="h-5 w-5 mr-2" />
+                    Informações Pessoais
+                  </CardTitle>
                   <CardDescription>
-                    Mantenha seus dados atualizados para melhor atendimento
+                    Suas informações básicas e dados de contato
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-4">
-                    <Avatar className="w-20 h-20">
-                      <AvatarImage src={profile.avatar} />
-                      <AvatarFallback>
-                        <User className="w-8 h-8" />
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-lg">
+                        {profile?.full_name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <Button variant="outline">
-                        <Upload className="mr-2 h-4 w-4" />
-                        Alterar Foto
-                      </Button>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Formatos aceitos: JPG, PNG (máx. 2MB)
-                      </p>
+                      <h3 className="text-lg font-semibold">{profile?.full_name || 'Usuário'}</h3>
+                      <Badge variant="secondary">{profile?.role || 'Cliente'}</Badge>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Nome Completo</Label>
-                      <Input
-                        id="name"
-                        value={profile.name}
-                        onChange={(e) => setProfile({...profile, name: e.target.value})}
-                      />
+
+                  <Separator />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="full_name">Nome Completo</Label>
+                      {editing ? (
+                        <Input
+                          id="full_name"
+                          value={editedProfile.full_name || ''}
+                          onChange={(e) => setEditedProfile({...editedProfile, full_name: e.target.value})}
+                        />
+                      ) : (
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 mr-2 text-gray-500" />
+                          <span>{profile?.full_name || 'Não informado'}</span>
+                        </div>
+                      )}
                     </div>
-                    <div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={profile.email}
-                        onChange={(e) => setProfile({...profile, email: e.target.value})}
-                      />
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                        <span>{profile?.email || 'Não informado'}</span>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="phone">Telefone</Label>
-                      <Input
-                        id="phone"
-                        value={profile.phone}
-                        onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                      {editing ? (
+                        <Input
+                          id="phone"
+                          value={editedProfile.phone || ''}
+                          onChange={(e) => setEditedProfile({...editedProfile, phone: e.target.value})}
+                        />
+                      ) : (
+                        <div className="flex items-center">
+                          <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                          <span>{profile?.phone || 'Não informado'}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="data_nascimento">Data de Nascimento</Label>
+                      {editing ? (
+                        <Input
+                          id="data_nascimento"
+                          type="date"
+                          value={editedProfile.data_nascimento || ''}
+                          onChange={(e) => setEditedProfile({...editedProfile, data_nascimento: e.target.value})}
+                        />
+                      ) : (
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2 text-gray-500" />
+                          <span>{profile?.data_nascimento ? new Date(profile.data_nascimento).toLocaleDateString('pt-BR') : 'Não informado'}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="notes">Observações</Label>
+                    {editing ? (
+                      <Textarea
+                        id="notes"
+                        value={editedProfile.notes || ''}
+                        onChange={(e) => setEditedProfile({...editedProfile, notes: e.target.value})}
+                        placeholder="Adicione observações sobre seu perfil..."
                       />
-                    </div>
-                    <div>
-                      <Label htmlFor="birthDate">Data de Nascimento</Label>
-                      <Input
-                        id="birthDate"
-                        type="date"
-                        value={profile.birthDate}
-                        onChange={(e) => setProfile({...profile, birthDate: e.target.value})}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="emergency">Contato de Emergência</Label>
-                    <Input
-                      id="emergency"
-                      value={profile.emergencyContact}
-                      onChange={(e) => setProfile({...profile, emergencyContact: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="bio">Sobre Mim</Label>
-                    <Textarea
-                      id="bio"
-                      value={profile.bio}
-                      onChange={(e) => setProfile({...profile, bio: e.target.value})}
-                      placeholder="Conte um pouco sobre você e seus objetivos..."
-                    />
+                    ) : (
+                      <div className="min-h-[60px] p-3 border rounded-md bg-gray-50">
+                        <span className="text-gray-700">{profile?.notes || 'Nenhuma observação adicionada'}</span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-            
-            <TabsContent value="preferences" className="space-y-4">
+
+              {/* Preferências */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Preferências de Notificação</CardTitle>
+                  <CardTitle>Preferências</CardTitle>
                   <CardDescription>
-                    Configure como você gostaria de receber notificações
+                    Configure suas preferências de atendimento e comunicação
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="email-notifications">Notificações por Email</Label>
-                      <p className="text-sm text-muted-foreground">Receba lembretes e atualizações por email</p>
-                    </div>
-                    <Switch
-                      id="email-notifications"
-                      checked={preferences.emailNotifications}
-                      onCheckedChange={(checked) => setPreferences({...preferences, emailNotifications: checked})}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="sms-notifications">Notificações por SMS</Label>
-                      <p className="text-sm text-muted-foreground">Receba lembretes urgentes por SMS</p>
-                    </div>
-                    <Switch
-                      id="sms-notifications"
-                      checked={preferences.smsNotifications}
-                      onCheckedChange={(checked) => setPreferences({...preferences, smsNotifications: checked})}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="reminder-time">Lembrete de Sessão (horas antes)</Label>
-                    <Input
-                      id="reminder-time"
-                      type="number"
-                      min="1"
-                      max="72"
-                      value={preferences.reminderTime}
-                      onChange={(e) => setPreferences({...preferences, reminderTime: parseInt(e.target.value)})}
-                    />
+                <CardContent>
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Configurações de preferências em desenvolvimento</p>
                   </div>
                 </CardContent>
               </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Preferências de Sessão</CardTitle>
-                  <CardDescription>
-                    Configure suas preferências para as sessões
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Tipo de Sessão Preferido</Label>
-                    <div className="flex gap-2 mt-2">
-                      <Badge variant={preferences.sessionType === "online" ? "default" : "outline"}>
-                        Online
-                      </Badge>
-                      <Badge variant={preferences.sessionType === "presencial" ? "default" : "outline"}>
-                        Presencial
-                      </Badge>
-                      <Badge variant={preferences.sessionType === "ambos" ? "default" : "outline"}>
-                        Ambos
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="security" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Segurança da Conta</CardTitle>
-                  <CardDescription>
-                    Mantenha sua conta segura
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center py-8">
-                    <Shield className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-600">Configurações de segurança em desenvolvimento</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="billing" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Informações de Pagamento</CardTitle>
-                  <CardDescription>
-                    Gerencie seus métodos de pagamento
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center py-8">
-                    <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-600">Métodos de pagamento em desenvolvimento</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+            </div>
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
-}
+};
+
+export default ClientProfile;

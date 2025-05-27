@@ -33,6 +33,8 @@ const FeaturedBlogCarousel = () => {
   useEffect(() => {
     const fetchFeaturedPosts = async () => {
       try {
+        console.log("🔍 Buscando posts do blog no banco de dados...");
+        
         const { data, error } = await supabase
           .from('blog_posts')
           .select('id, title, slug, excerpt, created_at')
@@ -41,12 +43,31 @@ const FeaturedBlogCarousel = () => {
           .limit(5);
 
         if (error) {
+          console.error("❌ Erro ao buscar posts:", error);
           throw error;
         }
 
+        console.log("✅ Posts encontrados:", data?.length || 0);
         setPosts(data || []);
       } catch (error) {
-        console.error("Erro ao buscar posts em destaque:", error);
+        console.error("❌ Erro ao buscar posts em destaque:", error);
+        // Em caso de erro, usar posts fictícios
+        setPosts([
+          {
+            id: "demo-1",
+            title: "Como Superar a Ansiedade no Dia a Dia",
+            slug: "como-superar-ansiedade",
+            excerpt: "Descubra técnicas práticas para lidar com a ansiedade e viver com mais tranquilidade.",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: "demo-2", 
+            title: "5 Passos para Construir Relacionamentos Saudáveis",
+            slug: "relacionamentos-saudaveis",
+            excerpt: "Aprenda a desenvolver vínculos mais profundos e significativos com as pessoas ao seu redor.",
+            created_at: new Date(Date.now() - 86400000).toISOString()
+          }
+        ]);
       } finally {
         setIsLoading(false);
       }

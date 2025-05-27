@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star, Heart, Youtube, ArrowLeft, ArrowRight, Calendar, Clock, User } from "lucide-react";
@@ -48,37 +47,68 @@ const EspecialistasPage = () => {
   useEffect(() => {
     const fetchEspecialistas = async () => {
       try {
-        // Buscar perfis com role = 'admin' pois são os terapeutas/especialistas
-        const { data, error } = await supabase
+        console.log("🔍 Buscando especialistas do banco de dados...");
+        
+        // Buscar perfis com role = 'admin' ou 'especialista'
+        const { data: profiles, error } = await supabase
           .from("profiles")
           .select("*")
-          .eq("role", "admin");
+          .in("role", ["admin", "especialista"]);
 
-        if (error) throw error;
+        if (error) {
+          console.error("❌ Erro ao buscar especialistas:", error);
+          throw error;
+        }
 
-        // Transformando os dados para o formato que precisamos
-        let especialistasData = data.map((profile) => ({
-          id: profile.id,
-          full_name: profile.full_name || "Especialista",
-          avatar_url: profile.avatar_url || "",
-          description: profile.notes || "Há +6 anos ajudo a superar ansiedade, estresse, medo, timidez, depressão, sabotagem, procrastinação, bloqueio, trauma, incerteza e a desenvolver autoestima, relacionamento, carreira comunicação, autoliderança, clareza e equilíbrio emocional para conquistar seus objetivos. Agende e nos vemos em breve.",
-          session_price: 150, // Valor padrão, idealmente viria do banco
-          rating: 4.8, // Valor padrão, idealmente viria de avaliações
-          specialty: "Terapeuta", // Exemplo, idealmente viria do banco
-          location: "Atendimento online",
-          experience: Math.floor(Math.random() * 20) + 3, // Entre 3 e 23 anos de experiência
-          appointments_count: Math.floor(Math.random() * 300) + 50, // Entre 50 e 350 atendimentos
-          reviews_count: Math.floor(Math.random() * 50) + 5 // Entre 5 e 55 comentários
-        }));
+        console.log("✅ Perfis encontrados:", profiles?.length || 0);
 
-        // Adicionar especialistas fictícios para visualização do layout
-        if (especialistasData.length < 6) {
+        // Buscar detalhes dos especialistas
+        const { data: specialists, error: specialistsError } = await supabase
+          .from("specialists")
+          .select("*");
+
+        if (specialistsError) {
+          console.error("❌ Erro ao buscar dados dos specialists:", specialistsError);
+        }
+
+        // Buscar detalhes específicos dos especialistas
+        const { data: specialistDetails, error: detailsError } = await supabase
+          .from("specialist_details")
+          .select("*");
+
+        if (detailsError) {
+          console.error("❌ Erro ao buscar detalhes dos especialistas:", detailsError);
+        }
+
+        // Combinar dados
+        const especialistasData = profiles?.map((profile) => {
+          const specialistData = specialists?.find(s => s.id === profile.id);
+          const detailsData = specialistDetails?.find(d => d.specialist_id === profile.id);
+          
+          return {
+            id: profile.id,
+            full_name: profile.full_name || "Especialista",
+            avatar_url: profile.avatar_url || "",
+            description: detailsData?.long_description || specialistData?.bio || "Especialista em desenvolvimento pessoal e bem-estar.",
+            session_price: 150, // Valor padrão, idealmente viria do banco
+            rating: detailsData?.rating || specialistData?.rating || 4.8,
+            specialty: specialistData?.specialty || "Terapeuta",
+            location: "Atendimento online",
+            experience: specialistData?.experience_years || Math.floor(Math.random() * 20) + 3,
+            appointments_count: detailsData?.sessions_completed || Math.floor(Math.random() * 300) + 50,
+            reviews_count: Math.floor(Math.random() * 50) + 5
+          };
+        }) || [];
+
+        // Se não tiver especialistas suficientes, adicionar alguns fictícios para demonstração
+        let finalData = [...especialistasData];
+        if (finalData.length < 3) {
           const ficticios = [
             {
               id: "ficticio-1",
               full_name: "Amanda Santos",
               avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Especialista em psicologia clínica com abordagem humanista, focada no autoconhecimento e desenvolvimento pessoal. Atendo questões relacionadas à ansiedade, autoestima, relacionamentos e transições de vida. Meu objetivo é criar um espaço seguro onde você possa explorar suas emoções e desenvolver recursos internos para uma vida mais plena e consciente.",
+              description: "Especialista em psicologia clínica com abordagem humanista, focada no autoconhecimento e desenvolvimento pessoal. Atendo questões relacionadas à ansiedade, autoestima, relacionamentos e transições de vida.",
               session_price: 180,
               rating: 4.9,
               specialty: "Psicóloga",
@@ -91,7 +121,7 @@ const EspecialistasPage = () => {
               id: "ficticio-2",
               full_name: "Ricardo Oliveira",
               avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Há +15 anos ajudo pessoas a superarem traumas emocionais e construírem relacionamentos saudáveis. Especialista em terapia de casal e familiar, trabalho com comunicação, resolução de conflitos e reconexão afetiva. Minha abordagem é prática e baseada em evidências, com foco em resultados concretos e duradouros.",
+              description: "Há +15 anos ajudo pessoas a superarem traumas emocionais e construírem relacionamentos saudáveis. Especialista em terapia de casal e familiar.",
               session_price: 200,
               rating: 4.7,
               specialty: "Terapeuta",
@@ -99,57 +129,34 @@ const EspecialistasPage = () => {
               experience: 15,
               appointments_count: 275,
               reviews_count: 41
-            },
-            {
-              id: "ficticio-3",
-              full_name: "Carla Mendes",
-              avatar_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Psicóloga especializada em terapia cognitivo-comportamental para ansiedade e depressão. Ajudo pessoas a identificarem padrões de pensamento negativos e desenvolverem habilidades práticas para lidar com desafios emocionais. Meu trabalho é focado em resultados, com ferramentas que você pode aplicar no dia a dia para melhorar sua qualidade de vida.",
-              session_price: 170,
-              rating: 4.8,
-              specialty: "Psicóloga",
-              location: "Atendimento online",
-              experience: 7,
-              appointments_count: 132,
-              reviews_count: 18
-            },
-            {
-              id: "ficticio-4",
-              full_name: "Thiago Luz",
-              avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Há +6 anos ajudo a superar ansiedade, estresse, medo, timidez, depressão, sabotagem, procrastinação, bloqueio, trauma, incerteza e a desenvolver autoestima, relacionamento, carreira comunicação, autoliderança, clareza e equilíbrio emocional para conquistar seus objetivos. Agende e nos vemos em breve.",
-              session_price: 190,
-              rating: 5.0,
-              specialty: "Terapeuta",
-              location: "Atendimento online",
-              experience: 21,
-              appointments_count: 181,
-              reviews_count: 19
-            },
-            {
-              id: "ficticio-5",
-              full_name: "Juliana Martins",
-              avatar_url: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Psicóloga especialista em desenvolvimento pessoal e profissional. Trabalho com questões relacionadas a carreira, propósito de vida e equilíbrio entre vida pessoal e trabalho. Minha abordagem integra técnicas de coaching e psicologia positiva para ajudar você a identificar seus talentos e alcançar seu potencial máximo.",
-              session_price: 160,
-              rating: 4.9,
-              specialty: "Psicóloga",
-              location: "Atendimento online",
-              experience: 6,
-              appointments_count: 98,
-              reviews_count: 15
             }
           ];
           
-          especialistasData = [...especialistasData, ...ficticios];
+          finalData = [...finalData, ...ficticios.slice(0, 3 - finalData.length)];
         }
 
-        setEspecialistas(especialistasData);
+        setEspecialistas(finalData);
         
-        // Após carregar os especialistas, vamos buscar a disponibilidade para cada um
-        await fetchAvailabilityForAll(especialistasData);
+        // Após carregar os especialistas, buscar disponibilidade
+        await fetchAvailabilityForAll(finalData);
       } catch (error) {
-        console.error("Erro ao buscar especialistas:", error);
+        console.error("❌ Erro ao buscar especialistas:", error);
+        // Em caso de erro, usar dados fictícios
+        setEspecialistas([
+          {
+            id: "demo-1",
+            full_name: "Dr. João Silva",
+            avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+            description: "Especialista em desenvolvimento pessoal com mais de 10 anos de experiência.",
+            session_price: 150,
+            rating: 4.8,
+            specialty: "Terapeuta",
+            location: "Atendimento online",
+            experience: 10,
+            appointments_count: 200,
+            reviews_count: 35
+          }
+        ]);
       } finally {
         setLoading(false);
       }
@@ -300,7 +307,7 @@ const EspecialistasPage = () => {
                         <div className="mt-4 flex flex-wrap gap-2">
                           <Badge variant="secondary" className="rounded-full">Ansiedade</Badge>
                           <Badge variant="secondary" className="rounded-full">Autoestima</Badge>
-                          <Badge variant="secondary" className="rounded-full">Avaliação de Perfil Profissional</Badge>
+                          <Badge variant="secondary" className="rounded-full">Relacionamentos</Badge>
                         </div>
                         
                         <p className="mt-4 text-gray-700 line-clamp-4">
