@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BlogController } from "@/controllers/BlogController";
@@ -7,6 +8,7 @@ import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
+// Interface para definir a estrutura completa de um post do blog
 interface BlogPost {
   id: string;
   title: string;
@@ -19,7 +21,12 @@ interface BlogPost {
   author_name?: string;
 }
 
-// Helper function to get image based on post index
+/**
+ * Função helper para gerar URLs de imagens baseadas no índice do post
+ * Mantém consistência visual com outras páginas do blog
+ * @param index - Índice do post
+ * @returns URL da imagem do Unsplash
+ */
 const getBlogImage = (index: number) => {
   const images = [
     "photo-1488590528505-98d2b5aba04b",
@@ -31,6 +38,10 @@ const getBlogImage = (index: number) => {
   return `https://images.unsplash.com/${images[index % images.length]}?auto=format&fit=crop&w=800&h=400&q=80`;
 };
 
+/**
+ * Página principal do blog que lista todos os posts
+ * Exibe um post em destaque no topo e uma grade com todos os posts
+ */
 const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
@@ -38,19 +49,31 @@ const Blog = () => {
   const [isFeaturedLoading, setIsFeaturedLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Busca todos os posts publicados usando o BlogController
+     * Responsável pela lista principal de posts
+     */
     const fetchPosts = async () => {
       try {
+        console.log("🔍 Blog.fetchPosts - Iniciando busca de posts");
         const postsData = await BlogController.getPublishedPosts();
+        console.log("✅ Blog.fetchPosts - Posts carregados:", postsData.length);
         setPosts(postsData);
       } catch (error) {
-        console.error("Erro ao buscar posts do blog:", error);
+        console.error("❌ Blog.fetchPosts - Erro ao buscar posts:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
+    /**
+     * Busca posts para a seção em destaque
+     * Usa query direta para evitar duplicação com o BlogController
+     */
     const fetchFeaturedPosts = async () => {
       try {
+        console.log("🔍 Blog.fetchFeaturedPosts - Iniciando busca de posts em destaque");
+        
         const { data, error } = await supabase
           .from('blog_posts')
           .select('id, title, slug, excerpt, created_at, content, author_id, updated_at')
@@ -59,22 +82,25 @@ const Blog = () => {
           .limit(5);
 
         if (error) {
+          console.error("❌ Blog.fetchFeaturedPosts - Erro na query:", error);
           throw error;
         }
 
+        console.log("✅ Blog.fetchFeaturedPosts - Posts em destaque carregados:", data?.length || 0);
         setFeaturedPosts(data || []);
       } catch (error) {
-        console.error("Erro ao buscar posts em destaque:", error);
+        console.error("❌ Blog.fetchFeaturedPosts - Erro geral:", error);
       } finally {
         setIsFeaturedLoading(false);
       }
     };
 
+    // Executa ambas as buscas em paralelo
     fetchPosts();
     fetchFeaturedPosts();
   }, []);
 
-  // Extract featured posts
+  // Extrai o primeiro post para destaque
   const featuredPost = featuredPosts.length > 0 ? featuredPosts[0] : null;
 
   return (
@@ -82,6 +108,7 @@ const Blog = () => {
       <Navigation />
       
       <div className="pt-16 pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Cabeçalho da página */}
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Todos os Artigos</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -89,45 +116,42 @@ const Blog = () => {
           </p>
         </div>
 
-        {/* Featured Posts Section - Only featuring the main article, no carousel */}
-        {!isFeaturedLoading && featuredPosts.length > 0 && (
+        {/* Seção de post em destaque */}
+        {!isFeaturedLoading && featuredPosts.length > 0 && featuredPost && (
           <div className="mb-16">
-            {/* Large featured article */}
-            {featuredPost && (
-              <div className="mb-12">
-                <Link to={`/blog/${featuredPost.slug}`}>
-                  <Card className="overflow-hidden border-0 shadow-lg bg-white transition-all hover:shadow-xl">
-                    <div className="md:flex">
-                      <div className="md:w-1/2 lg:w-3/5">
-                        <div className="aspect-[16/9] h-full">
-                          <img 
-                            src={getBlogImage(0)} 
-                            alt={featuredPost.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
-                      <div className="md:w-1/2 lg:w-2/5 p-6 md:p-8 flex flex-col justify-center">
-                        <CardTitle className="text-2xl md:text-3xl mb-4">{featuredPost.title}</CardTitle>
-                        <p className="text-sm text-gray-500 mb-4">
-                          {format(new Date(featuredPost.created_at), 'dd/MM/yyyy')}
-                        </p>
-                        <p className="text-gray-700 mb-6 line-clamp-4">{featuredPost.excerpt}</p>
-                        <div className="mt-auto">
-                          <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
-                            Leia o artigo completo
-                          </span>
-                        </div>
+            <div className="mb-12">
+              <Link to={`/blog/${featuredPost.slug}`}>
+                <Card className="overflow-hidden border-0 shadow-lg bg-white transition-all hover:shadow-xl">
+                  <div className="md:flex">
+                    <div className="md:w-1/2 lg:w-3/5">
+                      <div className="aspect-[16/9] h-full">
+                        <img 
+                          src={getBlogImage(0)} 
+                          alt={featuredPost.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     </div>
-                  </Card>
-                </Link>
-              </div>
-            )}
+                    <div className="md:w-1/2 lg:w-2/5 p-6 md:p-8 flex flex-col justify-center">
+                      <CardTitle className="text-2xl md:text-3xl mb-4">{featuredPost.title}</CardTitle>
+                      <p className="text-sm text-gray-500 mb-4">
+                        {format(new Date(featuredPost.created_at), 'dd/MM/yyyy')}
+                      </p>
+                      <p className="text-gray-700 mb-6 line-clamp-4">{featuredPost.excerpt}</p>
+                      <div className="mt-auto">
+                        <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                          Leia o artigo completo
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </div>
           </div>
         )}
 
-        {/* All Blog Posts Section */}
+        {/* Seção de todos os posts */}
         {isLoading ? (
           <div className="flex justify-center items-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
