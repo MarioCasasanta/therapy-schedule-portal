@@ -61,6 +61,15 @@ const BlogPost = () => {
           throw new Error("Slug inválido");
         }
 
+        // Verificar estado da autenticação
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log("🔑 BlogPost.fetchPost - Estado da sessão:", { 
+          hasSession: !!session, 
+          userId: session?.user?.id,
+          sessionError 
+        });
+
+        console.log("📊 BlogPost.fetchPost - Executando query...");
         const { data, error } = await supabase
           .from('blog_posts')
           .select('*')
@@ -70,6 +79,12 @@ const BlogPost = () => {
 
         if (error) {
           console.error("❌ BlogPost.fetchPost - Erro na query:", error);
+          console.error("❌ BlogPost.fetchPost - Detalhes do erro:", {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+          });
           throw error;
         }
 
@@ -79,6 +94,7 @@ const BlogPost = () => {
         }
 
         console.log("✅ BlogPost.fetchPost - Post encontrado:", data.title);
+        console.log("📋 BlogPost.fetchPost - Dados do post:", data);
         setPost(data);
       } catch (error: any) {
         console.error("❌ BlogPost.fetchPost - Erro geral:", error);
@@ -144,10 +160,8 @@ const BlogPost = () => {
           <ArrowLeft className="h-4 w-4 mr-2" /> Voltar para o Blog
         </Button>
         
-        {/* Artigo completo */}
         <article>
           <header className="mb-8">
-            {/* Imagem do post */}
             <div className="rounded-lg overflow-hidden mb-6">
               <img 
                 src={getBlogDetailImage(slug || '')} 
@@ -155,7 +169,6 @@ const BlogPost = () => {
                 className="w-full h-auto object-cover"
               />
             </div>
-            {/* Título e metadados */}
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
             <div className="text-gray-600">
               <time dateTime={post.created_at}>
@@ -164,7 +177,6 @@ const BlogPost = () => {
             </div>
           </header>
           
-          {/* Conteúdo do post */}
           <div className="prose prose-lg max-w-none text-gray-700">
             {renderContent(post.content)}
           </div>

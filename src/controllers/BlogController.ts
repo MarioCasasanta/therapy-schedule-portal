@@ -15,6 +15,14 @@ export class BlogController {
     try {
       console.log("🔍 BlogController.getAllPosts - Iniciando busca de posts", { includeUnpublished });
       
+      // Verificar sessão atual
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log("🔑 BlogController.getAllPosts - Sessão atual:", { 
+        hasSession: !!session, 
+        userId: session?.user?.id,
+        error: sessionError 
+      });
+      
       let query = supabase
         .from("blog_posts")
         .select("*")
@@ -25,14 +33,22 @@ export class BlogController {
         query = query.eq("published", true);
       }
 
+      console.log("📊 BlogController.getAllPosts - Executando query...");
       const { data, error } = await query;
 
       if (error) {
         console.error("❌ BlogController.getAllPosts - Erro na query:", error);
+        console.error("❌ BlogController.getAllPosts - Detalhes do erro:", {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
         throw error;
       }
 
       console.log("✅ BlogController.getAllPosts - Posts encontrados:", data?.length || 0);
+      console.log("📋 BlogController.getAllPosts - Dados retornados:", data);
       return data || [];
     } catch (error) {
       console.error("❌ BlogController.getAllPosts - Erro geral:", error);
@@ -58,6 +74,10 @@ export class BlogController {
     try {
       console.log("🔍 BlogController.getPostById - Buscando post por ID:", id);
       
+      // Verificar sessão atual
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("🔑 BlogController.getPostById - Sessão:", { hasSession: !!session });
+      
       const { data, error } = await supabase
         .from("blog_posts")
         .select("*")
@@ -66,6 +86,10 @@ export class BlogController {
 
       if (error) {
         console.error("❌ BlogController.getPostById - Erro na query:", error);
+        console.error("❌ BlogController.getPostById - Detalhes:", {
+          message: error.message,
+          code: error.code
+        });
         return null;
       }
 
@@ -86,6 +110,10 @@ export class BlogController {
     try {
       console.log("🔍 BlogController.getPostBySlug - Buscando post por slug:", slug);
       
+      // Verificar sessão atual
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("🔑 BlogController.getPostBySlug - Sessão:", { hasSession: !!session });
+      
       const { data, error } = await supabase
         .from("blog_posts")
         .select("*")
@@ -94,6 +122,10 @@ export class BlogController {
 
       if (error) {
         console.error("❌ BlogController.getPostBySlug - Erro na query:", error);
+        console.error("❌ BlogController.getPostBySlug - Detalhes:", {
+          message: error.message,
+          code: error.code
+        });
         return null;
       }
 

@@ -34,6 +34,37 @@ const getBlogImage = (index: number) => {
 };
 
 /**
+ * Função para gerar posts fictícios como fallback
+ * Usada quando não há posts no banco ou em caso de erro
+ * @returns Array de posts fictícios
+ */
+const getFallbackPosts = (): BlogPost[] => {
+  return [
+    {
+      id: "demo-1",
+      title: "Como Superar a Ansiedade no Dia a Dia",
+      slug: "como-superar-ansiedade",
+      excerpt: "Descubra técnicas práticas para lidar com a ansiedade e viver com mais tranquilidade.",
+      created_at: new Date().toISOString()
+    },
+    {
+      id: "demo-2", 
+      title: "5 Passos para Construir Relacionamentos Saudáveis",
+      slug: "relacionamentos-saudaveis",
+      excerpt: "Aprenda a desenvolver vínculos mais profundos e significativos com as pessoas ao seu redor.",
+      created_at: new Date(Date.now() - 86400000).toISOString()
+    },
+    {
+      id: "demo-3",
+      title: "Mindfulness: Uma Jornada de Autoconhecimento",
+      slug: "mindfulness-autoconhecimento",
+      excerpt: "Explore como a prática de mindfulness pode transformar sua relação consigo mesmo.",
+      created_at: new Date(Date.now() - 172800000).toISOString()
+    }
+  ];
+};
+
+/**
  * Componente que exibe um carrossel de posts em destaque do blog
  * Busca posts do banco de dados ou usa dados fictícios como fallback
  * Exibe o primeiro post em destaque maior e os demais em carrossel
@@ -51,7 +82,16 @@ const FeaturedBlogCarousel = () => {
       try {
         console.log("🔍 FeaturedBlogCarousel - Iniciando busca de posts em destaque");
         
+        // Verificar estado da autenticação
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log("🔑 FeaturedBlogCarousel - Estado da sessão:", { 
+          hasSession: !!session, 
+          userId: session?.user?.id,
+          sessionError 
+        });
+        
         // Query direta sem usar o BlogController para evitar dependências circulares
+        console.log("📊 FeaturedBlogCarousel - Executando query no banco...");
         const { data, error } = await supabase
           .from('blog_posts')
           .select('id, title, slug, excerpt, created_at')
@@ -61,21 +101,31 @@ const FeaturedBlogCarousel = () => {
 
         if (error) {
           console.error("❌ FeaturedBlogCarousel - Erro na busca:", error);
+          console.error("❌ FeaturedBlogCarousel - Detalhes do erro:", {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+          });
           // Em caso de erro, usar posts fictícios
+          console.log("🔄 FeaturedBlogCarousel - Usando fallback devido ao erro");
           setPosts(getFallbackPosts());
         } else {
           console.log("✅ FeaturedBlogCarousel - Posts encontrados:", data?.length || 0);
+          console.log("📋 FeaturedBlogCarousel - Dados retornados:", data);
           
           // Se não há posts no banco, usar dados fictícios
           if (!data || data.length === 0) {
             console.log("📝 FeaturedBlogCarousel - Usando posts fictícios (banco vazio)");
             setPosts(getFallbackPosts());
           } else {
+            console.log("✅ FeaturedBlogCarousel - Usando posts do banco de dados");
             setPosts(data);
           }
         }
       } catch (error) {
         console.error("❌ FeaturedBlogCarousel - Erro geral:", error);
+        console.log("🔄 FeaturedBlogCarousel - Usando fallback devido ao erro geral");
         // Fallback para dados fictícios
         setPosts(getFallbackPosts());
       } finally {
@@ -85,37 +135,6 @@ const FeaturedBlogCarousel = () => {
 
     fetchFeaturedPosts();
   }, []);
-
-  /**
-   * Função para gerar posts fictícios como fallback
-   * Usada quando não há posts no banco ou em caso de erro
-   * @returns Array de posts fictícios
-   */
-  const getFallbackPosts = (): BlogPost[] => {
-    return [
-      {
-        id: "demo-1",
-        title: "Como Superar a Ansiedade no Dia a Dia",
-        slug: "como-superar-ansiedade",
-        excerpt: "Descubra técnicas práticas para lidar com a ansiedade e viver com mais tranquilidade.",
-        created_at: new Date().toISOString()
-      },
-      {
-        id: "demo-2", 
-        title: "5 Passos para Construir Relacionamentos Saudáveis",
-        slug: "relacionamentos-saudaveis",
-        excerpt: "Aprenda a desenvolver vínculos mais profundos e significativos com as pessoas ao seu redor.",
-        created_at: new Date(Date.now() - 86400000).toISOString()
-      },
-      {
-        id: "demo-3",
-        title: "Mindfulness: Uma Jornada de Autoconhecimento",
-        slug: "mindfulness-autoconhecimento",
-        excerpt: "Explore como a prática de mindfulness pode transformar sua relação consigo mesmo.",
-        created_at: new Date(Date.now() - 172800000).toISOString()
-      }
-    ];
-  };
 
   // Estado de carregamento
   if (isLoading) {

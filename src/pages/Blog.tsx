@@ -56,8 +56,18 @@ const Blog = () => {
     const fetchPosts = async () => {
       try {
         console.log("🔍 Blog.fetchPosts - Iniciando busca de posts");
+        
+        // Verificar estado da autenticação antes da busca
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log("🔑 Blog.fetchPosts - Estado da sessão:", { 
+          hasSession: !!session, 
+          userId: session?.user?.id,
+          sessionError 
+        });
+        
         const postsData = await BlogController.getPublishedPosts();
         console.log("✅ Blog.fetchPosts - Posts carregados:", postsData.length);
+        console.log("📋 Blog.fetchPosts - Dados dos posts:", postsData);
         setPosts(postsData);
       } catch (error) {
         console.error("❌ Blog.fetchPosts - Erro ao buscar posts:", error);
@@ -74,6 +84,15 @@ const Blog = () => {
       try {
         console.log("🔍 Blog.fetchFeaturedPosts - Iniciando busca de posts em destaque");
         
+        // Verificar estado da autenticação
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log("🔑 Blog.fetchFeaturedPosts - Estado da sessão:", { 
+          hasSession: !!session, 
+          userId: session?.user?.id,
+          sessionError 
+        });
+        
+        console.log("📊 Blog.fetchFeaturedPosts - Executando query...");
         const { data, error } = await supabase
           .from('blog_posts')
           .select('id, title, slug, excerpt, created_at, content, author_id, updated_at')
@@ -83,10 +102,17 @@ const Blog = () => {
 
         if (error) {
           console.error("❌ Blog.fetchFeaturedPosts - Erro na query:", error);
+          console.error("❌ Blog.fetchFeaturedPosts - Detalhes do erro:", {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+          });
           throw error;
         }
 
         console.log("✅ Blog.fetchFeaturedPosts - Posts em destaque carregados:", data?.length || 0);
+        console.log("📋 Blog.fetchFeaturedPosts - Dados retornados:", data);
         setFeaturedPosts(data || []);
       } catch (error) {
         console.error("❌ Blog.fetchFeaturedPosts - Erro geral:", error);
