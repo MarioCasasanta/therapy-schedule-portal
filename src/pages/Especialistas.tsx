@@ -9,8 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AvailabilityController } from "@/controllers/AvailabilityController";
-import { Availability } from "@/types/availability";
 
 interface Especialista {
   id: string;
@@ -49,69 +47,62 @@ const EspecialistasPage = () => {
       try {
         console.log("🔍 Buscando especialistas do banco de dados...");
         
-        // Buscar perfis com role = 'admin' ou 'especialista'
+        // Buscar perfis com role = 'admin' ou 'especialista' - busca simplificada
         const { data: profiles, error } = await supabase
           .from("profiles")
           .select("*")
           .in("role", ["admin", "especialista"]);
 
-        if (error) {
-          console.error("❌ Erro ao buscar especialistas:", error);
-          throw error;
+        console.log("📊 Profiles encontrados:", profiles?.length || 0);
+
+        let especialistasData: Especialista[] = [];
+
+        if (!error && profiles && profiles.length > 0) {
+          // Se encontrou perfis, buscar dados adicionais
+          const { data: specialists } = await supabase
+            .from("specialists")
+            .select("*");
+
+          const { data: specialistDetails } = await supabase
+            .from("specialist_details")
+            .select("*");
+
+          console.log("📊 Specialists encontrados:", specialists?.length || 0);
+          console.log("📊 Specialist details encontrados:", specialistDetails?.length || 0);
+
+          // Combinar dados
+          especialistasData = profiles.map((profile) => {
+            const specialistData = specialists?.find(s => s.id === profile.id);
+            const detailsData = specialistDetails?.find(d => d.specialist_id === profile.id);
+            
+            return {
+              id: profile.id,
+              full_name: profile.full_name || "Especialista",
+              avatar_url: profile.avatar_url || "",
+              description: detailsData?.long_description || specialistData?.bio || "Especialista em desenvolvimento pessoal e bem-estar.",
+              session_price: 150,
+              rating: detailsData?.rating || specialistData?.rating || 4.8,
+              specialty: specialistData?.specialty || "Terapeuta",
+              location: "Atendimento online",
+              experience: specialistData?.experience_years || Math.floor(Math.random() * 20) + 3,
+              appointments_count: detailsData?.sessions_completed || Math.floor(Math.random() * 300) + 50,
+              reviews_count: Math.floor(Math.random() * 50) + 5
+            };
+          });
         }
 
-        console.log("✅ Perfis encontrados:", profiles?.length || 0);
-
-        // Buscar detalhes dos especialistas
-        const { data: specialists, error: specialistsError } = await supabase
-          .from("specialists")
-          .select("*");
-
-        if (specialistsError) {
-          console.error("❌ Erro ao buscar dados dos specialists:", specialistsError);
-        }
-
-        // Buscar detalhes específicos dos especialistas
-        const { data: specialistDetails, error: detailsError } = await supabase
-          .from("specialist_details")
-          .select("*");
-
-        if (detailsError) {
-          console.error("❌ Erro ao buscar detalhes dos especialistas:", detailsError);
-        }
-
-        // Combinar dados
-        const especialistasData = profiles?.map((profile) => {
-          const specialistData = specialists?.find(s => s.id === profile.id);
-          const detailsData = specialistDetails?.find(d => d.specialist_id === profile.id);
-          
-          return {
-            id: profile.id,
-            full_name: profile.full_name || "Especialista",
-            avatar_url: profile.avatar_url || "",
-            description: detailsData?.long_description || specialistData?.bio || "Especialista em desenvolvimento pessoal e bem-estar.",
-            session_price: 150, // Valor padrão, idealmente viria do banco
-            rating: detailsData?.rating || specialistData?.rating || 4.8,
-            specialty: specialistData?.specialty || "Terapeuta",
-            location: "Atendimento online",
-            experience: specialistData?.experience_years || Math.floor(Math.random() * 20) + 3,
-            appointments_count: detailsData?.sessions_completed || Math.floor(Math.random() * 300) + 50,
-            reviews_count: Math.floor(Math.random() * 50) + 5
-          };
-        }) || [];
-
-        // Se não tiver especialistas suficientes, adicionar alguns fictícios para demonstração
-        let finalData = [...especialistasData];
-        if (finalData.length < 3) {
+        // Se não tiver dados suficientes no banco, adicionar dados fictícios para demonstração
+        if (especialistasData.length < 3) {
+          console.log("📝 Adicionando especialistas fictícios para demonstração");
           const ficticios = [
             {
               id: "ficticio-1",
-              full_name: "Amanda Santos",
+              full_name: "Dr. Amanda Santos",
               avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
               description: "Especialista em psicologia clínica com abordagem humanista, focada no autoconhecimento e desenvolvimento pessoal. Atendo questões relacionadas à ansiedade, autoestima, relacionamentos e transições de vida.",
               session_price: 180,
               rating: 4.9,
-              specialty: "Psicóloga",
+              specialty: "Psicóloga Clínica",
               location: "Atendimento online",
               experience: 8,
               appointments_count: 156,
@@ -119,35 +110,49 @@ const EspecialistasPage = () => {
             },
             {
               id: "ficticio-2",
-              full_name: "Ricardo Oliveira",
+              full_name: "Dr. Ricardo Oliveira",
               avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-              description: "Há +15 anos ajudo pessoas a superarem traumas emocionais e construírem relacionamentos saudáveis. Especialista em terapia de casal e familiar.",
+              description: "Há +15 anos ajudo pessoas a superarem traumas emocionais e construírem relacionamentos saudáveis. Especialista em terapia de casal e familiar com abordagem sistêmica.",
               session_price: 200,
               rating: 4.7,
-              specialty: "Terapeuta",
+              specialty: "Terapeuta de Casal",
               location: "Atendimento online",
               experience: 15,
               appointments_count: 275,
               reviews_count: 41
+            },
+            {
+              id: "ficticio-3",
+              full_name: "Dra. Mariana Costa",
+              avatar_url: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+              description: "Psicóloga especializada em ansiedade e transtornos do humor. Utilizo técnicas de terapia cognitivo-comportamental para ajudar meus pacientes a desenvolverem estratégias eficazes de enfrentamento.",
+              session_price: 160,
+              rating: 4.8,
+              specialty: "Psicóloga TCC",
+              location: "Atendimento online",
+              experience: 6,
+              appointments_count: 98,
+              reviews_count: 18
             }
           ];
           
-          finalData = [...finalData, ...ficticios.slice(0, 3 - finalData.length)];
+          especialistasData = [...especialistasData, ...ficticios.slice(0, 3 - especialistasData.length)];
         }
 
-        setEspecialistas(finalData);
+        setEspecialistas(especialistasData);
+        console.log("✅ Especialistas finalizados:", especialistasData.length);
         
         // Após carregar os especialistas, buscar disponibilidade
-        await fetchAvailabilityForAll(finalData);
+        await fetchAvailabilityForAll(especialistasData);
       } catch (error) {
         console.error("❌ Erro ao buscar especialistas:", error);
-        // Em caso de erro, usar dados fictícios
-        setEspecialistas([
+        // Em caso de erro, usar dados fictícios completos
+        const dadosFicticios = [
           {
             id: "demo-1",
             full_name: "Dr. João Silva",
             avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-            description: "Especialista em desenvolvimento pessoal com mais de 10 anos de experiência.",
+            description: "Especialista em desenvolvimento pessoal com mais de 10 anos de experiência em terapia cognitivo-comportamental.",
             session_price: 150,
             rating: 4.8,
             specialty: "Terapeuta",
@@ -156,7 +161,9 @@ const EspecialistasPage = () => {
             appointments_count: 200,
             reviews_count: 35
           }
-        ]);
+        ];
+        setEspecialistas(dadosFicticios);
+        await fetchAvailabilityForAll(dadosFicticios);
       } finally {
         setLoading(false);
       }

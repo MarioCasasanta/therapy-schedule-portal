@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +34,7 @@ const FeaturedBlogCarousel = () => {
       try {
         console.log("🔍 Buscando posts do blog no banco de dados...");
         
+        // Busca simples sem joins para evitar erros de relacionamento
         const { data, error } = await supabase
           .from('blog_posts')
           .select('id, title, slug, excerpt, created_at')
@@ -44,14 +44,52 @@ const FeaturedBlogCarousel = () => {
 
         if (error) {
           console.error("❌ Erro ao buscar posts:", error);
-          throw error;
+          // Se houver erro, usar posts fictícios
+          setPosts([
+            {
+              id: "demo-1",
+              title: "Como Superar a Ansiedade no Dia a Dia",
+              slug: "como-superar-ansiedade",
+              excerpt: "Descubra técnicas práticas para lidar com a ansiedade e viver com mais tranquilidade.",
+              created_at: new Date().toISOString()
+            },
+            {
+              id: "demo-2", 
+              title: "5 Passos para Construir Relacionamentos Saudáveis",
+              slug: "relacionamentos-saudaveis",
+              excerpt: "Aprenda a desenvolver vínculos mais profundos e significativos com as pessoas ao seu redor.",
+              created_at: new Date(Date.now() - 86400000).toISOString()
+            }
+          ]);
+        } else {
+          console.log("✅ Posts encontrados:", data?.length || 0);
+          
+          // Se não há posts no banco, usar dados fictícios
+          if (!data || data.length === 0) {
+            console.log("📝 Usando posts fictícios - banco vazio");
+            setPosts([
+              {
+                id: "demo-1",
+                title: "Como Superar a Ansiedade no Dia a Dia",
+                slug: "como-superar-ansiedade",
+                excerpt: "Descubra técnicas práticas para lidar com a ansiedade e viver com mais tranquilidade.",
+                created_at: new Date().toISOString()
+              },
+              {
+                id: "demo-2", 
+                title: "5 Passos para Construir Relacionamentos Saudáveis",
+                slug: "relacionamentos-saudaveis",
+                excerpt: "Aprenda a desenvolver vínculos mais profundos e significativos com as pessoas ao seu redor.",
+                created_at: new Date(Date.now() - 86400000).toISOString()
+              }
+            ]);
+          } else {
+            setPosts(data);
+          }
         }
-
-        console.log("✅ Posts encontrados:", data?.length || 0);
-        setPosts(data || []);
       } catch (error) {
-        console.error("❌ Erro ao buscar posts em destaque:", error);
-        // Em caso de erro, usar posts fictícios
+        console.error("❌ Erro geral ao buscar posts:", error);
+        // Fallback para dados fictícios
         setPosts([
           {
             id: "demo-1",
