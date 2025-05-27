@@ -1,5 +1,5 @@
 
-import { Download, FileText, Code } from "lucide-react";
+import { Download, FileText, Code, Map } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -34,6 +34,16 @@ const DownloadSection = () => {
     }
   };
 
+  const downloadPlanejamentoExecutivo = async () => {
+    try {
+      const response = await fetch('/docs/planejamento-executivo.md');
+      const content = await response.text();
+      handleDownload('planejamento-executivo.md', content);
+    } catch (error) {
+      console.error('Erro ao baixar planejamento executivo:', error);
+    }
+  };
+
   return (
     <div className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -46,7 +56,7 @@ const DownloadSection = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -81,6 +91,25 @@ const DownloadSection = () => {
               <Button onClick={downloadTechnicalDoc} className="w-full">
                 <Download className="h-4 w-4 mr-2" />
                 Baixar Documentação Técnica
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Map className="h-5 w-5 text-sage-600" />
+                Planejamento Executivo
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                Estratégia de desenvolvimento em 4 fases, mapeamento de telas, 
+                componentes e cronograma de execução completo.
+              </p>
+              <Button onClick={downloadPlanejamentoExecutivo} className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Baixar Planejamento
               </Button>
             </CardContent>
           </Card>
