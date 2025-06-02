@@ -20,6 +20,7 @@ export class BlogController {
       console.log("🔑 BlogController.getAllPosts - Sessão atual:", { 
         hasSession: !!session, 
         userId: session?.user?.id,
+        userEmail: session?.user?.email,
         error: sessionError 
       });
       
@@ -31,6 +32,9 @@ export class BlogController {
       // Se não incluir não publicados, filtra apenas os publicados
       if (!includeUnpublished) {
         query = query.eq("published", true);
+        console.log("📊 BlogController.getAllPosts - Filtrando apenas posts publicados");
+      } else {
+        console.log("📊 BlogController.getAllPosts - Incluindo posts não publicados (admin)");
       }
 
       console.log("📊 BlogController.getAllPosts - Executando query...");

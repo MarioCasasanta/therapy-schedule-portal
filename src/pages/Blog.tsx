@@ -62,9 +62,26 @@ const Blog = () => {
         console.log("🔑 Blog.fetchPosts - Estado da sessão:", { 
           hasSession: !!session, 
           userId: session?.user?.id,
+          userEmail: session?.user?.email,
           sessionError 
         });
+
+        // Buscar perfil do usuário se logado
+        if (session?.user) {
+          console.log("👤 Blog.fetchPosts - Buscando perfil do usuário...");
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single();
+          
+          console.log("👤 Blog.fetchPosts - Perfil encontrado:", { 
+            profile, 
+            error: profileError 
+          });
+        }
         
+        console.log("📊 Blog.fetchPosts - Chamando BlogController.getPublishedPosts()");
         const postsData = await BlogController.getPublishedPosts();
         console.log("✅ Blog.fetchPosts - Posts carregados:", postsData.length);
         console.log("📋 Blog.fetchPosts - Dados dos posts:", postsData);
@@ -89,10 +106,11 @@ const Blog = () => {
         console.log("🔑 Blog.fetchFeaturedPosts - Estado da sessão:", { 
           hasSession: !!session, 
           userId: session?.user?.id,
+          userEmail: session?.user?.email,
           sessionError 
         });
         
-        console.log("📊 Blog.fetchFeaturedPosts - Executando query...");
+        console.log("📊 Blog.fetchFeaturedPosts - Executando query direta...");
         const { data, error } = await supabase
           .from('blog_posts')
           .select('id, title, slug, excerpt, created_at, content, author_id, updated_at')
